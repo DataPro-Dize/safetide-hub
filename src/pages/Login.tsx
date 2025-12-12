@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Logo } from '@/components/Logo';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
@@ -65,7 +66,8 @@ export default function Login() {
     <div className="min-h-screen flex">
       {/* Left side - Login Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
-        <div className="absolute top-4 right-4 lg:hidden">
+        <div className="absolute top-4 right-4 lg:hidden flex gap-2">
+          <ThemeToggle />
           <LanguageToggle variant="compact" />
         </div>
         
@@ -168,7 +170,8 @@ export default function Login() {
         </div>
         
         {/* Language toggle for desktop */}
-        <div className="absolute top-6 right-6">
+        <div className="absolute top-6 right-6 flex gap-2">
+          <ThemeToggle />
           <LanguageToggle variant="compact" className="border-primary-foreground/30 text-primary-foreground" />
         </div>
 
