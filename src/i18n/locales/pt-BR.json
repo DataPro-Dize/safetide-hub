@@ -1,0 +1,87 @@
+{
+  "common": {
+    "welcome": "Bem-Vindo!",
+    "login": "Entrar",
+    "logout": "Sair",
+    "register": "Cadastrar",
+    "email": "E-mail",
+    "password": "Senha",
+    "rememberMe": "Lembrar meu acesso",
+    "forgotPassword": "Esqueci minha senha",
+    "language": "Em qual idioma deseja continuar?",
+    "portuguese": "Português",
+    "english": "Inglês",
+    "loading": "Carregando...",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "actions": "Ações",
+    "status": "Status",
+    "name": "Nome",
+    "description": "Descrição"
+  },
+  "auth": {
+    "subtitle": "Ao DataPró, sua plataforma de automação de dados e inteligência em segurança do trabalho.",
+    "emailPlaceholder": "E-mail",
+    "passwordPlaceholder": "Senha",
+    "invalidCredentials": "Credenciais inválidas",
+    "loginSuccess": "Login realizado com sucesso!",
+    "logoutSuccess": "Logout realizado com sucesso!",
+    "registerSuccess": "Cadastro realizado com sucesso!",
+    "createAccount": "Criar conta",
+    "alreadyHaveAccount": "Já possui uma conta?",
+    "dontHaveAccount": "Não possui uma conta?"
+  },
+  "dashboard": {
+    "title": "Painel de Controle",
+    "deviations": "Desvios",
+    "workflows": "Fluxos de Trabalho",
+    "companies": "Empresas",
+    "plants": "Áreas",
+    "users": "Usuários"
+  },
+  "deviations": {
+    "title": "Desvios",
+    "new": "Novo Desvio",
+    "categories": {
+      "access_exit": "Acesso/Saída",
+      "chemical_products": "Produtos Químicos",
+      "electrical": "Elétrica",
+      "fire": "Incêndio",
+      "ergonomics": "Ergonomia",
+      "ppe": "EPI",
+      "machinery": "Maquinário",
+      "fall_protection": "Proteção contra Quedas",
+      "confined_space": "Espaço Confinado",
+      "other": "Outros"
+    },
+    "probability": "Probabilidade",
+    "severity": "Severidade",
+    "riskRating": "Classificação de Risco",
+    "status": {
+      "open": "Aberto",
+      "in_progress": "Em Andamento",
+      "done": "Concluído"
+    }
+  },
+  "workflows": {
+    "title": "Fluxos de Trabalho",
+    "new": "Novo Fluxo",
+    "status": {
+      "pending": "Pendente",
+      "approved": "Aprovado",
+      "rejected": "Rejeitado"
+    }
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "deviations": "Desvios",
+    "workflows": "Fluxos",
+    "settings": "Configurações",
+    "profile": "Perfil"
+  }
+}
