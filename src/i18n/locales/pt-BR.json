@@ -22,7 +22,12 @@
     "actions": "Ações",
     "status": "Status",
     "name": "Nome",
-    "description": "Descrição"
+    "description": "Descrição",
+    "title": "Título",
+    "date": "Data",
+    "all": "Todos",
+    "error": "Erro",
+    "fillRequired": "Preencha todos os campos obrigatórios"
   },
   "auth": {
     "subtitle": "Ao DataPró, sua plataforma de automação de dados e inteligência em segurança do trabalho.",
@@ -46,7 +51,27 @@
   },
   "deviations": {
     "title": "Desvios",
+    "pageTitle": "Gestão de Riscos e Ocorrências",
+    "pageDescription": "Gerencie desvios e não conformidades identificadas",
     "new": "Novo Desvio",
+    "newDescription": "Registre um novo desvio ou não conformidade",
+    "noData": "Nenhum desvio encontrado",
+    "createSuccess": "Desvio criado com sucesso!",
+    "details": "Detalhes",
+    "category": "Categoria",
+    "titlePlaceholder": "Digite o título do desvio",
+    "descriptionPlaceholder": "Descreva o desvio em detalhes",
+    "selectLocation": "Selecione a localização",
+    "corporateGroup": "Grupo Empresarial",
+    "selectGroup": "Selecione o grupo",
+    "company": "Empresa",
+    "selectCompany": "Selecione a empresa",
+    "plant": "Área/Planta",
+    "selectPlant": "Selecione a área",
+    "selectCategory": "Selecione a categoria",
+    "riskAssessment": "Avaliação de Risco",
+    "locationDetails": "Detalhes da Localização",
+    "locationPlaceholder": "Ex: Setor A, Andar 2",
     "categories": {
       "access_exit": "Acesso/Saída",
       "chemical_products": "Produtos Químicos",
@@ -62,6 +87,21 @@
     "probability": "Probabilidade",
     "severity": "Severidade",
     "riskRating": "Classificação de Risco",
+    "probabilityLevels": {
+      "low": "Baixa (1)",
+      "medium": "Média (2)",
+      "high": "Alta (3)"
+    },
+    "severityLevels": {
+      "low": "Baixa (1)",
+      "medium": "Média (2)",
+      "high": "Alta (3)"
+    },
+    "riskLevels": {
+      "low": "Baixo",
+      "medium": "Médio",
+      "high": "Alto"
+    },
     "status": {
       "open": "Aberto",
       "in_progress": "Em Andamento",
@@ -70,7 +110,10 @@
   },
   "workflows": {
     "title": "Fluxos de Trabalho",
-    "new": "Novo Fluxo",
+    "new": "Nova Ação",
+    "noData": "Nenhuma ação cadastrada",
+    "createSuccess": "Ação criada com sucesso!",
+    "selectResponsible": "Selecione o responsável",
     "status": {
       "pending": "Pendente",
       "approved": "Aprovado",
@@ -79,9 +122,14 @@
   },
   "nav": {
     "dashboard": "Painel",
+    "riskManagement": "Gestão de Riscos",
+    "safetyIndicators": "Indicadores de Segurança",
+    "trainings": "Treinamentos",
+    "audit": "Auditoria e Inspeções",
+    "usersSettings": "Clientes e Usuários",
+    "settings": "Configurações",
     "deviations": "Desvios",
     "workflows": "Fluxos",
-    "settings": "Configurações",
     "profile": "Perfil"
   }
 }

@@ -22,7 +22,12 @@
     "actions": "Actions",
     "status": "Status",
     "name": "Name",
-    "description": "Description"
+    "description": "Description",
+    "title": "Title",
+    "date": "Date",
+    "all": "All",
+    "error": "Error",
+    "fillRequired": "Please fill all required fields"
   },
   "auth": {
     "subtitle": "DataPró, your data automation and workplace safety intelligence platform.",
@@ -46,7 +51,27 @@
   },
   "deviations": {
     "title": "Deviations",
+    "pageTitle": "Risk & Occurrence Management",
+    "pageDescription": "Manage identified deviations and non-conformities",
     "new": "New Deviation",
+    "newDescription": "Register a new deviation or non-conformity",
+    "noData": "No deviations found",
+    "createSuccess": "Deviation created successfully!",
+    "details": "Details",
+    "category": "Category",
+    "titlePlaceholder": "Enter the deviation title",
+    "descriptionPlaceholder": "Describe the deviation in detail",
+    "selectLocation": "Select location",
+    "corporateGroup": "Corporate Group",
+    "selectGroup": "Select group",
+    "company": "Company",
+    "selectCompany": "Select company",
+    "plant": "Plant/Area",
+    "selectPlant": "Select plant",
+    "selectCategory": "Select category",
+    "riskAssessment": "Risk Assessment",
+    "locationDetails": "Location Details",
+    "locationPlaceholder": "E.g., Sector A, Floor 2",
     "categories": {
       "access_exit": "Access/Exit",
       "chemical_products": "Chemical Products",
@@ -62,6 +87,21 @@
     "probability": "Probability",
     "severity": "Severity",
     "riskRating": "Risk Rating",
+    "probabilityLevels": {
+      "low": "Low (1)",
+      "medium": "Medium (2)",
+      "high": "High (3)"
+    },
+    "severityLevels": {
+      "low": "Low (1)",
+      "medium": "Medium (2)",
+      "high": "High (3)"
+    },
+    "riskLevels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
     "status": {
       "open": "Open",
       "in_progress": "In Progress",
@@ -70,7 +110,10 @@
   },
   "workflows": {
     "title": "Workflows",
-    "new": "New Workflow",
+    "new": "New Action",
+    "noData": "No actions registered",
+    "createSuccess": "Action created successfully!",
+    "selectResponsible": "Select responsible",
     "status": {
       "pending": "Pending",
       "approved": "Approved",
@@ -79,9 +122,14 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "riskManagement": "Risk Management",
+    "safetyIndicators": "Safety Indicators",
+    "trainings": "Trainings",
+    "audit": "Audit & Inspections",
+    "usersSettings": "Clients & Users",
+    "settings": "Settings",
     "deviations": "Deviations",
     "workflows": "Workflows",
-    "settings": "Settings",
     "profile": "Profile"
   }
 }
