@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
   return (
     <header className="h-16 border-b border-border bg-background px-6 flex items-center justify-end gap-4">
+      <ThemeToggle />
       <LanguageToggle variant="compact" />
       
       <Button variant="ghost" size="icon" className="relative">
