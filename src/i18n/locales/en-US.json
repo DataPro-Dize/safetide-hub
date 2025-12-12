@@ -1,0 +1,87 @@
+{
+  "common": {
+    "welcome": "Welcome!",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password",
+    "language": "Select your language:",
+    "portuguese": "Portuguese",
+    "english": "English",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description"
+  },
+  "auth": {
+    "subtitle": "DataPró, your data automation and workplace safety intelligence platform.",
+    "emailPlaceholder": "Email",
+    "passwordPlaceholder": "Password",
+    "invalidCredentials": "Invalid credentials",
+    "loginSuccess": "Login successful!",
+    "logoutSuccess": "Logout successful!",
+    "registerSuccess": "Registration successful!",
+    "createAccount": "Create account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "deviations": "Deviations",
+    "workflows": "Workflows",
+    "companies": "Companies",
+    "plants": "Plants",
+    "users": "Users"
+  },
+  "deviations": {
+    "title": "Deviations",
+    "new": "New Deviation",
+    "categories": {
+      "access_exit": "Access/Exit",
+      "chemical_products": "Chemical Products",
+      "electrical": "Electrical",
+      "fire": "Fire",
+      "ergonomics": "Ergonomics",
+      "ppe": "PPE",
+      "machinery": "Machinery",
+      "fall_protection": "Fall Protection",
+      "confined_space": "Confined Space",
+      "other": "Other"
+    },
+    "probability": "Probability",
+    "severity": "Severity",
+    "riskRating": "Risk Rating",
+    "status": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "done": "Done"
+    }
+  },
+  "workflows": {
+    "title": "Workflows",
+    "new": "New Workflow",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "deviations": "Deviations",
+    "workflows": "Workflows",
+    "settings": "Settings",
+    "profile": "Profile"
+  }
+}
