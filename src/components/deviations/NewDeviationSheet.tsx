@@ -137,7 +137,6 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
       category: values.category as any,
       probability: values.probability,
       severity: values.severity,
-      risk_rating: riskRating,
       location_details: values.location_details || null,
       creator_id: user.id,
       status: 'open',
