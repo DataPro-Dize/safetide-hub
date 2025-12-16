@@ -323,34 +323,52 @@ export type Database = {
       }
       workflows: {
         Row: {
+          completed_at: string | null
           created_at: string
           description: string | null
           deviation_id: string
+          evidence_photos: string[] | null
           id: string
+          response_notes: string | null
           responsible_id: string
           status: Database["public"]["Enums"]["workflow_status"]
           title: string
           updated_at: string
+          validated_at: string | null
+          validator_id: string | null
+          validator_notes: string | null
         }
         Insert: {
+          completed_at?: string | null
           created_at?: string
           description?: string | null
           deviation_id: string
+          evidence_photos?: string[] | null
           id?: string
+          response_notes?: string | null
           responsible_id: string
           status?: Database["public"]["Enums"]["workflow_status"]
           title: string
           updated_at?: string
+          validated_at?: string | null
+          validator_id?: string | null
+          validator_notes?: string | null
         }
         Update: {
+          completed_at?: string | null
           created_at?: string
           description?: string | null
           deviation_id?: string
+          evidence_photos?: string[] | null
           id?: string
+          response_notes?: string | null
           responsible_id?: string
           status?: Database["public"]["Enums"]["workflow_status"]
           title?: string
           updated_at?: string
+          validated_at?: string | null
+          validator_id?: string | null
+          validator_notes?: string | null
         }
         Relationships: [
           {
@@ -398,7 +416,13 @@ export type Database = {
         | "other"
       deviation_status: "open" | "in_progress" | "done"
       user_role: "technician" | "supervisor" | "admin"
-      workflow_status: "pending" | "approved" | "rejected"
+      workflow_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "submitted_completed"
+        | "submitted_blocked"
+        | "returned"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -542,7 +566,14 @@ export const Constants = {
       ],
       deviation_status: ["open", "in_progress", "done"],
       user_role: ["technician", "supervisor", "admin"],
-      workflow_status: ["pending", "approved", "rejected"],
+      workflow_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "submitted_completed",
+        "submitted_blocked",
+        "returned",
+      ],
     },
   },
 } as const

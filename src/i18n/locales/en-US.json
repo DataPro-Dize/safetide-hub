@@ -72,6 +72,7 @@
     "riskAssessment": "Risk Assessment",
     "locationDetails": "Location Details",
     "locationPlaceholder": "E.g., Sector A, Floor 2",
+    "photos": "Photos",
     "categories": {
       "access_exit": "Access/Exit",
       "chemical_products": "Chemical Products",
@@ -114,11 +115,67 @@
     "noData": "No actions registered",
     "createSuccess": "Action created successfully!",
     "selectResponsible": "Select responsible",
+    "responsible": "Responsible",
+    "respond": "Respond",
+    "resubmit": "Resubmit",
+    "validate": "Validate",
+    "hasNotes": "Has notes",
+    "photos": "photos",
+    "returnedFeedback": "Return feedback",
+    "filters": {
+      "mine": "My Actions",
+      "toValidate": "To Validate"
+    },
     "status": {
       "pending": "Pending",
+      "submitted_completed": "Submitted - Completed",
+      "submitted_blocked": "Submitted - Blocked",
       "approved": "Approved",
+      "returned": "Returned",
       "rejected": "Rejected"
+    },
+    "response": {
+      "title": "Respond to Action",
+      "chooseAction": "How would you like to respond to this action?",
+      "markCompleted": "Mark as Completed",
+      "markBlocked": "Unable to Complete",
+      "markingCompleted": "Marking as completed",
+      "markingBlocked": "Reporting unable to complete",
+      "notes": "Notes",
+      "notesPlaceholder": "Describe what was done or the reason for inability...",
+      "notesRequired": "Notes are required when unable to complete",
+      "evidence": "Evidence Photos",
+      "submit": "Submit Response",
+      "success": "Response submitted successfully!"
+    },
+    "validation": {
+      "title": "Validate Action",
+      "submittedAt": "Submitted at",
+      "responseNotes": "Responsible's Notes",
+      "evidencePhotos": "Evidence Photos",
+      "validatorNotes": "Your Notes",
+      "validatorNotesPlaceholder": "Add notes if needed...",
+      "requiredForReturn": "required for return",
+      "notesRequired": "Notes are required to return",
+      "approve": "Approve",
+      "return": "Return",
+      "approved": "Action approved successfully!",
+      "returned": "Action returned for revision"
     }
+  },
+  "imageUpload": {
+    "dragOrClick": "Drag images or click to select",
+    "maxSize": "Maximum 5MB per image",
+    "images": "images",
+    "uploading": "Uploading...",
+    "limitReached": "Limit reached",
+    "maxImagesReached": "You can add up to {{max}} images",
+    "invalidType": "Invalid file type. Only images are allowed.",
+    "fileTooLarge": "File too large. Maximum 5MB."
+  },
+  "imageCarousel": {
+    "noImages": "No photos attached",
+    "fullView": "Full view"
   },
   "nav": {
     "dashboard": "Dashboard",

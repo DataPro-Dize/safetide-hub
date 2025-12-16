@@ -29,8 +29,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { RiskMatrix } from './RiskMatrix';
+import { ImageUpload } from '@/components/ui/ImageUpload';
 import type { Tables } from '@/integrations/supabase/types';
 
 type CorporateGroup = Tables<'corporate_groups'>;
@@ -61,13 +63,13 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
   const { t } = useTranslation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<string[]>([]);
   
   const [groups, setGroups] = useState<CorporateGroup[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [plants, setPlants] = useState<Plant[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [filteredPlants, setFilteredPlants] = useState<Plant[]>([]);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -140,6 +142,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
       location_details: values.location_details || null,
       creator_id: user.id,
       status: 'open',
+      photos: photos,
     });
 
     if (error) {
@@ -147,6 +150,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
     } else {
       toast({ title: t('deviations.createSuccess') });
       form.reset();
+      setPhotos([]);
       onOpenChange(false);
       onSuccess();
     }
@@ -387,6 +391,17 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
                 </FormItem>
               )}
             />
+
+            {/* Photo Upload */}
+            <div className="space-y-2">
+              <Label>{t('deviations.photos')}</Label>
+              <ImageUpload
+                bucket="deviation-photos"
+                maxImages={10}
+                images={photos}
+                onImagesChange={setPhotos}
+              />
+            </div>
 
             <div className="flex gap-3 pt-4">
               <Button
