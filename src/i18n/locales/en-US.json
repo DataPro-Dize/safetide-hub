@@ -188,5 +188,89 @@
     "deviations": "Deviations",
     "workflows": "Workflows",
     "profile": "Profile"
+  },
+  "admin": {
+    "accessDenied": "Access Denied",
+    "adminOnly": "This page is restricted to administrators.",
+    "clients": {
+      "title": "Clients",
+      "client": "Client",
+      "modules": "Modules",
+      "add": "Add Client",
+      "edit": "Edit Client",
+      "namePlaceholder": "Corporate group name",
+      "size": "Size",
+      "sizes": {
+        "small": "Small",
+        "medium": "Medium",
+        "large": "Large",
+        "enterprise": "Enterprise"
+      },
+      "registrationLink": "Registration Link",
+      "linkCopied": "Link copied!",
+      "riskManagement": "Risk Management, Occurrences & Corrective Actions",
+      "createSuccess": "Client created successfully!",
+      "updateSuccess": "Client updated successfully!",
+      "deleteSuccess": "Client deleted successfully!",
+      "confirmDelete": "Confirm deletion",
+      "deleteWarning": "Are you sure you want to delete this client? All linked companies and plants will also be deleted.",
+      "noData": "No clients registered"
+    },
+    "companies": {
+      "title": "Projects",
+      "add": "+ Projects",
+      "edit": "Edit Project",
+      "namePlaceholder": "Company/project name",
+      "createSuccess": "Project created successfully!",
+      "updateSuccess": "Project updated successfully!",
+      "deleteSuccess": "Project deleted successfully!",
+      "confirmDelete": "Confirm deletion",
+      "deleteWarning": "Are you sure you want to delete this project? All linked plants will also be deleted.",
+      "noData": "No projects registered"
+    },
+    "plants": {
+      "title": "Plants",
+      "add": "+ Plants",
+      "namePlaceholder": "Plant/area name",
+      "createSuccess": "Plant created successfully!",
+      "deleteSuccess": "Plant deleted successfully!",
+      "confirmDelete": "Confirm deletion",
+      "deleteWarning": "Are you sure you want to delete this plant?"
+    },
+    "users": {
+      "title": "Users",
+      "add": "Add User",
+      "edit": "Edit User",
+      "role": "Role",
+      "phone": "Phone",
+      "phonePlaceholder": "(00) 00000-0000",
+      "namePlaceholder": "Full name",
+      "emailPlaceholder": "email@example.com",
+      "corporateGroup": "Corporate Group",
+      "selectGroup": "Select group",
+      "moduleAccess": "Module Access",
+      "modules": {
+        "riskManagement": "Risk Management",
+        "safetyIndicators": "Safety Indicators",
+        "trainings": "Trainings",
+        "audit": "Audit"
+      },
+      "roles": {
+        "admin": "Administrator",
+        "supervisor": "Supervisor",
+        "technician": "Technician"
+      },
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "activeStatus": "Active User",
+      "activeDescription": "Inactive users cannot access the system.",
+      "createSuccess": "User created successfully!",
+      "updateSuccess": "User updated successfully!",
+      "deactivateSuccess": "User deactivated successfully!",
+      "confirmDeactivate": "Deactivate User",
+      "deactivateWarning": "Are you sure you want to deactivate this user? They will no longer be able to access the system.",
+      "deactivate": "Deactivate",
+      "noData": "No users found"
+    }
   }
 }
