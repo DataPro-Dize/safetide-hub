@@ -188,5 +188,89 @@
     "deviations": "Desvios",
     "workflows": "Fluxos",
     "profile": "Perfil"
+  },
+  "admin": {
+    "accessDenied": "Acesso Negado",
+    "adminOnly": "Esta página é restrita para administradores.",
+    "clients": {
+      "title": "Clientes",
+      "client": "Cliente",
+      "modules": "Módulos",
+      "add": "Adicionar Cliente",
+      "edit": "Editar Cliente",
+      "namePlaceholder": "Nome do grupo empresarial",
+      "size": "Porte",
+      "sizes": {
+        "small": "Pequeno",
+        "medium": "Médio",
+        "large": "Grande",
+        "enterprise": "Enterprise"
+      },
+      "registrationLink": "Link de Cadastro",
+      "linkCopied": "Link copiado!",
+      "riskManagement": "Gestão de Riscos, Ocorrências & Ações Corretivas",
+      "createSuccess": "Cliente criado com sucesso!",
+      "updateSuccess": "Cliente atualizado com sucesso!",
+      "deleteSuccess": "Cliente excluído com sucesso!",
+      "confirmDelete": "Confirmar exclusão",
+      "deleteWarning": "Tem certeza que deseja excluir este cliente? Todas as empresas e plantas vinculadas também serão excluídas.",
+      "noData": "Nenhum cliente cadastrado"
+    },
+    "companies": {
+      "title": "Projetos",
+      "add": "+ Projetos",
+      "edit": "Editar Projeto",
+      "namePlaceholder": "Nome da empresa/projeto",
+      "createSuccess": "Projeto criado com sucesso!",
+      "updateSuccess": "Projeto atualizado com sucesso!",
+      "deleteSuccess": "Projeto excluído com sucesso!",
+      "confirmDelete": "Confirmar exclusão",
+      "deleteWarning": "Tem certeza que deseja excluir este projeto? Todas as plantas vinculadas também serão excluídas.",
+      "noData": "Nenhum projeto cadastrado"
+    },
+    "plants": {
+      "title": "Plantas",
+      "add": "+ Plantas",
+      "namePlaceholder": "Nome da planta/área",
+      "createSuccess": "Planta criada com sucesso!",
+      "deleteSuccess": "Planta excluída com sucesso!",
+      "confirmDelete": "Confirmar exclusão",
+      "deleteWarning": "Tem certeza que deseja excluir esta planta?"
+    },
+    "users": {
+      "title": "Usuários",
+      "add": "Adicionar Usuário",
+      "edit": "Editar Usuário",
+      "role": "Função",
+      "phone": "Telefone",
+      "phonePlaceholder": "(00) 00000-0000",
+      "namePlaceholder": "Nome completo",
+      "emailPlaceholder": "email@exemplo.com",
+      "corporateGroup": "Grupo Empresarial",
+      "selectGroup": "Selecione o grupo",
+      "moduleAccess": "Acesso aos Módulos",
+      "modules": {
+        "riskManagement": "Gestão de Riscos",
+        "safetyIndicators": "Indicadores de Segurança",
+        "trainings": "Treinamentos",
+        "audit": "Auditoria"
+      },
+      "roles": {
+        "admin": "Administrador",
+        "supervisor": "Supervisor",
+        "technician": "Técnico"
+      },
+      "statusActive": "Ativo",
+      "statusInactive": "Inativo",
+      "activeStatus": "Usuário Ativo",
+      "activeDescription": "Usuários inativos não podem acessar o sistema.",
+      "createSuccess": "Usuário criado com sucesso!",
+      "updateSuccess": "Usuário atualizado com sucesso!",
+      "deactivateSuccess": "Usuário desativado com sucesso!",
+      "confirmDeactivate": "Desativar Usuário",
+      "deactivateWarning": "Tem certeza que deseja desativar este usuário? Ele não poderá mais acessar o sistema.",
+      "deactivate": "Desativar",
+      "noData": "Nenhum usuário encontrado"
+    }
   }
 }

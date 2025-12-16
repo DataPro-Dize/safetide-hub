@@ -9,6 +9,7 @@ import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import RiskManagement from "./pages/RiskManagement";
+import ClientsUsers from "./pages/ClientsUsers";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/risk-management" element={<RiskManagement />} />
+              <Route path="/settings/users" element={<ClientsUsers />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
