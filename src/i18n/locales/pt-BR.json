@@ -72,6 +72,7 @@
     "riskAssessment": "Avaliação de Risco",
     "locationDetails": "Detalhes da Localização",
     "locationPlaceholder": "Ex: Setor A, Andar 2",
+    "photos": "Fotos",
     "categories": {
       "access_exit": "Acesso/Saída",
       "chemical_products": "Produtos Químicos",
@@ -114,11 +115,67 @@
     "noData": "Nenhuma ação cadastrada",
     "createSuccess": "Ação criada com sucesso!",
     "selectResponsible": "Selecione o responsável",
+    "responsible": "Responsável",
+    "respond": "Responder",
+    "resubmit": "Reenviar",
+    "validate": "Validar",
+    "hasNotes": "Com observações",
+    "photos": "fotos",
+    "returnedFeedback": "Feedback da devolução",
+    "filters": {
+      "mine": "Minhas Ações",
+      "toValidate": "Para Validar"
+    },
     "status": {
       "pending": "Pendente",
+      "submitted_completed": "Submetido - Concluído",
+      "submitted_blocked": "Submetido - Bloqueado",
       "approved": "Aprovado",
+      "returned": "Devolvido",
       "rejected": "Rejeitado"
+    },
+    "response": {
+      "title": "Responder Ação",
+      "chooseAction": "Como você deseja responder esta ação?",
+      "markCompleted": "Marcar como Concluído",
+      "markBlocked": "Impossibilidade de Conclusão",
+      "markingCompleted": "Marcando como concluído",
+      "markingBlocked": "Reportando impossibilidade",
+      "notes": "Observações",
+      "notesPlaceholder": "Descreva o que foi feito ou o motivo da impossibilidade...",
+      "notesRequired": "Observações são obrigatórias para impossibilidade",
+      "evidence": "Fotos de Evidência",
+      "submit": "Enviar Resposta",
+      "success": "Resposta enviada com sucesso!"
+    },
+    "validation": {
+      "title": "Validar Ação",
+      "submittedAt": "Submetido em",
+      "responseNotes": "Observações do Responsável",
+      "evidencePhotos": "Fotos de Evidência",
+      "validatorNotes": "Suas Observações",
+      "validatorNotesPlaceholder": "Adicione observações se necessário...",
+      "requiredForReturn": "obrigatório para devolução",
+      "notesRequired": "Observações são obrigatórias para devolver",
+      "approve": "Aprovar",
+      "return": "Devolver",
+      "approved": "Ação aprovada com sucesso!",
+      "returned": "Ação devolvida para refazer"
     }
+  },
+  "imageUpload": {
+    "dragOrClick": "Arraste imagens ou clique para selecionar",
+    "maxSize": "Máximo 5MB por imagem",
+    "images": "imagens",
+    "uploading": "Enviando...",
+    "limitReached": "Limite atingido",
+    "maxImagesReached": "Você pode adicionar no máximo {{max}} imagens",
+    "invalidType": "Tipo de arquivo inválido. Apenas imagens são permitidas.",
+    "fileTooLarge": "Arquivo muito grande. Máximo 5MB."
+  },
+  "imageCarousel": {
+    "noImages": "Nenhuma foto anexada",
+    "fullView": "Visualização completa"
   },
   "nav": {
     "dashboard": "Painel",
