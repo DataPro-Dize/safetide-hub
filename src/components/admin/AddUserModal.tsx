@@ -61,6 +61,13 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
     }));
   };
 
+  // Generate cryptographically secure temporary password
+  const generateSecurePassword = (): string => {
+    const array = new Uint8Array(24);
+    crypto.getRandomValues(array);
+    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim()) {
@@ -70,10 +77,10 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
 
     setLoading(true);
 
-    // Create user via Supabase Auth
+    // Create user via Supabase Auth with secure temporary password
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: formData.email.trim(),
-      password: Math.random().toString(36).slice(-12), // Temporary password
+      password: generateSecurePassword(),
       options: {
         data: {
           name: formData.name.trim(),
