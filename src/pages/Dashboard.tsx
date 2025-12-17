@@ -7,37 +7,80 @@ import {
   Building2, 
   Factory, 
   GitBranch,
+  Loader2,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface DashboardStats {
+  deviations: number;
+  workflows: number;
+  companies: number;
+  plants: number;
+}
 
 export default function Dashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [stats, setStats] = useState<DashboardStats>({
+    deviations: 0,
+    workflows: 0,
+    companies: 0,
+    plants: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const [deviationsRes, workflowsRes, companiesRes, plantsRes] = await Promise.all([
+          supabase.from('deviations').select('id', { count: 'exact', head: true }),
+          supabase.from('workflows').select('id', { count: 'exact', head: true }),
+          supabase.from('companies').select('id', { count: 'exact', head: true }),
+          supabase.from('plants').select('id', { count: 'exact', head: true }),
+        ]);
+
+        setStats({
+          deviations: deviationsRes.count ?? 0,
+          workflows: workflowsRes.count ?? 0,
+          companies: companiesRes.count ?? 0,
+          plants: plantsRes.count ?? 0,
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStats();
+  }, []);
+
+  const statCards = [
     { 
       title: t('dashboard.deviations'), 
-      value: '0', 
+      value: stats.deviations, 
       icon: AlertTriangle, 
       color: 'text-warning',
       bgColor: 'bg-warning/10'
     },
     { 
       title: t('dashboard.workflows'), 
-      value: '0', 
+      value: stats.workflows, 
       icon: GitBranch, 
       color: 'text-info',
       bgColor: 'bg-info/10'
     },
     { 
       title: t('dashboard.companies'), 
-      value: '0', 
+      value: stats.companies, 
       icon: Building2, 
       color: 'text-primary',
       bgColor: 'bg-primary/10'
     },
     { 
       title: t('dashboard.plants'), 
-      value: '0', 
+      value: stats.plants, 
       icon: Factory, 
       color: 'text-secondary',
       bgColor: 'bg-secondary/10'
@@ -54,7 +97,7 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <Card 
             key={stat.title} 
             className="border-0 shadow-md hover:shadow-lg transition-shadow animate-fade-in-up"
@@ -69,7 +112,9 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-foreground">{stat.value}</div>
+              <div className="text-3xl font-bold text-foreground">
+                {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stat.value}
+              </div>
             </CardContent>
           </Card>
         ))}
