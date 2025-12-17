@@ -101,14 +101,10 @@ export function AppSidebar() {
       )}
       collapsible="icon"
     >
-      <SidebarHeader className="p-4 border-b border-sidebar-border">
+      <SidebarHeader className="p-4 border-b border-sidebar-border gradient-brand">
         <div className="flex items-center justify-between">
-          {!collapsed && (
-            <div className="gradient-brand rounded-lg p-2">
-              <Logo size="sm" />
-            </div>
-          )}
-          <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-accent" />
+          {!collapsed && <Logo size="sm" />}
+          <SidebarTrigger className="text-white hover:bg-white/20" />
         </div>
       </SidebarHeader>
 
