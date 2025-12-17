@@ -103,7 +103,7 @@ export function AppSidebar() {
     >
       <SidebarHeader className="p-4 border-b border-sidebar-border">
         <div className="flex items-center justify-between">
-          {!collapsed && <Logo variant="light" size="sm" />}
+          {!collapsed && <Logo size="sm" />}
           <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-accent" />
         </div>
       </SidebarHeader>
