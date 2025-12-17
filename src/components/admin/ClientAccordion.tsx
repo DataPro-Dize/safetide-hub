@@ -20,6 +20,7 @@ import { AddCompanyModal } from './AddCompanyModal';
 import { AddPlantModal } from './AddPlantModal';
 import { EditClientModal } from './EditClientModal';
 import { EditCompanyModal } from './EditCompanyModal';
+import { EditPlantModal } from './EditPlantModal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,6 +66,7 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
   const [addPlantCompanyId, setAddPlantCompanyId] = useState<string | null>(null);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
   const [editCompanyId, setEditCompanyId] = useState<string | null>(null);
+  const [editPlantId, setEditPlantId] = useState<string | null>(null);
   const [deleteGroupId, setDeleteGroupId] = useState<string | null>(null);
   const [deleteCompanyId, setDeleteCompanyId] = useState<string | null>(null);
   const [deletePlantId, setDeletePlantId] = useState<string | null>(null);
@@ -136,6 +138,7 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
 
   const editingGroup = groups.find(g => g.id === editGroupId);
   const editingCompany = groups.flatMap(g => g.companies).find(c => c.id === editCompanyId);
+  const editingPlant = groups.flatMap(g => g.companies).flatMap(c => c.plants).find(p => p.id === editPlantId);
 
   return (
     <>
@@ -229,15 +232,30 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
                           <span className="font-medium text-foreground">
                             {company.name}
                           </span>
-                          <div className="flex gap-1 flex-wrap">
+                          <div className="flex gap-2 flex-wrap">
                             {company.plants.map((plant) => (
-                              <Badge
+                              <div
                                 key={plant.id}
-                                variant="outline"
-                                className="text-xs"
+                                className="flex items-center gap-1 bg-muted/50 rounded-md px-2 py-1 border border-border"
                               >
-                                {plant.name}
-                              </Badge>
+                                <span className="text-xs text-foreground">{plant.name}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-5 w-5"
+                                  onClick={() => setEditPlantId(plant.id)}
+                                >
+                                  <Pencil className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-5 w-5 text-destructive hover:text-destructive"
+                                  onClick={() => setDeletePlantId(plant.id)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
                             ))}
                           </div>
                         </div>
@@ -307,6 +325,15 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
           open={!!editCompanyId}
           onOpenChange={() => setEditCompanyId(null)}
           company={editingCompany}
+          onSuccess={onRefresh}
+        />
+      )}
+
+      {editingPlant && (
+        <EditPlantModal
+          open={!!editPlantId}
+          onOpenChange={() => setEditPlantId(null)}
+          plant={editingPlant}
           onSuccess={onRefresh}
         />
       )}
