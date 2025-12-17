@@ -177,7 +177,7 @@ export default function Login() {
 
         {/* Logo and branding */}
         <div className="relative z-10 animate-float">
-          <Logo variant="light" size="xl" />
+          <Logo size="xl" />
         </div>
       </div>
     </div>
