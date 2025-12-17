@@ -103,7 +103,11 @@ export function AppSidebar() {
     >
       <SidebarHeader className="p-4 border-b border-sidebar-border">
         <div className="flex items-center justify-between">
-          {!collapsed && <Logo size="sm" />}
+          {!collapsed && (
+            <div className="gradient-brand rounded-lg p-2">
+              <Logo size="sm" />
+            </div>
+          )}
           <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-accent" />
         </div>
       </SidebarHeader>
