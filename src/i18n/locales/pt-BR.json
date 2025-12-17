@@ -231,8 +231,10 @@
     "plants": {
       "title": "Plantas",
       "add": "+ Plantas",
+      "edit": "Editar Planta",
       "namePlaceholder": "Nome da planta/área",
       "createSuccess": "Planta criada com sucesso!",
+      "updateSuccess": "Planta atualizada com sucesso!",
       "deleteSuccess": "Planta excluída com sucesso!",
       "confirmDelete": "Confirmar exclusão",
       "deleteWarning": "Tem certeza que deseja excluir esta planta?"

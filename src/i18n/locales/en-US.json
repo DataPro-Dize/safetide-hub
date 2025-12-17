@@ -231,8 +231,10 @@
     "plants": {
       "title": "Plants",
       "add": "+ Plants",
+      "edit": "Edit Plant",
       "namePlaceholder": "Plant/area name",
       "createSuccess": "Plant created successfully!",
+      "updateSuccess": "Plant updated successfully!",
       "deleteSuccess": "Plant deleted successfully!",
       "confirmDelete": "Confirm deletion",
       "deleteWarning": "Are you sure you want to delete this plant?"
