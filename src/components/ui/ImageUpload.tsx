@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { useSignedUrls } from '@/hooks/useSignedUrl';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ImageUploadProps {
@@ -25,28 +25,26 @@ export function ImageUpload({
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const { signedUrls, loading: loadingUrls } = useSignedUrls(images);
 
   const uploadFile = async (file: File): Promise<string | null> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
     const { error } = await supabase.storage
       .from(bucket)
-      .upload(fileName, file, { upsert: false });
+      .upload(filePath, file, { upsert: false });
 
     if (error) {
       console.error('Upload error:', error);
       return null;
     }
 
-    const { data: urlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(fileName);
-
-    return urlData.publicUrl;
+    // Return the file path instead of URL - we'll generate signed URLs when displaying
+    return `${bucket}:${filePath}`;
   };
 
   const handleFiles = useCallback(async (files: FileList | null) => {
@@ -157,27 +155,35 @@ export function ImageUpload({
 
       {images.length > 0 && (
         <div className="grid grid-cols-4 gap-2">
-          {images.map((url, index) => (
-            <div key={index} className="relative group aspect-square">
-              <img
-                src={url}
-                alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg"
-              />
-              {!disabled && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeImage(index);
-                  }}
-                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              )}
+          {loadingUrls ? (
+            <div className="col-span-4 flex justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ))}
+          ) : (
+            signedUrls.map((url, index) => (
+              url && (
+                <div key={index} className="relative group aspect-square">
+                  <img
+                    src={url}
+                    alt={`Upload ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                  {!disabled && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeImage(index);
+                      }}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  )}
+                </div>
+              )
+            ))
+          )}
         </div>
       )}
     </div>

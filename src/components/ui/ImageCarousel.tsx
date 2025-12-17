@@ -13,7 +13,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { Image as ImageIcon, X } from 'lucide-react';
+import { Image as ImageIcon, X, Loader2 } from 'lucide-react';
+import { useSignedUrls } from '@/hooks/useSignedUrl';
 
 interface ImageCarouselProps {
   images: string[];
@@ -24,6 +25,7 @@ export function ImageCarousel({ images, className }: ImageCarouselProps) {
   const { t } = useTranslation();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { signedUrls, loading } = useSignedUrls(images);
 
   if (images.length === 0) {
     return (
@@ -34,30 +36,40 @@ export function ImageCarousel({ images, className }: ImageCarouselProps) {
     );
   }
 
+  if (loading) {
+    return (
+      <div className={cn("flex flex-col items-center justify-center py-8 text-muted-foreground", className)}>
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <>
       <div className={cn("relative", className)}>
         <Carousel className="w-full">
           <CarouselContent>
-            {images.map((url, index) => (
-              <CarouselItem key={index}>
-                <div 
-                  className="aspect-video relative cursor-pointer overflow-hidden rounded-lg bg-muted"
-                  onClick={() => {
-                    setSelectedImage(url);
-                    setCurrentIndex(index);
-                  }}
-                >
-                  <img
-                    src={url}
-                    alt={`Image ${index + 1}`}
-                    className="w-full h-full object-cover transition-transform hover:scale-105"
-                  />
-                </div>
-              </CarouselItem>
+            {signedUrls.map((url, index) => (
+              url && (
+                <CarouselItem key={index}>
+                  <div 
+                    className="aspect-video relative cursor-pointer overflow-hidden rounded-lg bg-muted"
+                    onClick={() => {
+                      setSelectedImage(url);
+                      setCurrentIndex(index);
+                    }}
+                  >
+                    <img
+                      src={url}
+                      alt={`Image ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform hover:scale-105"
+                    />
+                  </div>
+                </CarouselItem>
+              )
             ))}
           </CarouselContent>
-          {images.length > 1 && (
+          {signedUrls.length > 1 && (
             <>
               <CarouselPrevious className="left-2" />
               <CarouselNext className="right-2" />
