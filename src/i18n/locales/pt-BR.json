@@ -297,5 +297,13 @@
       "deactivate": "Desativar",
       "noData": "Nenhum usuário encontrado"
     }
+  },
+  "notifications": {
+    "title": "Notificações",
+    "new": "novas",
+    "markAllRead": "Marcar todas",
+    "empty": "Nenhuma notificação",
+    "newWorkflow": "Novo Fluxo de Trabalho",
+    "workflowAssigned": "Um novo fluxo de trabalho foi atribuído a você"
   }
 }
