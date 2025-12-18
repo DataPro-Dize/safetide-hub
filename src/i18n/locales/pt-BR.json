@@ -49,7 +49,20 @@
     "checkYourEmail": "Verifique seu e-mail",
     "resetEmailSentTo": "Enviamos um link de redefinição para",
     "checkSpam": "Não recebeu? Verifique sua pasta de spam.",
-    "tryAnotherEmail": "Tentar outro e-mail"
+    "tryAnotherEmail": "Tentar outro e-mail",
+    "resetPasswordTitle": "Redefinir Senha",
+    "resetPasswordDescription": "Digite sua nova senha abaixo.",
+    "newPassword": "Nova Senha",
+    "newPasswordPlaceholder": "Digite sua nova senha",
+    "confirmPassword": "Confirmar Senha",
+    "confirmPasswordPlaceholder": "Confirme sua nova senha",
+    "updatePassword": "Atualizar Senha",
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
+    "passwordUpdated": "Senha Atualizada!",
+    "passwordUpdatedDescription": "Sua senha foi atualizada com sucesso. Você pode fazer login agora.",
+    "goToLogin": "Ir para o Login",
+    "invalidResetLink": "Link de redefinição inválido ou expirado. Solicite um novo link."
   },
   "dashboard": {
     "title": "Painel de Controle",

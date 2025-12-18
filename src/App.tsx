@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import RiskManagement from "./pages/RiskManagement";
 import ClientsUsers from "./pages/ClientsUsers";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* Protected Routes */}
             <Route element={<ProtectedLayout />}>
