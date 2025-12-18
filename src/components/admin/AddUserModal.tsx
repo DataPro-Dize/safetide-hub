@@ -61,13 +61,6 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
     }));
   };
 
-  // Generate cryptographically secure temporary password
-  const generateSecurePassword = (): string => {
-    const array = new Uint8Array(24);
-    crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.email.trim()) {
@@ -77,56 +70,39 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
 
     setLoading(true);
 
-    // Create user via Supabase Auth with secure temporary password
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: formData.email.trim(),
-      password: generateSecurePassword(),
-      options: {
-        data: {
-          name: formData.name.trim(),
-        },
-      },
-    });
+    try {
+      // Get current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({ title: t('common.error'), description: 'Sessão expirada. Faça login novamente.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
 
-    if (authError) {
-      toast({ title: t('common.error'), description: authError.message, variant: 'destructive' });
-      setLoading(false);
-      return;
-    }
-
-    if (authData.user) {
-      // Update profile with role
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
+      // Call edge function to create user
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: {
+          email: formData.email.trim(),
           name: formData.name.trim(),
           phone: formData.phone || null,
           role: formData.role,
-          is_admin: formData.role === 'admin',
-        })
-        .eq('id', authData.user.id);
+          groupId: formData.groupId || null,
+        },
+      });
 
-      if (profileError) {
-        console.error('Error updating profile:', profileError);
+      if (error) {
+        console.error('Edge function error:', error);
+        toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+        setLoading(false);
+        return;
       }
 
-      // Link user to company if group selected
-      if (formData.groupId) {
-        // Get first company of the group
-        const { data: companies } = await supabase
-          .from('companies')
-          .select('id')
-          .eq('group_id', formData.groupId)
-          .limit(1);
-
-        if (companies && companies.length > 0) {
-          await supabase
-            .from('user_companies')
-            .insert({
-              user_id: authData.user.id,
-              company_id: companies[0].id,
-            });
-        }
+      if (data?.error) {
+        console.error('Create user error:', data.error);
+        toast({ title: t('common.error'), description: data.error, variant: 'destructive' });
+        setLoading(false);
+        return;
       }
 
       toast({ title: t('admin.users.createSuccess') });
@@ -140,9 +116,12 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
       });
       onOpenChange(false);
       onSuccess();
+    } catch (err) {
+      console.error('Unexpected error:', err);
+      toast({ title: t('common.error'), description: 'Erro inesperado ao criar usuário', variant: 'destructive' });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
