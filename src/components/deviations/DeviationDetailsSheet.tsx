@@ -96,8 +96,38 @@ export function DeviationDetailsSheet({
   };
 
   const fetchProfiles = async () => {
-    const { data } = await supabase.from('profiles').select('*');
-    if (data) setProfiles(data);
+    if (!deviation) return;
+    
+    // First get the company_id from the plant
+    const { data: plant } = await supabase
+      .from('plants')
+      .select('company_id')
+      .eq('id', deviation.plant_id)
+      .single();
+    
+    if (!plant) return;
+    
+    // Get users who have access to this company
+    const { data: userCompanies } = await supabase
+      .from('user_companies')
+      .select('user_id')
+      .eq('company_id', plant.company_id);
+    
+    if (!userCompanies || userCompanies.length === 0) {
+      setProfiles([]);
+      return;
+    }
+    
+    const userIds = userCompanies.map(uc => uc.user_id);
+    
+    // Fetch profiles for those users
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('id', userIds)
+      .eq('is_active', true);
+    
+    if (profiles) setProfiles(profiles);
   };
 
   const handleAddWorkflow = async () => {
