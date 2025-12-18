@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import RiskManagement from "./pages/RiskManagement";
 import ClientsUsers from "./pages/ClientsUsers";
@@ -25,6 +26,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             
             {/* Protected Routes */}
             <Route element={<ProtectedLayout />}>

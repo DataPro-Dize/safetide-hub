@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -121,12 +121,12 @@ export default function Login() {
                       {t('common.rememberMe')}
                     </Label>
                   </div>
-                  <button
-                    type="button"
+                  <Link
+                    to="/forgot-password"
                     className="text-sm text-primary hover:text-primary/80 transition-colors"
                   >
                     {t('common.forgotPassword')}
-                  </button>
+                  </Link>
                 </div>
               )}
 

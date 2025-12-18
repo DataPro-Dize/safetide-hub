@@ -39,7 +39,17 @@
     "registerSuccess": "Cadastro realizado com sucesso!",
     "createAccount": "Criar conta",
     "alreadyHaveAccount": "Já possui uma conta?",
-    "dontHaveAccount": "Não possui uma conta?"
+    "dontHaveAccount": "Não possui uma conta?",
+    "forgotPasswordTitle": "Esqueceu sua senha?",
+    "forgotPasswordDescription": "Digite seu e-mail e enviaremos um link para redefinir sua senha.",
+    "sendResetLink": "Enviar link de redefinição",
+    "backToLogin": "Voltar para o login",
+    "resetEmailSent": "E-mail enviado!",
+    "resetEmailSentDescription": "Verifique sua caixa de entrada para redefinir sua senha.",
+    "checkYourEmail": "Verifique seu e-mail",
+    "resetEmailSentTo": "Enviamos um link de redefinição para",
+    "checkSpam": "Não recebeu? Verifique sua pasta de spam.",
+    "tryAnotherEmail": "Tentar outro e-mail"
   },
   "dashboard": {
     "title": "Painel de Controle",

@@ -39,7 +39,17 @@
     "registerSuccess": "Registration successful!",
     "createAccount": "Create account",
     "alreadyHaveAccount": "Already have an account?",
-    "dontHaveAccount": "Don't have an account?"
+    "dontHaveAccount": "Don't have an account?",
+    "forgotPasswordTitle": "Forgot your password?",
+    "forgotPasswordDescription": "Enter your email and we'll send you a link to reset your password.",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login",
+    "resetEmailSent": "Email sent!",
+    "resetEmailSentDescription": "Check your inbox to reset your password.",
+    "checkYourEmail": "Check your email",
+    "resetEmailSentTo": "We sent a reset link to",
+    "checkSpam": "Didn't receive it? Check your spam folder.",
+    "tryAnotherEmail": "Try another email"
   },
   "dashboard": {
     "title": "Dashboard",
