@@ -297,5 +297,13 @@
       "deactivate": "Deactivate",
       "noData": "No users found"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "new": "new",
+    "markAllRead": "Mark all",
+    "empty": "No notifications",
+    "newWorkflow": "New Workflow",
+    "workflowAssigned": "A new workflow has been assigned to you"
   }
 }

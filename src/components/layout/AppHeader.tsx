@@ -1,9 +1,8 @@
-import { useTranslation } from 'react-i18next';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
+import { useNotifications } from '@/hooks/useNotifications';
 import { User } from '@supabase/supabase-js';
 
 interface AppHeaderProps {
@@ -11,7 +10,14 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ user }: AppHeaderProps) {
-  const { t } = useTranslation();
+  const {
+    notifications,
+    unreadCount,
+    isLoading,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification
+  } = useNotifications(user?.id);
 
   const initials = user?.email
     ? user.email.substring(0, 2).toUpperCase()
@@ -22,12 +28,14 @@ export function AppHeader({ user }: AppHeaderProps) {
       <ThemeToggle />
       <LanguageToggle variant="compact" />
       
-      <Button variant="ghost" size="icon" className="relative">
-        <Bell className="h-5 w-5" />
-        <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground flex items-center justify-center">
-          3
-        </span>
-      </Button>
+      <NotificationDropdown
+        notifications={notifications}
+        unreadCount={unreadCount}
+        isLoading={isLoading}
+        onMarkAsRead={markAsRead}
+        onMarkAllAsRead={markAllAsRead}
+        onDelete={deleteNotification}
+      />
 
       <div className="flex items-center gap-3">
         <Avatar className="h-9 w-9">
