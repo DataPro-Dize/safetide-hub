@@ -208,6 +208,7 @@
     "audit": "Audit & Inspections",
     "usersSettings": "Clients & Users",
     "settings": "Settings",
+    "auditTemplates": "Audit Templates",
     "deviations": "Deviations",
     "workflows": "Workflows",
     "profile": "Profile"
@@ -305,5 +306,88 @@
     "empty": "No notifications",
     "newWorkflow": "New Workflow",
     "workflowAssigned": "A new workflow has been assigned to you"
+  },
+  "audit": {
+    "title": "Audit & Inspections",
+    "description": "Manage audits, inspections and safety checklists",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "list": "List",
+      "form": "Form"
+    },
+    "kpi": {
+      "totalInspections": "Total Inspections",
+      "openNonConformities": "Open Non-Conformities",
+      "closedActions": "Closed Actions",
+      "complianceRate": "Compliance Rate"
+    },
+    "charts": {
+      "byStatus": "Inspections by Status",
+      "byCategory": "Non-Conformities by Category"
+    },
+    "status": {
+      "planned": "Planned",
+      "in_progress": "In Progress",
+      "completed": "Completed"
+    },
+    "categories": {
+      "safety": "Safety",
+      "environment": "Environment",
+      "health": "Health"
+    },
+    "recentActivity": "Recent Activity",
+    "noData": "No audits found",
+    "startNew": "Start New Audit",
+    "startNewDescription": "Create a new audit based on a template",
+    "newAudit": "New Audit",
+    "editAudit": "Edit Audit",
+    "auditor": "Auditor",
+    "location": "Location",
+    "type": "Type",
+    "score": "Score",
+    "info": "Audit Information",
+    "selectType": "Select type",
+    "selectLocation": "Select location",
+    "checklist": "Checklist",
+    "answers": {
+      "pass": "Pass",
+      "fail": "Fail"
+    },
+    "comment": "Comment",
+    "commentPlaceholder": "Describe the non-conformity...",
+    "evidence": "Photo Evidence",
+    "generalNotes": "General Notes",
+    "notesPlaceholder": "Add general notes about the audit...",
+    "signature": "Signature",
+    "signatureHint": "Sign here",
+    "clearSignature": "Clear Signature",
+    "saveDraft": "Save Draft",
+    "finalize": "Finalize Audit",
+    "saveSuccess": "Audit saved successfully!",
+    "finalizeSuccess": "Audit finalized successfully!",
+    "templates": {
+      "title": "Audit Templates",
+      "description": "Configure templates and checklists for your audits",
+      "list": "Templates",
+      "sections": "Sections & Questions",
+      "newTemplate": "New Template",
+      "editTemplate": "Edit Template",
+      "namePlaceholder": "Template name",
+      "descriptionPlaceholder": "Template description",
+      "addSection": "Add Section",
+      "editSection": "Edit Section",
+      "sectionPlaceholder": "Section name (e.g., PPE, Machinery)",
+      "addQuestion": "Add Question",
+      "editQuestion": "Edit Question",
+      "questionText": "Question Text",
+      "questionPlaceholder": "E.g., Are fire extinguishers valid?",
+      "selectTemplate": "Select a template to edit",
+      "noData": "No templates registered",
+      "noSections": "No sections registered",
+      "saveSuccess": "Saved successfully!",
+      "deleteSuccess": "Deleted successfully!",
+      "confirmDelete": "Confirm Deletion",
+      "deleteWarning": "This action cannot be undone."
+    }
   }
 }

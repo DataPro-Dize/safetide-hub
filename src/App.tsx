@@ -12,6 +12,8 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import RiskManagement from "./pages/RiskManagement";
 import ClientsUsers from "./pages/ClientsUsers";
+import Audit from "./pages/Audit";
+import AuditTemplates from "./pages/AuditTemplates";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,7 +36,9 @@ const App = () => (
             <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/risk-management" element={<RiskManagement />} />
+              <Route path="/audit" element={<Audit />} />
               <Route path="/settings/users" element={<ClientsUsers />} />
+              <Route path="/settings/audit-templates" element={<AuditTemplates />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

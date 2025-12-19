@@ -208,6 +208,7 @@
     "audit": "Auditoria e Inspeções",
     "usersSettings": "Clientes e Usuários",
     "settings": "Configurações",
+    "auditTemplates": "Templates de Auditoria",
     "deviations": "Desvios",
     "workflows": "Fluxos",
     "profile": "Perfil"
@@ -305,5 +306,88 @@
     "empty": "Nenhuma notificação",
     "newWorkflow": "Novo Fluxo de Trabalho",
     "workflowAssigned": "Um novo fluxo de trabalho foi atribuído a você"
+  },
+  "audit": {
+    "title": "Auditoria e Inspeções",
+    "description": "Gerencie auditorias, inspeções e checklists de segurança",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "list": "Lista",
+      "form": "Formulário"
+    },
+    "kpi": {
+      "totalInspections": "Total de Inspeções",
+      "openNonConformities": "Não Conformidades Abertas",
+      "closedActions": "Ações Concluídas",
+      "complianceRate": "Taxa de Conformidade"
+    },
+    "charts": {
+      "byStatus": "Inspeções por Status",
+      "byCategory": "Não Conformidades por Categoria"
+    },
+    "status": {
+      "planned": "Planejada",
+      "in_progress": "Em Andamento",
+      "completed": "Concluída"
+    },
+    "categories": {
+      "safety": "Segurança",
+      "environment": "Meio Ambiente",
+      "health": "Saúde"
+    },
+    "recentActivity": "Atividade Recente",
+    "noData": "Nenhuma auditoria encontrada",
+    "startNew": "Iniciar Nova Auditoria",
+    "startNewDescription": "Crie uma nova auditoria baseada em um template",
+    "newAudit": "Nova Auditoria",
+    "editAudit": "Editar Auditoria",
+    "auditor": "Auditor",
+    "location": "Localização",
+    "type": "Tipo",
+    "score": "Pontuação",
+    "info": "Informações da Auditoria",
+    "selectType": "Selecione o tipo",
+    "selectLocation": "Selecione a localização",
+    "checklist": "Checklist",
+    "answers": {
+      "pass": "Conforme",
+      "fail": "Não Conforme"
+    },
+    "comment": "Comentário",
+    "commentPlaceholder": "Descreva a não conformidade...",
+    "evidence": "Evidências Fotográficas",
+    "generalNotes": "Observações Gerais",
+    "notesPlaceholder": "Adicione observações gerais sobre a auditoria...",
+    "signature": "Assinatura",
+    "signatureHint": "Assine aqui",
+    "clearSignature": "Limpar Assinatura",
+    "saveDraft": "Salvar Rascunho",
+    "finalize": "Finalizar Auditoria",
+    "saveSuccess": "Auditoria salva com sucesso!",
+    "finalizeSuccess": "Auditoria finalizada com sucesso!",
+    "templates": {
+      "title": "Templates de Auditoria",
+      "description": "Configure os templates e checklists para suas auditorias",
+      "list": "Templates",
+      "sections": "Seções e Perguntas",
+      "newTemplate": "Novo Template",
+      "editTemplate": "Editar Template",
+      "namePlaceholder": "Nome do template",
+      "descriptionPlaceholder": "Descrição do template",
+      "addSection": "Adicionar Seção",
+      "editSection": "Editar Seção",
+      "sectionPlaceholder": "Nome da seção (ex: EPIs, Maquinário)",
+      "addQuestion": "Adicionar Pergunta",
+      "editQuestion": "Editar Pergunta",
+      "questionText": "Texto da Pergunta",
+      "questionPlaceholder": "Ex: Os extintores estão dentro da validade?",
+      "selectTemplate": "Selecione um template para editar",
+      "noData": "Nenhum template cadastrado",
+      "noSections": "Nenhuma seção cadastrada",
+      "saveSuccess": "Salvo com sucesso!",
+      "deleteSuccess": "Excluído com sucesso!",
+      "confirmDelete": "Confirmar Exclusão",
+      "deleteWarning": "Esta ação não pode ser desfeita."
+    }
   }
 }
