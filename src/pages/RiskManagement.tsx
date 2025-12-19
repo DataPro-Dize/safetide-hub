@@ -33,11 +33,13 @@ import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Deviation = Tables<'deviations'>;
+type Profile = Tables<'profiles'>;
 
 export default function RiskManagement() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [deviations, setDeviations] = useState<Deviation[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isNewSheetOpen, setIsNewSheetOpen] = useState(false);
   const [selectedDeviation, setSelectedDeviation] = useState<Deviation | null>(null);
@@ -60,6 +62,15 @@ export default function RiskManagement() {
     const { data, error } = await query;
     if (!error && data) {
       setDeviations(data);
+      // Fetch profiles for creators
+      const creatorIds = [...new Set(data.map(d => d.creator_id))];
+      if (creatorIds.length > 0) {
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('id', creatorIds);
+        if (profilesData) setProfiles(profilesData);
+      }
     }
     setLoading(false);
   };
@@ -160,13 +171,14 @@ export default function RiskManagement() {
                 <TableHead>{t('deviations.category')}</TableHead>
                 <TableHead>{t('deviations.riskRating')}</TableHead>
                 <TableHead>{t('common.status')}</TableHead>
+                <TableHead>{t('deviations.reportedBy')}</TableHead>
                 <TableHead>{t('common.date')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={7} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                       {t('common.loading')}
@@ -175,39 +187,45 @@ export default function RiskManagement() {
                 </TableRow>
               ) : deviations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     {t('deviations.noData')}
                   </TableCell>
                 </TableRow>
               ) : (
-                deviations.map((deviation) => (
-                  <TableRow 
-                    key={deviation.id} 
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => setSelectedDeviation(deviation)}
-                  >
-                    <TableCell className="font-mono text-xs">
-                      {deviation.id.substring(0, 8)}
-                    </TableCell>
-                    <TableCell className="font-medium">{deviation.title}</TableCell>
-                    <TableCell>
-                      {t(`deviations.categories.${deviation.category}`)}
-                    </TableCell>
-                    <TableCell>
-                      <span className={cn('font-semibold', getRiskColor(deviation.risk_rating))}>
-                        {getRiskLabel(deviation.risk_rating)}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(deviation.status)}>
-                        {t(`deviations.status.${deviation.status}`)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {format(new Date(deviation.created_at), 'PPP', { locale: dateLocale })}
-                    </TableCell>
-                  </TableRow>
-                ))
+                deviations.map((deviation) => {
+                  const creatorProfile = profiles.find(p => p.id === deviation.creator_id);
+                  return (
+                    <TableRow 
+                      key={deviation.id} 
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => setSelectedDeviation(deviation)}
+                    >
+                      <TableCell className="font-mono text-xs">
+                        {deviation.id.substring(0, 8)}
+                      </TableCell>
+                      <TableCell className="font-medium">{deviation.title}</TableCell>
+                      <TableCell>
+                        {t(`deviations.categories.${deviation.category}`)}
+                      </TableCell>
+                      <TableCell>
+                        <span className={cn('font-semibold', getRiskColor(deviation.risk_rating))}>
+                          {getRiskLabel(deviation.risk_rating)}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(deviation.status)}>
+                          {t(`deviations.status.${deviation.status}`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {creatorProfile?.name || '-'}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {format(new Date(deviation.created_at), 'dd/MM/yyyy HH:mm')}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

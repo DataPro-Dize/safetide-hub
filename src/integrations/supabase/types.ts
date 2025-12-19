@@ -331,6 +331,7 @@ export type Database = {
           description: string | null
           id: string
           location_details: string | null
+          phase: Database["public"]["Enums"]["deviation_phase"] | null
           photos: string[] | null
           plant_id: string
           probability: number
@@ -347,6 +348,7 @@ export type Database = {
           description?: string | null
           id?: string
           location_details?: string | null
+          phase?: Database["public"]["Enums"]["deviation_phase"] | null
           photos?: string[] | null
           plant_id: string
           probability: number
@@ -363,6 +365,7 @@ export type Database = {
           description?: string | null
           id?: string
           location_details?: string | null
+          phase?: Database["public"]["Enums"]["deviation_phase"] | null
           photos?: string[] | null
           plant_id?: string
           probability?: number
@@ -571,10 +574,12 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          deadline: string | null
           description: string | null
           deviation_id: string
           evidence_photos: string[] | null
           id: string
+          nature: Database["public"]["Enums"]["workflow_nature"] | null
           response_notes: string | null
           responsible_id: string
           status: Database["public"]["Enums"]["workflow_status"]
@@ -587,10 +592,12 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
+          deadline?: string | null
           description?: string | null
           deviation_id: string
           evidence_photos?: string[] | null
           id?: string
+          nature?: Database["public"]["Enums"]["workflow_nature"] | null
           response_notes?: string | null
           responsible_id: string
           status?: Database["public"]["Enums"]["workflow_status"]
@@ -603,10 +610,12 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
+          deadline?: string | null
           description?: string | null
           deviation_id?: string
           evidence_photos?: string[] | null
           id?: string
+          nature?: Database["public"]["Enums"]["workflow_nature"] | null
           response_notes?: string | null
           responsible_id?: string
           status?: Database["public"]["Enums"]["workflow_status"]
@@ -662,8 +671,10 @@ export type Database = {
         | "fall_protection"
         | "confined_space"
         | "other"
+      deviation_phase: "operations" | "construction"
       deviation_status: "open" | "in_progress" | "done"
       user_role: "technician" | "supervisor" | "admin"
+      workflow_nature: "corrective" | "preventive"
       workflow_status:
         | "pending"
         | "approved"
@@ -814,8 +825,10 @@ export const Constants = {
         "confined_space",
         "other",
       ],
+      deviation_phase: ["operations", "construction"],
       deviation_status: ["open", "in_progress", "done"],
       user_role: ["technician", "supervisor", "admin"],
+      workflow_nature: ["corrective", "preventive"],
       workflow_status: [
         "pending",
         "approved",
