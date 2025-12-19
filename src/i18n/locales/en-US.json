@@ -69,6 +69,11 @@
     "deviations": "Deviations",
     "workflows": "Workflows",
     "companies": "Companies",
+    "capaClosureRate": "CAPA Closure Rate",
+    "riskControl": "Controlled vs. Uncontrolled Risks",
+    "controlledRisks": "Controlled",
+    "uncontrolledRisks": "Uncontrolled",
+    "noRiskData": "No risk data available",
     "plants": "Plants",
     "users": "Users"
   },

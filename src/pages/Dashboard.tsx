@@ -8,15 +8,22 @@ import {
   Factory, 
   GitBranch,
   Loader2,
+  CheckCircle2,
+  ShieldCheck,
+  ShieldAlert,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 interface DashboardStats {
   deviations: number;
   workflows: number;
   companies: number;
   plants: number;
+  completedDeviations: number;
+  controlledRisks: number;
+  uncontrolledRisks: number;
 }
 
 export default function Dashboard() {
@@ -27,24 +34,36 @@ export default function Dashboard() {
     workflows: 0,
     companies: 0,
     plants: 0,
+    completedDeviations: 0,
+    controlledRisks: 0,
+    uncontrolledRisks: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [deviationsRes, workflowsRes, companiesRes, plantsRes] = await Promise.all([
+        const [deviationsRes, workflowsRes, companiesRes, plantsRes, deviationsDataRes] = await Promise.all([
           supabase.from('deviations').select('id', { count: 'exact', head: true }),
           supabase.from('workflows').select('id', { count: 'exact', head: true }),
           supabase.from('companies').select('id', { count: 'exact', head: true }),
           supabase.from('plants').select('id', { count: 'exact', head: true }),
+          supabase.from('deviations').select('status'),
         ]);
+
+        const deviationsData = deviationsDataRes.data || [];
+        const completedDeviations = deviationsData.filter(d => d.status === 'done').length;
+        const controlledRisks = deviationsData.filter(d => d.status === 'done').length;
+        const uncontrolledRisks = deviationsData.filter(d => d.status === 'open' || d.status === 'in_progress').length;
 
         setStats({
           deviations: deviationsRes.count ?? 0,
           workflows: workflowsRes.count ?? 0,
           companies: companiesRes.count ?? 0,
           plants: plantsRes.count ?? 0,
+          completedDeviations,
+          controlledRisks,
+          uncontrolledRisks,
         });
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
@@ -55,6 +74,15 @@ export default function Dashboard() {
 
     fetchStats();
   }, []);
+
+  const capaClosureRate = stats.deviations > 0 
+    ? Math.round((stats.completedDeviations / stats.deviations) * 100) 
+    : 0;
+
+  const riskChartData = [
+    { name: t('dashboard.controlledRisks'), value: stats.controlledRisks, color: 'hsl(var(--success))' },
+    { name: t('dashboard.uncontrolledRisks'), value: stats.uncontrolledRisks, color: 'hsl(var(--destructive))' },
+  ];
 
   const statCards = [
     { 
@@ -85,6 +113,13 @@ export default function Dashboard() {
       color: 'text-secondary',
       bgColor: 'bg-secondary/10'
     },
+    { 
+      title: t('dashboard.capaClosureRate'), 
+      value: `${capaClosureRate}%`, 
+      icon: CheckCircle2, 
+      color: 'text-success',
+      bgColor: 'bg-success/10'
+    },
   ];
 
   return (
@@ -96,7 +131,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {statCards.map((stat, index) => (
           <Card 
             key={stat.title} 
@@ -119,6 +154,61 @@ export default function Dashboard() {
           </Card>
         ))}
       </div>
+
+      {/* Risk Chart */}
+      <Card className="border-0 shadow-md">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            {t('dashboard.riskControl')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : stats.controlledRisks === 0 && stats.uncontrolledRisks === 0 ? (
+            <div className="flex items-center justify-center h-64 text-muted-foreground">
+              {t('dashboard.noRiskData')}
+            </div>
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={riskChartData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  >
+                    {riskChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    formatter={(value) => <span className="text-foreground">{value}</span>}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
       <Card className="border-0 shadow-md">
