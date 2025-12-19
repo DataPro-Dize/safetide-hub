@@ -66,6 +66,9 @@ export function DeviationDetailsSheet({
     title: '',
     description: '',
     responsible_id: '',
+    deadline: '',
+    deadline_time: '',
+    nature: '' as 'corrective' | 'preventive' | '',
   });
 
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
@@ -131,8 +134,15 @@ export function DeviationDetailsSheet({
   };
 
   const handleAddWorkflow = async () => {
-    if (!deviation || !newWorkflow.title || !newWorkflow.responsible_id) {
+    if (!deviation || !newWorkflow.title || !newWorkflow.responsible_id || !newWorkflow.deadline || !newWorkflow.deadline_time || !newWorkflow.nature) {
       toast({ title: t('common.fillRequired'), variant: 'destructive' });
+      return;
+    }
+
+    // Combine date and time
+    const deadlineDateTime = new Date(`${newWorkflow.deadline}T${newWorkflow.deadline_time}`);
+    if (deadlineDateTime < new Date()) {
+      toast({ title: t('workflows.deadlineInPast'), variant: 'destructive' });
       return;
     }
 
@@ -142,6 +152,8 @@ export function DeviationDetailsSheet({
       title: newWorkflow.title,
       description: newWorkflow.description || null,
       responsible_id: newWorkflow.responsible_id,
+      deadline: deadlineDateTime.toISOString(),
+      nature: newWorkflow.nature as any,
       status: 'pending',
     });
 
@@ -149,7 +161,7 @@ export function DeviationDetailsSheet({
       toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } else {
       toast({ title: t('workflows.createSuccess') });
-      setNewWorkflow({ title: '', description: '', responsible_id: '' });
+      setNewWorkflow({ title: '', description: '', responsible_id: '', deadline: '', deadline_time: '', nature: '' });
       setShowNewWorkflow(false);
       fetchWorkflows();
     }
@@ -297,6 +309,42 @@ export function DeviationDetailsSheet({
                       ))}
                     </SelectContent>
                   </Select>
+                  
+                  {/* Deadline date and time */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <Label className="text-xs">{t('workflows.deadline')}</Label>
+                      <Input
+                        type="date"
+                        min={new Date().toISOString().split('T')[0]}
+                        value={newWorkflow.deadline}
+                        onChange={(e) => setNewWorkflow(prev => ({ ...prev, deadline: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">{t('workflows.time')}</Label>
+                      <Input
+                        type="time"
+                        value={newWorkflow.deadline_time}
+                        onChange={(e) => setNewWorkflow(prev => ({ ...prev, deadline_time: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Nature dropdown */}
+                  <Select
+                    value={newWorkflow.nature}
+                    onValueChange={(v) => setNewWorkflow(prev => ({ ...prev, nature: v as 'corrective' | 'preventive' }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('workflows.selectNature')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="corrective">{t('workflows.nature.corrective')}</SelectItem>
+                      <SelectItem value="preventive">{t('workflows.nature.preventive')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+
                   <div className="flex gap-2">
                     <Button
                       variant="outline"

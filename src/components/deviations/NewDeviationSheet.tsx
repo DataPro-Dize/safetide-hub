@@ -49,6 +49,7 @@ const formSchema = z.object({
   probability: z.number().min(1).max(3),
   severity: z.number().min(1).max(3),
   location_details: z.string().optional(),
+  phase: z.string().min(1, 'Select a phase'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -82,6 +83,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
       probability: 1,
       severity: 1,
       location_details: '',
+      phase: '',
     },
   });
 
@@ -143,6 +145,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
       creator_id: user.id,
       status: 'open',
       photos: photos,
+      phase: values.phase as any,
     });
 
     if (error) {
@@ -213,11 +216,11 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
                 name="group_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('deviations.corporateGroup')}</FormLabel>
+                    <FormLabel>{t('deviations.companyLabel')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder={t('deviations.selectGroup')} />
+                          <SelectValue placeholder={t('deviations.selectCompanyLabel')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -238,7 +241,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
                 name="company_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('deviations.company')}</FormLabel>
+                    <FormLabel>{t('deviations.projectLabel')}</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
                       value={field.value}
@@ -246,7 +249,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder={t('deviations.selectCompany')} />
+                          <SelectValue placeholder={t('deviations.selectProjectLabel')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -310,6 +313,29 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
                           {t(`deviations.categories.${cat}`)}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Phase dropdown */}
+            <FormField
+              control={form.control}
+              name="phase"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('deviations.phase')}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('deviations.selectPhase')} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="operations">{t('deviations.phases.operations')}</SelectItem>
+                      <SelectItem value="construction">{t('deviations.phases.construction')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
