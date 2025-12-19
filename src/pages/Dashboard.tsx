@@ -10,11 +10,14 @@ import {
   Loader2,
   CheckCircle2,
   ShieldCheck,
-  ShieldAlert,
+  Calendar,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { ptBR, enUS } from 'date-fns/locale';
 
 interface DashboardStats {
   deviations: number;
@@ -26,8 +29,13 @@ interface DashboardStats {
   uncontrolledRisks: number;
 }
 
+interface MonthlyData {
+  month: string;
+  deviations: number;
+}
+
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     deviations: 0,
@@ -39,6 +47,10 @@ export default function Dashboard() {
     uncontrolledRisks: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+  const [selectedMonths, setSelectedMonths] = useState('6');
+
+  const dateLocale = i18n.language === 'pt-BR' ? ptBR : enUS;
 
   useEffect(() => {
     async function fetchStats() {
@@ -48,7 +60,7 @@ export default function Dashboard() {
           supabase.from('workflows').select('id', { count: 'exact', head: true }),
           supabase.from('companies').select('id', { count: 'exact', head: true }),
           supabase.from('plants').select('id', { count: 'exact', head: true }),
-          supabase.from('deviations').select('status'),
+          supabase.from('deviations').select('status, created_at'),
         ]);
 
         const deviationsData = deviationsDataRes.data || [];
@@ -65,6 +77,28 @@ export default function Dashboard() {
           controlledRisks,
           uncontrolledRisks,
         });
+
+        // Process monthly data
+        const monthsCount = parseInt(selectedMonths);
+        const monthlyStats: MonthlyData[] = [];
+        
+        for (let i = monthsCount - 1; i >= 0; i--) {
+          const monthDate = subMonths(new Date(), i);
+          const monthStart = startOfMonth(monthDate);
+          const monthEnd = endOfMonth(monthDate);
+          
+          const deviationsInMonth = deviationsData.filter(d => {
+            const createdAt = new Date(d.created_at);
+            return createdAt >= monthStart && createdAt <= monthEnd;
+          }).length;
+          
+          monthlyStats.push({
+            month: format(monthDate, 'MMM', { locale: dateLocale }),
+            deviations: deviationsInMonth,
+          });
+        }
+        
+        setMonthlyData(monthlyStats);
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
       } finally {
@@ -73,7 +107,7 @@ export default function Dashboard() {
     }
 
     fetchStats();
-  }, []);
+  }, [selectedMonths, dateLocale]);
 
   const capaClosureRate = stats.deviations > 0 
     ? Math.round((stats.completedDeviations / stats.deviations) * 100) 
@@ -155,60 +189,127 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Risk Chart */}
-      <Card className="border-0 shadow-md">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-primary" />
-            {t('dashboard.riskControl')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : stats.controlledRisks === 0 && stats.uncontrolledRisks === 0 ? (
-            <div className="flex items-center justify-center h-64 text-muted-foreground">
-              {t('dashboard.noRiskData')}
-            </div>
-          ) : (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={riskChartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {riskChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                    }}
-                  />
-                  <Legend 
-                    verticalAlign="bottom" 
-                    height={36}
-                    formatter={(value) => <span className="text-foreground">{value}</span>}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Risk Pie Chart */}
+        <Card className="border-0 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              {t('dashboard.riskControl')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : stats.controlledRisks === 0 && stats.uncontrolledRisks === 0 ? (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                {t('dashboard.noRiskData')}
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={riskChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      labelLine={false}
+                    >
+                      {riskChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36}
+                      formatter={(value) => <span className="text-foreground">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Monthly Deviations Bar Chart */}
+        <Card className="border-0 shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              {t('dashboard.monthlyDeviations')}
+            </CardTitle>
+            <Select value={selectedMonths} onValueChange={setSelectedMonths}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">{t('dashboard.lastMonths', { count: 3 })}</SelectItem>
+                <SelectItem value="6">{t('dashboard.lastMonths', { count: 6 })}</SelectItem>
+                <SelectItem value="9">{t('dashboard.lastMonths', { count: 9 })}</SelectItem>
+                <SelectItem value="12">{t('dashboard.lastMonths', { count: 12 })}</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : monthlyData.length === 0 || monthlyData.every(d => d.deviations === 0) ? (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                {t('dashboard.noMonthlyData')}
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis 
+                      dataKey="month" 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                    />
+                    <YAxis 
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      allowDecimals={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                      labelStyle={{ color: 'hsl(var(--foreground))' }}
+                    />
+                    <Bar 
+                      dataKey="deviations" 
+                      fill="hsl(var(--destructive))" 
+                      radius={[4, 4, 0, 0]}
+                      name={t('dashboard.deviations')}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Quick Actions */}
       <Card className="border-0 shadow-md">
