@@ -14,6 +14,208 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_items: {
+        Row: {
+          answer: Database["public"]["Enums"]["audit_answer"] | null
+          audit_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          photos: string[] | null
+          question_id: string
+          updated_at: string
+        }
+        Insert: {
+          answer?: Database["public"]["Enums"]["audit_answer"] | null
+          audit_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          photos?: string[] | null
+          question_id: string
+          updated_at?: string
+        }
+        Update: {
+          answer?: Database["public"]["Enums"]["audit_answer"] | null
+          audit_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          photos?: string[] | null
+          question_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_items_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_items_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "audit_template_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_template_questions: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          question_text: string
+          section_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          question_text: string
+          section_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          question_text?: string
+          section_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_template_questions_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "audit_template_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_template_sections: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          order_index: number
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          order_index?: number
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          order_index?: number
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_template_sections_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "audit_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audits: {
+        Row: {
+          auditor_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          plant_id: string
+          scheduled_date: string
+          score_percentage: number | null
+          signature_url: string | null
+          status: Database["public"]["Enums"]["audit_status"]
+          template_id: string
+          updated_at: string
+        }
+        Insert: {
+          auditor_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plant_id: string
+          scheduled_date: string
+          score_percentage?: number | null
+          signature_url?: string | null
+          status?: Database["public"]["Enums"]["audit_status"]
+          template_id: string
+          updated_at?: string
+        }
+        Update: {
+          auditor_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plant_id?: string
+          scheduled_date?: string
+          score_percentage?: number | null
+          signature_url?: string | null
+          status?: Database["public"]["Enums"]["audit_status"]
+          template_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audits_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audits_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "audit_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           address_city: string | null
@@ -446,6 +648,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      audit_answer: "pass" | "fail" | "na"
+      audit_status: "planned" | "in_progress" | "completed"
       company_size: "small" | "medium" | "large" | "enterprise"
       deviation_category:
         | "access_exit"
@@ -595,6 +799,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      audit_answer: ["pass", "fail", "na"],
+      audit_status: ["planned", "in_progress", "completed"],
       company_size: ["small", "medium", "large", "enterprise"],
       deviation_category: [
         "access_exit",

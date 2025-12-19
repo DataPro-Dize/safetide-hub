@@ -58,7 +58,7 @@ const navItems = [
     title: 'nav.audit', 
     url: '/audit', 
     icon: ClipboardCheck,
-    disabled: true 
+    disabled: false 
   },
 ];
 
@@ -70,8 +70,8 @@ const adminItems = [
     disabled: false 
   },
   { 
-    title: 'nav.settings', 
-    url: '/settings', 
+    title: 'nav.auditTemplates', 
+    url: '/settings/audit-templates', 
     icon: Settings,
     disabled: false 
   },
