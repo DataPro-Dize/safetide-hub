@@ -74,6 +74,9 @@
     "controlledRisks": "Controlled",
     "uncontrolledRisks": "Uncontrolled",
     "noRiskData": "No risk data available",
+    "monthlyDeviations": "Deviations by Month",
+    "lastMonths": "Last {{count}} months",
+    "noMonthlyData": "No monthly data available",
     "plants": "Plants",
     "users": "Users"
   },

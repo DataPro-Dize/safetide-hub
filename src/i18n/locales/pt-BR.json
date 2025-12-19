@@ -75,7 +75,10 @@
     "riskControl": "Riscos Controlados vs. Não Controlados",
     "controlledRisks": "Controlados",
     "uncontrolledRisks": "Não Controlados",
-    "noRiskData": "Nenhum dado de risco disponível"
+    "noRiskData": "Nenhum dado de risco disponível",
+    "monthlyDeviations": "Desvios por Mês",
+    "lastMonths": "Últimos {{count}} meses",
+    "noMonthlyData": "Nenhum dado mensal disponível"
   },
   "deviations": {
     "title": "Desvios",
