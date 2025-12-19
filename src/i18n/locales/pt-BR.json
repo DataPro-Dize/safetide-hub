@@ -70,7 +70,12 @@
     "workflows": "Fluxos de Trabalho",
     "companies": "Empresas",
     "plants": "Áreas",
-    "users": "Usuários"
+    "users": "Usuários",
+    "capaClosureRate": "Taxa de Fechamento CAPA",
+    "riskControl": "Riscos Controlados vs. Não Controlados",
+    "controlledRisks": "Controlados",
+    "uncontrolledRisks": "Não Controlados",
+    "noRiskData": "Nenhum dado de risco disponível"
   },
   "deviations": {
     "title": "Desvios",
