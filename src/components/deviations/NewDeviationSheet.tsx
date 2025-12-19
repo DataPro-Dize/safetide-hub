@@ -46,6 +46,7 @@ const formSchema = z.object({
   company_id: z.string().min(1, 'Select a company'),
   plant_id: z.string().min(1, 'Select a plant'),
   category: z.string().min(1, 'Select a category'),
+  classification: z.string().min(1, 'Select a classification'),
   probability: z.number().min(1).max(3),
   severity: z.number().min(1).max(3),
   location_details: z.string().optional(),
@@ -80,6 +81,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
       company_id: '',
       plant_id: '',
       category: '',
+      classification: 'health_safety',
       probability: 1,
       severity: 1,
       location_details: '',
@@ -139,6 +141,7 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
       description: values.description || null,
       plant_id: values.plant_id,
       category: values.category as any,
+      classification: values.classification as any,
       probability: values.probability,
       severity: values.severity,
       location_details: values.location_details || null,
@@ -161,8 +164,15 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
   };
 
   const categories = [
-    'access_exit', 'chemical_products', 'electrical', 'fire', 
-    'ergonomics', 'ppe', 'machinery', 'fall_protection', 'confined_space', 'other'
+    'not_applicable', 'access_exit', 'chemical_handling', 'confined_space',
+    'contractor_management', 'driving_safety', 'electrical_safety', 'ergonomics',
+    'excavations', 'fire', 'housekeeping', 'load_handling', 'lighting', 'loto',
+    'manual_load_handling', 'noise', 'machinery', 'ppe', 'procedures', 'scaffolding',
+    'signage', 'slip_trip_fall', 'storage', 'wellbeing', 'work_at_height'
+  ];
+
+  const classifications = [
+    'audit', 'environment', 'health_safety', 'property_security', 'social_responsibility'
   ];
 
   return (
@@ -311,6 +321,31 @@ export function NewDeviationSheet({ open, onOpenChange, onSuccess }: NewDeviatio
                       {categories.map((cat) => (
                         <SelectItem key={cat} value={cat}>
                           {t(`deviations.categories.${cat}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="classification"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('deviations.classification')}</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('deviations.selectClassification')} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {classifications.map((cls) => (
+                        <SelectItem key={cls} value={cls}>
+                          {t(`deviations.classifications.${cls}`)}
                         </SelectItem>
                       ))}
                     </SelectContent>
