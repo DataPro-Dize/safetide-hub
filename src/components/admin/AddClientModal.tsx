@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 
 interface AddClientModalProps {
@@ -25,12 +26,28 @@ interface AddClientModalProps {
   onSuccess: () => void;
 }
 
+const availableModules = [
+  { id: 'risk_management', label: 'admin.users.modules.riskManagement' },
+  { id: 'safety_indicators', label: 'admin.users.modules.safetyIndicators' },
+  { id: 'trainings', label: 'admin.users.modules.trainings' },
+  { id: 'audit', label: 'admin.users.modules.audit' },
+];
+
 export function AddClientModal({ open, onOpenChange, onSuccess }: AddClientModalProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [sizeType, setSizeType] = useState<string>('medium');
+  const [selectedModules, setSelectedModules] = useState<string[]>(['risk_management']);
+
+  const handleModuleToggle = (moduleId: string) => {
+    setSelectedModules(prev =>
+      prev.includes(moduleId)
+        ? prev.filter(id => id !== moduleId)
+        : [...prev, moduleId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,28 +57,51 @@ export function AddClientModal({ open, onOpenChange, onSuccess }: AddClientModal
     }
 
     setLoading(true);
-    const { error } = await supabase
+    
+    // Create corporate group
+    const { data: groupData, error: groupError } = await supabase
       .from('corporate_groups')
       .insert({
         name: name.trim(),
         size_type: sizeType as 'small' | 'medium' | 'large' | 'enterprise',
-      });
+      })
+      .select('id')
+      .single();
 
-    if (error) {
-      toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: t('admin.clients.createSuccess') });
-      setName('');
-      setSizeType('medium');
-      onOpenChange(false);
-      onSuccess();
+    if (groupError) {
+      toast({ title: t('common.error'), description: groupError.message, variant: 'destructive' });
+      setLoading(false);
+      return;
     }
+
+    // Insert client modules
+    if (selectedModules.length > 0) {
+      const modulesToInsert = selectedModules.map(moduleId => ({
+        group_id: groupData.id,
+        module_id: moduleId,
+      }));
+
+      const { error: modulesError } = await supabase
+        .from('client_modules')
+        .insert(modulesToInsert);
+
+      if (modulesError) {
+        console.error('Error inserting modules:', modulesError);
+      }
+    }
+
+    toast({ title: t('admin.clients.createSuccess') });
+    setName('');
+    setSizeType('medium');
+    setSelectedModules(['risk_management']);
+    onOpenChange(false);
+    onSuccess();
     setLoading(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{t('admin.clients.add')}</DialogTitle>
         </DialogHeader>
@@ -89,6 +129,27 @@ export function AddClientModal({ open, onOpenChange, onSuccess }: AddClientModal
                 <SelectItem value="enterprise">{t('admin.clients.sizes.enterprise')}</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label>{t('admin.clients.moduleAccess')}</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {availableModules.map((module) => (
+                <div key={module.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`client-${module.id}`}
+                    checked={selectedModules.includes(module.id)}
+                    onCheckedChange={() => handleModuleToggle(module.id)}
+                  />
+                  <label
+                    htmlFor={`client-${module.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {t(module.label)}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

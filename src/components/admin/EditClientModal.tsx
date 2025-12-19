@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 
 interface CorporateGroup {
@@ -32,17 +33,49 @@ interface EditClientModalProps {
   onSuccess: () => void;
 }
 
+const availableModules = [
+  { id: 'risk_management', label: 'admin.users.modules.riskManagement' },
+  { id: 'safety_indicators', label: 'admin.users.modules.safetyIndicators' },
+  { id: 'trainings', label: 'admin.users.modules.trainings' },
+  { id: 'audit', label: 'admin.users.modules.audit' },
+];
+
 export function EditClientModal({ open, onOpenChange, group, onSuccess }: EditClientModalProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(group.name);
   const [sizeType, setSizeType] = useState<string>(group.size_type || 'medium');
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
 
   useEffect(() => {
     setName(group.name);
     setSizeType(group.size_type || 'medium');
-  }, [group]);
+    
+    // Fetch current modules for this client
+    const fetchModules = async () => {
+      const { data } = await supabase
+        .from('client_modules')
+        .select('module_id')
+        .eq('group_id', group.id);
+      
+      if (data) {
+        setSelectedModules(data.map(m => m.module_id));
+      }
+    };
+    
+    if (open) {
+      fetchModules();
+    }
+  }, [group, open]);
+
+  const handleModuleToggle = (moduleId: string) => {
+    setSelectedModules(prev =>
+      prev.includes(moduleId)
+        ? prev.filter(id => id !== moduleId)
+        : [...prev, moduleId]
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +85,9 @@ export function EditClientModal({ open, onOpenChange, group, onSuccess }: EditCl
     }
 
     setLoading(true);
-    const { error } = await supabase
+    
+    // Update corporate group
+    const { error: groupError } = await supabase
       .from('corporate_groups')
       .update({
         name: name.trim(),
@@ -60,19 +95,42 @@ export function EditClientModal({ open, onOpenChange, group, onSuccess }: EditCl
       })
       .eq('id', group.id);
 
-    if (error) {
-      toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
-    } else {
-      toast({ title: t('admin.clients.updateSuccess') });
-      onOpenChange(false);
-      onSuccess();
+    if (groupError) {
+      toast({ title: t('common.error'), description: groupError.message, variant: 'destructive' });
+      setLoading(false);
+      return;
     }
+
+    // Delete existing modules and insert new ones
+    await supabase
+      .from('client_modules')
+      .delete()
+      .eq('group_id', group.id);
+
+    if (selectedModules.length > 0) {
+      const modulesToInsert = selectedModules.map(moduleId => ({
+        group_id: group.id,
+        module_id: moduleId,
+      }));
+
+      const { error: modulesError } = await supabase
+        .from('client_modules')
+        .insert(modulesToInsert);
+
+      if (modulesError) {
+        console.error('Error inserting modules:', modulesError);
+      }
+    }
+
+    toast({ title: t('admin.clients.updateSuccess') });
+    onOpenChange(false);
+    onSuccess();
     setLoading(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{t('admin.clients.edit')}</DialogTitle>
         </DialogHeader>
@@ -100,6 +158,27 @@ export function EditClientModal({ open, onOpenChange, group, onSuccess }: EditCl
                 <SelectItem value="enterprise">{t('admin.clients.sizes.enterprise')}</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label>{t('admin.clients.moduleAccess')}</Label>
+            <div className="grid grid-cols-2 gap-3">
+              {availableModules.map((module) => (
+                <div key={module.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`edit-client-${module.id}`}
+                    checked={selectedModules.includes(module.id)}
+                    onCheckedChange={() => handleModuleToggle(module.id)}
+                  />
+                  <label
+                    htmlFor={`edit-client-${module.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {t(module.label)}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
