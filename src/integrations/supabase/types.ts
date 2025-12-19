@@ -216,6 +216,35 @@ export type Database = {
           },
         ]
       }
+      client_modules: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          module_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          module_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          module_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_modules_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           address_city: string | null

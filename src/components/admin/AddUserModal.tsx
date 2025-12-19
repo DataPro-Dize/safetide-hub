@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -32,7 +32,7 @@ interface AddUserModalProps {
   onSuccess: () => void;
 }
 
-const modules = [
+const allModules = [
   { id: 'risk_management', label: 'admin.users.modules.riskManagement' },
   { id: 'safety_indicators', label: 'admin.users.modules.safetyIndicators' },
   { id: 'trainings', label: 'admin.users.modules.trainings' },
@@ -43,14 +43,43 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
   const { t } = useTranslation();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [availableModules, setAvailableModules] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     role: 'technician' as 'technician' | 'supervisor' | 'admin',
     groupId: '',
-    selectedModules: ['risk_management'] as string[],
+    selectedModules: [] as string[],
   });
+
+  // Fetch available modules when group changes
+  useEffect(() => {
+    const fetchClientModules = async () => {
+      if (!formData.groupId) {
+        setAvailableModules([]);
+        setFormData(prev => ({ ...prev, selectedModules: [] }));
+        return;
+      }
+
+      const { data } = await supabase
+        .from('client_modules')
+        .select('module_id')
+        .eq('group_id', formData.groupId);
+
+      if (data) {
+        const moduleIds = data.map(m => m.module_id);
+        setAvailableModules(moduleIds);
+        // Reset selected modules to only include available ones
+        setFormData(prev => ({
+          ...prev,
+          selectedModules: prev.selectedModules.filter(id => moduleIds.includes(id)),
+        }));
+      }
+    };
+
+    fetchClientModules();
+  }, [formData.groupId]);
 
   const handleModuleToggle = (moduleId: string) => {
     setFormData(prev => ({
@@ -112,7 +141,7 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
         phone: '',
         role: 'technician',
         groupId: '',
-        selectedModules: ['risk_management'],
+        selectedModules: [],
       });
       onOpenChange(false);
       onSuccess();
@@ -123,6 +152,8 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
       setLoading(false);
     }
   };
+
+  const filteredModules = allModules.filter(m => availableModules.includes(m.id));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -204,23 +235,29 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
 
           <div className="space-y-3">
             <Label>{t('admin.users.moduleAccess')}</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {modules.map((module) => (
-                <div key={module.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={module.id}
-                    checked={formData.selectedModules.includes(module.id)}
-                    onCheckedChange={() => handleModuleToggle(module.id)}
-                  />
-                  <label
-                    htmlFor={module.id}
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    {t(module.label)}
-                  </label>
-                </div>
-              ))}
-            </div>
+            {!formData.groupId ? (
+              <p className="text-sm text-muted-foreground">{t('admin.users.selectGroupFirst')}</p>
+            ) : filteredModules.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('admin.users.noModulesAvailable')}</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {filteredModules.map((module) => (
+                  <div key={module.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={module.id}
+                      checked={formData.selectedModules.includes(module.id)}
+                      onCheckedChange={() => handleModuleToggle(module.id)}
+                    />
+                    <label
+                      htmlFor={module.id}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {t(module.label)}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
