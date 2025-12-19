@@ -355,6 +355,9 @@ export type Database = {
       deviations: {
         Row: {
           category: Database["public"]["Enums"]["deviation_category"]
+          classification:
+            | Database["public"]["Enums"]["deviation_classification"]
+            | null
           created_at: string
           creator_id: string
           description: string | null
@@ -372,6 +375,9 @@ export type Database = {
         }
         Insert: {
           category?: Database["public"]["Enums"]["deviation_category"]
+          classification?:
+            | Database["public"]["Enums"]["deviation_classification"]
+            | null
           created_at?: string
           creator_id: string
           description?: string | null
@@ -389,6 +395,9 @@ export type Database = {
         }
         Update: {
           category?: Database["public"]["Enums"]["deviation_category"]
+          classification?:
+            | Database["public"]["Enums"]["deviation_classification"]
+            | null
           created_at?: string
           creator_id?: string
           description?: string | null
@@ -690,16 +699,37 @@ export type Database = {
       audit_status: "planned" | "in_progress" | "completed"
       company_size: "small" | "medium" | "large" | "enterprise"
       deviation_category:
+        | "not_applicable"
         | "access_exit"
-        | "chemical_products"
-        | "electrical"
-        | "fire"
-        | "ergonomics"
-        | "ppe"
-        | "machinery"
-        | "fall_protection"
+        | "chemical_handling"
         | "confined_space"
-        | "other"
+        | "contractor_management"
+        | "driving_safety"
+        | "electrical_safety"
+        | "ergonomics"
+        | "excavations"
+        | "fire"
+        | "housekeeping"
+        | "load_handling"
+        | "lighting"
+        | "loto"
+        | "manual_load_handling"
+        | "noise"
+        | "machinery"
+        | "ppe"
+        | "procedures"
+        | "scaffolding"
+        | "signage"
+        | "slip_trip_fall"
+        | "storage"
+        | "wellbeing"
+        | "work_at_height"
+      deviation_classification:
+        | "audit"
+        | "environment"
+        | "health_safety"
+        | "property_security"
+        | "social_responsibility"
       deviation_phase: "operations" | "construction"
       deviation_status: "open" | "in_progress" | "done"
       user_role: "technician" | "supervisor" | "admin"
@@ -843,16 +873,38 @@ export const Constants = {
       audit_status: ["planned", "in_progress", "completed"],
       company_size: ["small", "medium", "large", "enterprise"],
       deviation_category: [
+        "not_applicable",
         "access_exit",
-        "chemical_products",
-        "electrical",
-        "fire",
-        "ergonomics",
-        "ppe",
-        "machinery",
-        "fall_protection",
+        "chemical_handling",
         "confined_space",
-        "other",
+        "contractor_management",
+        "driving_safety",
+        "electrical_safety",
+        "ergonomics",
+        "excavations",
+        "fire",
+        "housekeeping",
+        "load_handling",
+        "lighting",
+        "loto",
+        "manual_load_handling",
+        "noise",
+        "machinery",
+        "ppe",
+        "procedures",
+        "scaffolding",
+        "signage",
+        "slip_trip_fall",
+        "storage",
+        "wellbeing",
+        "work_at_height",
+      ],
+      deviation_classification: [
+        "audit",
+        "environment",
+        "health_safety",
+        "property_security",
+        "social_responsibility",
       ],
       deviation_phase: ["operations", "construction"],
       deviation_status: ["open", "in_progress", "done"],

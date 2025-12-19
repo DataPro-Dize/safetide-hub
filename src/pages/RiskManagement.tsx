@@ -105,8 +105,11 @@ export default function RiskManagement() {
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
 
   const categories = [
-    'access_exit', 'chemical_products', 'electrical', 'fire', 
-    'ergonomics', 'ppe', 'machinery', 'fall_protection', 'confined_space', 'other'
+    'not_applicable', 'access_exit', 'chemical_handling', 'confined_space',
+    'contractor_management', 'driving_safety', 'electrical_safety', 'ergonomics',
+    'excavations', 'fire', 'housekeeping', 'load_handling', 'lighting', 'loto',
+    'manual_load_handling', 'noise', 'machinery', 'ppe', 'procedures', 'scaffolding',
+    'signage', 'slip_trip_fall', 'storage', 'wellbeing', 'work_at_height'
   ];
 
   return (

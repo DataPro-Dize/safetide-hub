@@ -311,24 +311,6 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card className="border-0 shadow-md">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">
-            {t('common.actions')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button variant="brand" onClick={() => navigate('/risk-management')}>
-            <AlertTriangle className="mr-2 h-4 w-4" />
-            {t('deviations.new')}
-          </Button>
-          <Button variant="outline">
-            <GitBranch className="mr-2 h-4 w-4" />
-            {t('workflows.new')}
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }
