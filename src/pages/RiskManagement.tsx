@@ -24,7 +24,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 type DeviationStatus = Database['public']['Enums']['deviation_status'];
 type DeviationCategory = Database['public']['Enums']['deviation_category'];
-import { Plus, Filter, Download } from 'lucide-react';
+import { Plus, Download } from 'lucide-react';
 import { NewDeviationSheet } from '@/components/deviations/NewDeviationSheet';
 import { DeviationDetailsSheet } from '@/components/deviations/DeviationDetailsSheet';
 import { format } from 'date-fns';
@@ -180,40 +180,6 @@ export default function RiskManagement() {
         </div>
       </div>
 
-      {/* Filters */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="py-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('common.status')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('common.all')}</SelectItem>
-                <SelectItem value="open">{t('deviations.status.open')}</SelectItem>
-                <SelectItem value="in_progress">{t('deviations.status.in_progress')}</SelectItem>
-                <SelectItem value="done">{t('deviations.status.done')}</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder={t('deviations.category')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t('common.all')}</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {t(`deviations.categories.${cat}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Data Table */}
       <Card className="border-0 shadow-sm">
         <CardContent className="p-0">
@@ -246,9 +212,35 @@ export default function RiskManagement() {
                     className="h-8 text-xs"
                   />
                 </TableHead>
+                <TableHead className="py-2">
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder={t('common.all')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('common.all')}</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {t(`deviations.categories.${cat}`)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableHead>
                 <TableHead className="py-2"></TableHead>
-                <TableHead className="py-2"></TableHead>
-                <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder={t('common.all')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('common.all')}</SelectItem>
+                      <SelectItem value="open">{t('deviations.status.open')}</SelectItem>
+                      <SelectItem value="in_progress">{t('deviations.status.in_progress')}</SelectItem>
+                      <SelectItem value="done">{t('deviations.status.done')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableHead>
                 <TableHead className="py-2">
                   <Input 
                     placeholder="Buscar..."
