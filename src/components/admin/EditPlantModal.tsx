@@ -53,7 +53,7 @@ export function EditPlantModal({ open, onOpenChange, plant, onSuccess }: EditPla
     if (error) {
       toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: t('admin.plants.updateSuccess') });
+      toast({ title: t('admin.units.updateSuccess') });
       onOpenChange(false);
       onSuccess();
     }
@@ -64,7 +64,7 @@ export function EditPlantModal({ open, onOpenChange, plant, onSuccess }: EditPla
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t('admin.plants.edit')}</DialogTitle>
+          <DialogTitle>{t('admin.units.edit')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -73,7 +73,7 @@ export function EditPlantModal({ open, onOpenChange, plant, onSuccess }: EditPla
               id="plant-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={t('admin.plants.namePlaceholder')}
+              placeholder={t('admin.units.namePlaceholder')}
             />
           </div>
 

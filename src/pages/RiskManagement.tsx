@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -23,7 +24,7 @@ import type { Database } from '@/integrations/supabase/types';
 
 type DeviationStatus = Database['public']['Enums']['deviation_status'];
 type DeviationCategory = Database['public']['Enums']['deviation_category'];
-import { Plus, Filter } from 'lucide-react';
+import { Plus, Filter, Download } from 'lucide-react';
 import { NewDeviationSheet } from '@/components/deviations/NewDeviationSheet';
 import { DeviationDetailsSheet } from '@/components/deviations/DeviationDetailsSheet';
 import { format } from 'date-fns';
@@ -31,6 +32,7 @@ import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
+import * as XLSX from 'xlsx';
 
 type Deviation = Tables<'deviations'>;
 type Profile = Tables<'profiles'>;
@@ -47,6 +49,12 @@ export default function RiskManagement() {
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  
+  // Search filters
+  const [searchId, setSearchId] = useState('');
+  const [searchTitle, setSearchTitle] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [searchReporter, setSearchReporter] = useState('');
 
   const fetchDeviations = async () => {
     setLoading(true);
@@ -112,6 +120,43 @@ export default function RiskManagement() {
     'signage', 'slip_trip_fall', 'storage', 'wellbeing', 'work_at_height'
   ];
 
+  // Apply search filters
+  const filteredDeviations = deviations.filter(deviation => {
+    const creatorProfile = profiles.find(p => p.id === deviation.creator_id);
+    const creatorName = creatorProfile?.name || '';
+    const dateStr = format(new Date(deviation.created_at), 'dd/MM/yyyy');
+    
+    if (searchId && !deviation.id.toLowerCase().includes(searchId.toLowerCase())) return false;
+    if (searchTitle && !deviation.title.toLowerCase().includes(searchTitle.toLowerCase())) return false;
+    if (searchDate && !dateStr.includes(searchDate)) return false;
+    if (searchReporter && !creatorName.toLowerCase().includes(searchReporter.toLowerCase())) return false;
+    
+    return true;
+  });
+
+  // Export to Excel
+  const handleExportExcel = () => {
+    const exportData = filteredDeviations.map(deviation => {
+      const creatorProfile = profiles.find(p => p.id === deviation.creator_id);
+      return {
+        'ID': deviation.id.substring(0, 8),
+        [t('common.title')]: deviation.title,
+        [t('deviations.category')]: t(`deviations.categories.${deviation.category}`),
+        [t('deviations.riskRating')]: getRiskLabel(deviation.risk_rating),
+        [t('common.status')]: t(`deviations.status.${deviation.status}`),
+        [t('deviations.reportedBy')]: creatorProfile?.name || '-',
+        [t('common.date')]: format(new Date(deviation.created_at), 'dd/MM/yyyy HH:mm'),
+        [t('common.description')]: deviation.description || '',
+        [t('deviations.locationDetails')]: deviation.location_details || '',
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Riscos');
+    XLSX.writeFile(wb, `riscos_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -123,10 +168,16 @@ export default function RiskManagement() {
             {t('deviations.pageDescription')}
           </p>
         </div>
-        <Button variant="brand" onClick={() => setIsNewSheetOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('deviations.new')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportExcel} disabled={filteredDeviations.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            Excel
+          </Button>
+          <Button variant="brand" onClick={() => setIsNewSheetOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('deviations.new')}
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -177,6 +228,44 @@ export default function RiskManagement() {
                 <TableHead>{t('deviations.reportedBy')}</TableHead>
                 <TableHead>{t('common.date')}</TableHead>
               </TableRow>
+              {/* Search Row */}
+              <TableRow className="bg-muted/30">
+                <TableHead className="py-2">
+                  <Input 
+                    placeholder="Buscar..."
+                    value={searchId}
+                    onChange={(e) => setSearchId(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2">
+                  <Input 
+                    placeholder="Buscar..."
+                    value={searchTitle}
+                    onChange={(e) => setSearchTitle(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2">
+                  <Input 
+                    placeholder="Buscar..."
+                    value={searchReporter}
+                    onChange={(e) => setSearchReporter(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2">
+                  <Input 
+                    placeholder="dd/mm/aaaa"
+                    value={searchDate}
+                    onChange={(e) => setSearchDate(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
@@ -188,14 +277,14 @@ export default function RiskManagement() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : deviations.length === 0 ? (
+              ) : filteredDeviations.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     {t('deviations.noData')}
                   </TableCell>
                 </TableRow>
               ) : (
-                deviations.map((deviation) => {
+                filteredDeviations.map((deviation) => {
                   const creatorProfile = profiles.find(p => p.id === deviation.creator_id);
                   return (
                     <TableRow 

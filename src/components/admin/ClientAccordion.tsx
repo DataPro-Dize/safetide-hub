@@ -130,7 +130,7 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
     if (error) {
       toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: t('admin.plants.deleteSuccess') });
+      toast({ title: t('admin.units.deleteSuccess') });
       onRefresh();
     }
     setDeletePlantId(null);
@@ -283,7 +283,7 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
                             onClick={() => setAddPlantCompanyId(company.id)}
                           >
                             <Plus className="h-3.5 w-3.5" />
-                            {t('admin.plants.add')}
+                            {t('admin.units.add')}
                           </Button>
                         </div>
                       </div>
@@ -376,9 +376,9 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
       <AlertDialog open={!!deletePlantId} onOpenChange={() => setDeletePlantId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('admin.plants.confirmDelete')}</AlertDialogTitle>
+            <AlertDialogTitle>{t('admin.units.confirmDelete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('admin.plants.deleteWarning')}
+              {t('admin.units.deleteWarning')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

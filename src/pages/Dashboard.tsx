@@ -23,7 +23,7 @@ interface DashboardStats {
   deviations: number;
   workflows: number;
   companies: number;
-  plants: number;
+  units: number;
   completedDeviations: number;
   controlledRisks: number;
   uncontrolledRisks: number;
@@ -41,7 +41,7 @@ export default function Dashboard() {
     deviations: 0,
     workflows: 0,
     companies: 0,
-    plants: 0,
+    units: 0,
     completedDeviations: 0,
     controlledRisks: 0,
     uncontrolledRisks: 0,
@@ -55,7 +55,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [deviationsRes, workflowsRes, companiesRes, plantsRes, deviationsDataRes] = await Promise.all([
+        const [deviationsRes, workflowsRes, companiesRes, unitsRes, deviationsDataRes] = await Promise.all([
           supabase.from('deviations').select('id', { count: 'exact', head: true }),
           supabase.from('workflows').select('id', { count: 'exact', head: true }),
           supabase.from('companies').select('id', { count: 'exact', head: true }),
@@ -72,7 +72,7 @@ export default function Dashboard() {
           deviations: deviationsRes.count ?? 0,
           workflows: workflowsRes.count ?? 0,
           companies: companiesRes.count ?? 0,
-          plants: plantsRes.count ?? 0,
+          units: unitsRes.count ?? 0,
           completedDeviations,
           controlledRisks,
           uncontrolledRisks,
@@ -141,8 +141,8 @@ export default function Dashboard() {
       bgColor: 'bg-primary/10'
     },
     { 
-      title: t('dashboard.plants'), 
-      value: stats.plants, 
+      title: t('dashboard.units'), 
+      value: stats.units, 
       icon: Factory, 
       color: 'text-secondary',
       bgColor: 'bg-secondary/10'
