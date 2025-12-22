@@ -56,9 +56,9 @@ export function AuditList({ onNewAudit, onEditAudit }: AuditListProps) {
           scheduled_date,
           status,
           score_percentage,
+          auditor_id,
           audit_templates(name),
-          plants(name),
-          profiles:auditor_id(name)
+          plants(name)
         `)
         .order('scheduled_date', { ascending: false });
 
@@ -70,6 +70,15 @@ export function AuditList({ onNewAudit, onEditAudit }: AuditListProps) {
 
       if (error) throw error;
 
+      // Fetch auditor names separately
+      const auditorIds = [...new Set((data || []).map(a => a.auditor_id))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', auditorIds);
+      
+      const profilesMap = new Map(profiles?.map(p => [p.id, p.name]) || []);
+
       const formattedAudits = (data || []).map(audit => ({
         id: audit.id,
         scheduled_date: audit.scheduled_date,
@@ -77,7 +86,7 @@ export function AuditList({ onNewAudit, onEditAudit }: AuditListProps) {
         score_percentage: audit.score_percentage,
         template_name: (audit.audit_templates as any)?.name || '',
         plant_name: (audit.plants as any)?.name || '',
-        auditor_name: (audit.profiles as any)?.name || '',
+        auditor_name: profilesMap.get(audit.auditor_id) || '',
       }));
 
       setAudits(formattedAudits);
