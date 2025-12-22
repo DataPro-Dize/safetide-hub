@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, Copy, MoreVertical, Plus, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, MoreVertical, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -79,14 +79,6 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
     );
   };
 
-  const copyRegistrationLink = (groupId: string) => {
-    const link = `${window.location.origin}/register?group=${groupId}`;
-    navigator.clipboard.writeText(link);
-    toast({
-      title: t('admin.clients.linkCopied'),
-      description: link,
-    });
-  };
 
   const handleDeleteGroup = async () => {
     if (!deleteGroupId) return;
@@ -157,16 +149,6 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
                 {t('admin.clients.riskManagement')}
               </div>
               <div className="col-span-4 flex items-center justify-end gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                  onClick={() => copyRegistrationLink(group.id)}
-                >
-                  {t('admin.clients.registrationLink')}
-                  <Copy className="h-3.5 w-3.5" />
-                </Button>
-
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="h-8 w-8">
