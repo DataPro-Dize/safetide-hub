@@ -52,7 +52,7 @@ const navItems = [
     title: 'nav.trainings', 
     url: '/trainings', 
     icon: BookOpen,
-    disabled: true 
+    disabled: false 
   },
   { 
     title: 'nav.audit', 

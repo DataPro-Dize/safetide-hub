@@ -446,5 +446,70 @@
       "confirmDelete": "Confirm Deletion",
       "deleteWarning": "This action cannot be undone."
     }
+  },
+  "trainings": {
+    "title": "Trainings",
+    "description": "Manage trainings and certifications",
+    "unknown": "Unknown",
+    "noData": "No trainings found",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "sessions": "Sessions",
+      "classroom": "Classroom"
+    },
+    "kpi": {
+      "scheduled": "Scheduled",
+      "completed": "Completed",
+      "expiredCertificates": "Expired Certificates",
+      "attendanceRate": "Attendance Rate"
+    },
+    "charts": {
+      "complianceByDepartment": "Compliance by Department",
+      "monthlyExecuted": "Monthly Trainings Executed"
+    },
+    "status": {
+      "scheduled": "Scheduled",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "sessionStarted": "Session started!",
+    "sessions": {
+      "title": "Training Sessions",
+      "schedule": "Schedule Training",
+      "trainingName": "Training",
+      "instructor": "Instructor",
+      "location": "Location",
+      "enrolled": "Enrolled",
+      "startClass": "Start Class",
+      "continueClass": "Continue Class",
+      "trainingType": "Training Type",
+      "selectType": "Select type",
+      "plant": "Plant",
+      "selectPlant": "Select plant",
+      "time": "Time",
+      "selectInstructor": "Select instructor",
+      "locationPlaceholder": "E.g., Room 01, Auditorium",
+      "maxParticipants": "Max Participants",
+      "participants": "Participants",
+      "selectedCount": "{{count}} selected",
+      "createSuccess": "Training scheduled successfully!"
+    },
+    "classroom": {
+      "present": "Present",
+      "attendanceList": "Attendance List",
+      "addParticipant": "Add Participant",
+      "signed": "Signed",
+      "evidence": "Photo Evidence",
+      "classPhoto": "Class Photo",
+      "finalize": "Complete Training",
+      "signatureFor": "Signature for",
+      "signatureSaved": "Signature saved!",
+      "participantAdded": "Participant added!",
+      "noUsersAvailable": "No users available",
+      "confirmFinalize": "Confirm Completion",
+      "finalizeDescription": "{{present}} of {{total}} participants are present. Complete training?",
+      "trainingCompleted": "Training completed successfully!"
+    }
   }
 }
