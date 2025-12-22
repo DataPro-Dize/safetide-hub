@@ -430,6 +430,181 @@ export type Database = {
           },
         ]
       }
+      kpi_audit_logs: {
+        Row: {
+          change_reason: string
+          changed_at: string
+          changed_by: string
+          id: string
+          new_values: Json
+          old_values: Json
+          report_id: string
+        }
+        Insert: {
+          change_reason: string
+          changed_at?: string
+          changed_by: string
+          id?: string
+          new_values: Json
+          old_values: Json
+          report_id: string
+        }
+        Update: {
+          change_reason?: string
+          changed_at?: string
+          changed_by?: string
+          id?: string
+          new_values?: Json
+          old_values?: Json
+          report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_audit_logs_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_audit_logs_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "kpi_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kpi_reports: {
+        Row: {
+          acidente_afastamento: number
+          acidente_fatal: number
+          acidente_prim_socorros: number
+          acidente_restricao_trabalho: number
+          acidente_tratamento_medico: number
+          acidente_veiculos: number
+          acoes_abertas: number
+          acoes_fechadas: number
+          created_at: string
+          created_by: string
+          dias_perdidos: number
+          edit_count: number
+          efetivo_contratados: number
+          efetivo_empresa: number
+          horas_trabalhadas_contratados: number
+          horas_trabalhadas_empresa: number
+          horas_treinadas_contratados: number
+          horas_treinadas_empresa: number
+          id: string
+          inspecoes_seg_contratados: number
+          inspecoes_seg_empresa: number
+          is_locked: boolean
+          last_edit_reason: string | null
+          last_edited_at: string | null
+          last_edited_by: string | null
+          month: number
+          perigos_desvios: number
+          plant_id: string
+          quase_acidente: number
+          safety_walks_contratados: number
+          safety_walks_empresa: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          acidente_afastamento?: number
+          acidente_fatal?: number
+          acidente_prim_socorros?: number
+          acidente_restricao_trabalho?: number
+          acidente_tratamento_medico?: number
+          acidente_veiculos?: number
+          acoes_abertas?: number
+          acoes_fechadas?: number
+          created_at?: string
+          created_by: string
+          dias_perdidos?: number
+          edit_count?: number
+          efetivo_contratados?: number
+          efetivo_empresa?: number
+          horas_trabalhadas_contratados?: number
+          horas_trabalhadas_empresa?: number
+          horas_treinadas_contratados?: number
+          horas_treinadas_empresa?: number
+          id?: string
+          inspecoes_seg_contratados?: number
+          inspecoes_seg_empresa?: number
+          is_locked?: boolean
+          last_edit_reason?: string | null
+          last_edited_at?: string | null
+          last_edited_by?: string | null
+          month: number
+          perigos_desvios?: number
+          plant_id: string
+          quase_acidente?: number
+          safety_walks_contratados?: number
+          safety_walks_empresa?: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          acidente_afastamento?: number
+          acidente_fatal?: number
+          acidente_prim_socorros?: number
+          acidente_restricao_trabalho?: number
+          acidente_tratamento_medico?: number
+          acidente_veiculos?: number
+          acoes_abertas?: number
+          acoes_fechadas?: number
+          created_at?: string
+          created_by?: string
+          dias_perdidos?: number
+          edit_count?: number
+          efetivo_contratados?: number
+          efetivo_empresa?: number
+          horas_trabalhadas_contratados?: number
+          horas_trabalhadas_empresa?: number
+          horas_treinadas_contratados?: number
+          horas_treinadas_empresa?: number
+          id?: string
+          inspecoes_seg_contratados?: number
+          inspecoes_seg_empresa?: number
+          is_locked?: boolean
+          last_edit_reason?: string | null
+          last_edited_at?: string | null
+          last_edited_by?: string | null
+          month?: number
+          perigos_desvios?: number
+          plant_id?: string
+          quase_acidente?: number
+          safety_walks_contratados?: number
+          safety_walks_empresa?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_reports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_reports_last_edited_by_fkey"
+            columns: ["last_edited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_reports_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string

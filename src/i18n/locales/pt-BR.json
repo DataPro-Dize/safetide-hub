@@ -512,5 +512,29 @@
       "finalizeDescription": "{{present}} de {{total}} participantes estão presentes. Deseja concluir o treinamento?",
       "trainingCompleted": "Treinamento concluído com sucesso!"
     }
+  },
+  "indicators": {
+    "title": "Indicadores de Segurança",
+    "description": "Gestão de KPIs de segurança mensais",
+    "tabs": { "dashboard": "Dashboard", "report": "Apontamento", "list": "Relatórios" },
+    "selectPeriod": "Selecione o Período",
+    "plant": "Unidade", "selectPlant": "Selecione a unidade",
+    "year": "Ano", "month": "Mês",
+    "selectPlantFirst": "Selecione uma unidade para iniciar",
+    "months": { "1": "Janeiro", "2": "Fevereiro", "3": "Março", "4": "Abril", "5": "Maio", "6": "Junho", "7": "Julho", "8": "Agosto", "9": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro" },
+    "kpi": { "totalHHT": "Total HHT", "totalAccidents": "Total Acidentes", "workforce": "Efetivo", "frequencyRate": "Taxa de Frequência" },
+    "charts": { "monthlyHHT": "HHT Mensal", "frequencyRate": "Taxa de Frequência" },
+    "calc": { "totalHHT": "Total HHT (Empresa + Contratados)", "totalAccidents": "Total de Acidentes Registráveis", "frequencyRate": "Taxa de Frequência" },
+    "sections": { "hoursWorked": "Horas Trabalhadas", "workforce": "Efetivo", "accidents": "Acidentes", "safetyActivities": "Atividades de Segurança" },
+    "fields": { "horasEmpresa": "Horas Empresa", "horasContratados": "Horas Contratados", "horasTreinadasEmpresa": "Horas Treinadas Empresa", "horasTreinadasContratados": "Horas Treinadas Contratados", "efetivoEmpresa": "Efetivo Empresa", "efetivoContratados": "Efetivo Contratados", "acidenteFatal": "Acidente Fatal", "acidenteAfastamento": "Acidente c/ Afastamento", "acidenteRestricao": "Acidente c/ Restrição", "acidenteTratamento": "Acidente c/ Tratamento Médico", "acidentePrimSocorros": "Primeiros Socorros", "acidenteVeiculos": "Acidentes de Veículos", "quaseAcidente": "Quase Acidentes", "diasPerdidos": "Dias Perdidos", "inspecoesEmpresa": "Inspeções Empresa", "inspecoesContratados": "Inspeções Contratados", "safetyWalksEmpresa": "Safety Walks Empresa", "safetyWalksContratados": "Safety Walks Contratados", "perigosDesvios": "Perigos/Desvios", "acoesAbertas": "Ações Abertas", "acoesFechadas": "Ações Fechadas" },
+    "editReport": "Editar Apontamento", "saveChanges": "Salvar Alterações", "createReport": "Criar Apontamento",
+    "editLocked": "Edição Bloqueada", "edited": "Retificado", "editedBy": "Editado por {{name}} em {{date}}",
+    "reason": "Motivo", "originalRecord": "Registro Original", "canEditOnce": "Este registro pode ser alterado apenas uma vez. Após a alteração, não será possível editar novamente.",
+    "createSuccess": "Apontamento criado com sucesso!", "updateSuccess": "Apontamento atualizado com sucesso!",
+    "status": { "original": "Original", "edited": "Retificado" },
+    "editModal": { "title": "Confirmar Alteração", "description": "A alteração de apontamentos só é permitida uma vez.", "warning": "Após confirmar, este registro será marcado como RETIFICADO e não poderá ser alterado novamente.", "reason": "Justificativa da Alteração", "placeholder": "Descreva o motivo da alteração...", "minChars": "Mínimo de 10 caracteres", "confirm": "Confirmar Alteração" },
+    "list": { "title": "Relatórios de KPI", "export": "Exportar Excel", "searchPlaceholder": "Buscar por projeto ou unidade...", "project": "Projeto", "plant": "Unidade", "period": "Período", "hht": "HHT", "accidents": "Acidentes", "status": "Status" },
+    "export": { "project": "Projeto", "plant": "Unidade", "year": "Ano", "month": "Mês", "status": "Status", "createdBy": "Criado por", "createdAt": "Criado em", "editReason": "Motivo Edição", "editedBy": "Editado por" },
+    "noData": "Nenhum apontamento encontrado"
   }
 }

@@ -511,5 +511,29 @@
       "finalizeDescription": "{{present}} of {{total}} participants are present. Complete training?",
       "trainingCompleted": "Training completed successfully!"
     }
+  },
+  "indicators": {
+    "title": "Safety Indicators",
+    "description": "Monthly safety KPI management",
+    "tabs": { "dashboard": "Dashboard", "report": "Report", "list": "Reports" },
+    "selectPeriod": "Select Period",
+    "plant": "Plant", "selectPlant": "Select plant",
+    "year": "Year", "month": "Month",
+    "selectPlantFirst": "Select a plant to start",
+    "months": { "1": "January", "2": "February", "3": "March", "4": "April", "5": "May", "6": "June", "7": "July", "8": "August", "9": "September", "10": "October", "11": "November", "12": "December" },
+    "kpi": { "totalHHT": "Total HHT", "totalAccidents": "Total Accidents", "workforce": "Workforce", "frequencyRate": "Frequency Rate" },
+    "charts": { "monthlyHHT": "Monthly HHT", "frequencyRate": "Frequency Rate" },
+    "calc": { "totalHHT": "Total HHT (Company + Contractors)", "totalAccidents": "Total Recordable Accidents", "frequencyRate": "Frequency Rate" },
+    "sections": { "hoursWorked": "Hours Worked", "workforce": "Workforce", "accidents": "Accidents", "safetyActivities": "Safety Activities" },
+    "fields": { "horasEmpresa": "Company Hours", "horasContratados": "Contractor Hours", "horasTreinadasEmpresa": "Company Training Hours", "horasTreinadasContratados": "Contractor Training Hours", "efetivoEmpresa": "Company Workforce", "efetivoContratados": "Contractor Workforce", "acidenteFatal": "Fatal Accident", "acidenteAfastamento": "Lost Time Accident", "acidenteRestricao": "Restricted Work Accident", "acidenteTratamento": "Medical Treatment Accident", "acidentePrimSocorros": "First Aid", "acidenteVeiculos": "Vehicle Accidents", "quaseAcidente": "Near Misses", "diasPerdidos": "Lost Days", "inspecoesEmpresa": "Company Inspections", "inspecoesContratados": "Contractor Inspections", "safetyWalksEmpresa": "Company Safety Walks", "safetyWalksContratados": "Contractor Safety Walks", "perigosDesvios": "Hazards/Deviations", "acoesAbertas": "Open Actions", "acoesFechadas": "Closed Actions" },
+    "editReport": "Edit Report", "saveChanges": "Save Changes", "createReport": "Create Report",
+    "editLocked": "Edit Locked", "edited": "Edited", "editedBy": "Edited by {{name}} on {{date}}",
+    "reason": "Reason", "originalRecord": "Original Record", "canEditOnce": "This record can only be changed once. After the change, it cannot be edited again.",
+    "createSuccess": "Report created successfully!", "updateSuccess": "Report updated successfully!",
+    "status": { "original": "Original", "edited": "Edited" },
+    "editModal": { "title": "Confirm Change", "description": "Report changes are only allowed once.", "warning": "After confirming, this record will be marked as EDITED and cannot be changed again.", "reason": "Change Justification", "placeholder": "Describe the reason for the change...", "minChars": "Minimum 10 characters", "confirm": "Confirm Change" },
+    "list": { "title": "KPI Reports", "export": "Export Excel", "searchPlaceholder": "Search by project or plant...", "project": "Project", "plant": "Plant", "period": "Period", "hht": "HHT", "accidents": "Accidents", "status": "Status" },
+    "export": { "project": "Project", "plant": "Plant", "year": "Year", "month": "Month", "status": "Status", "createdBy": "Created by", "createdAt": "Created at", "editReason": "Edit Reason", "editedBy": "Edited by" },
+    "noData": "No reports found"
   }
 }

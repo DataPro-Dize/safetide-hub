@@ -15,6 +15,7 @@ import ClientsUsers from "./pages/ClientsUsers";
 import Audit from "./pages/Audit";
 import AuditTemplates from "./pages/AuditTemplates";
 import Trainings from "./pages/Trainings";
+import SafetyIndicators from "./pages/SafetyIndicators";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/risk-management" element={<RiskManagement />} />
+              <Route path="/indicators" element={<SafetyIndicators />} />
               <Route path="/audit" element={<Audit />} />
               <Route path="/trainings" element={<Trainings />} />
               <Route path="/settings/users" element={<ClientsUsers />} />
