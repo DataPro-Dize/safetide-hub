@@ -43,7 +43,7 @@ export function AddPlantModal({ open, onOpenChange, companyId, onSuccess }: AddP
     if (error) {
       toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: t('admin.plants.createSuccess') });
+      toast({ title: t('admin.units.createSuccess') });
       setName('');
       onOpenChange(false);
       onSuccess();
@@ -55,7 +55,7 @@ export function AddPlantModal({ open, onOpenChange, companyId, onSuccess }: AddP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t('admin.plants.add')}</DialogTitle>
+          <DialogTitle>{t('admin.units.add')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -64,7 +64,7 @@ export function AddPlantModal({ open, onOpenChange, companyId, onSuccess }: AddP
               id="plant-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={t('admin.plants.namePlaceholder')}
+              placeholder={t('admin.units.namePlaceholder')}
             />
           </div>
 
