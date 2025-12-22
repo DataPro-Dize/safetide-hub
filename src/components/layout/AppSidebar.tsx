@@ -96,14 +96,14 @@ export function AppSidebar() {
   return (
     <Sidebar
       className={cn(
-        'border-r-0 bg-sidebar text-sidebar-foreground',
+        'border-r-0 bg-[hsl(213_37%_26%)] text-white',
         collapsed ? 'w-16' : 'w-64'
       )}
       collapsible="icon"
     >
-      <SidebarHeader className="p-4 border-b border-sidebar-border gradient-brand">
+      <SidebarHeader className="p-4 border-b border-white/10 gradient-brand">
         <div className="flex items-center justify-between">
-          {!collapsed && <Logo size="sm" />}
+          {!collapsed && <Logo size="sm" variant="horizontal" />}
           <SidebarTrigger className="text-white hover:bg-white/20" />
         </div>
       </SidebarHeader>
@@ -119,8 +119,9 @@ export function AppSidebar() {
                     disabled={item.disabled}
                     tooltip={collapsed ? t(item.title) : undefined}
                     className={cn(
-                      'w-full justify-start gap-3 px-4 py-3 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors',
-                      isActive(item.url) && 'bg-sidebar-accent text-sidebar-foreground font-medium',
+                      'w-full justify-start gap-3 px-4 py-3 text-white/80 hover:bg-[hsl(184_80%_32%)] hover:text-white transition-colors',
+                      'dark:hover:bg-[hsl(184_80%_32%)]',
+                      isActive(item.url) && 'bg-[hsl(184_80%_32%)] text-white font-medium',
                       item.disabled && 'opacity-50 cursor-not-allowed'
                     )}
                   >
@@ -155,8 +156,9 @@ export function AppSidebar() {
                     disabled={item.disabled}
                     tooltip={collapsed ? t(item.title) : undefined}
                     className={cn(
-                      'w-full justify-start gap-3 px-4 py-3 text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors',
-                      isActive(item.url) && 'bg-sidebar-accent text-sidebar-foreground font-medium'
+                      'w-full justify-start gap-3 px-4 py-3 text-white/80 hover:bg-[hsl(184_80%_32%)] hover:text-white transition-colors',
+                      'dark:hover:bg-[hsl(184_80%_32%)]',
+                      isActive(item.url) && 'bg-[hsl(184_80%_32%)] text-white font-medium'
                     )}
                   >
                     <NavLink
@@ -174,11 +176,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      <SidebarFooter className="border-t border-white/10 p-4">
         <SidebarMenuButton
           onClick={handleLogout}
           tooltip={collapsed ? t('common.logout') : undefined}
-          className="w-full justify-start gap-3 px-4 py-3 text-sidebar-foreground/80 hover:bg-destructive/20 hover:text-destructive transition-colors"
+          className="w-full justify-start gap-3 px-4 py-3 text-white/80 hover:bg-destructive/20 hover:text-destructive transition-colors"
         >
           <LogOut className="h-5 w-5 shrink-0" />
           {!collapsed && <span>{t('common.logout')}</span>}

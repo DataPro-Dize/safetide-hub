@@ -149,7 +149,7 @@ export default function ClientsUsers() {
               className="pl-10 bg-card border-border"
             />
           </div>
-          <Button onClick={() => setShowAddClientModal(true)} className="gap-2">
+          <Button onClick={() => setShowAddClientModal(true)} className="gap-2 bg-button-add hover:bg-button-add/90 text-white">
             <Plus className="h-4 w-4" />
             {t('admin.clients.add')}
           </Button>
