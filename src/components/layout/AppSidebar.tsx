@@ -46,7 +46,7 @@ const navItems = [
     title: 'nav.safetyIndicators', 
     url: '/indicators', 
     icon: BarChart3,
-    disabled: true 
+    disabled: false 
   },
   { 
     title: 'nav.trainings', 
