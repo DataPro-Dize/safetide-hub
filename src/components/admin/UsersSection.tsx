@@ -156,7 +156,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
         </div>
 
         <div className="flex-1 flex justify-end">
-          <Button onClick={() => setShowAddUserModal(true)} className="gap-2">
+          <Button onClick={() => setShowAddUserModal(true)} className="gap-2 bg-button-add hover:bg-button-add/90 text-white">
             <Plus className="h-4 w-4" />
             {t('admin.users.add')}
           </Button>

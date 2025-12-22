@@ -208,8 +208,7 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
                   </h4>
                   <Button
                     size="sm"
-                    variant="secondary"
-                    className="gap-1"
+                    className="gap-1 bg-button-add hover:bg-button-add/90 text-white"
                     onClick={() => setAddCompanyGroupId(group.id)}
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -278,8 +277,7 @@ export function ClientAccordion({ groups, onRefresh }: ClientAccordionProps) {
                           </Button>
                           <Button
                             size="sm"
-                            variant="secondary"
-                            className="gap-1 ml-2"
+                            className="gap-1 ml-2 bg-button-add hover:bg-button-add/90 text-white"
                             onClick={() => setAddPlantCompanyId(company.id)}
                           >
                             <Plus className="h-3.5 w-3.5" />

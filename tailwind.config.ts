@@ -61,6 +61,9 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         brand: {
+          primary: "hsl(var(--brand-primary))",
+          secondary: "hsl(var(--brand-secondary))",
+          light: "hsl(var(--brand-light))",
           teal: "hsl(var(--brand-teal))",
           "teal-light": "hsl(var(--brand-teal-light))",
           blue: "hsl(var(--brand-blue))",
@@ -78,6 +81,7 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        "button-add": "hsl(var(--button-add))",
       },
       borderRadius: {
         lg: "var(--radius)",
