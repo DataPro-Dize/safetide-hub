@@ -14,6 +14,7 @@ import RiskManagement from "./pages/RiskManagement";
 import ClientsUsers from "./pages/ClientsUsers";
 import Audit from "./pages/Audit";
 import AuditTemplates from "./pages/AuditTemplates";
+import Trainings from "./pages/Trainings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/risk-management" element={<RiskManagement />} />
               <Route path="/audit" element={<Audit />} />
+              <Route path="/trainings" element={<Trainings />} />
               <Route path="/settings/users" element={<ClientsUsers />} />
               <Route path="/settings/audit-templates" element={<AuditTemplates />} />
             </Route>

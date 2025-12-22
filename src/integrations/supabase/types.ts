@@ -551,6 +551,199 @@ export type Database = {
         }
         Relationships: []
       }
+      training_enrollments: {
+        Row: {
+          certificate_url: string | null
+          created_at: string
+          digital_signature_url: string | null
+          grade: number | null
+          id: string
+          session_id: string
+          signed_at: string | null
+          status: Database["public"]["Enums"]["training_enrollment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          created_at?: string
+          digital_signature_url?: string | null
+          grade?: number | null
+          id?: string
+          session_id: string
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["training_enrollment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          certificate_url?: string | null
+          created_at?: string
+          digital_signature_url?: string | null
+          grade?: number | null
+          id?: string
+          session_id?: string
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["training_enrollment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_enrollments_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "training_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_enrollments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_evidence: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          photo_url: string
+          session_id: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          photo_url: string
+          session_id: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          photo_url?: string
+          session_id?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_evidence_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "training_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_evidence_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          instructor_id: string
+          location_room: string | null
+          max_participants: number | null
+          plant_id: string
+          scheduled_date: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["training_session_status"]
+          training_type_id: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          instructor_id: string
+          location_room?: string | null
+          max_participants?: number | null
+          plant_id: string
+          scheduled_date: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["training_session_status"]
+          training_type_id: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          instructor_id?: string
+          location_room?: string | null
+          max_participants?: number | null
+          plant_id?: string
+          scheduled_date?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["training_session_status"]
+          training_type_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_sessions_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_sessions_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_sessions_training_type_id_fkey"
+            columns: ["training_type_id"]
+            isOneToOne: false
+            referencedRelation: "training_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_mandatory: boolean
+          title: string
+          updated_at: string
+          validity_months: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_mandatory?: boolean
+          title: string
+          updated_at?: string
+          validity_months?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_mandatory?: boolean
+          title?: string
+          updated_at?: string
+          validity_months?: number
+        }
+        Relationships: []
+      }
       user_companies: {
         Row: {
           company_id: string
@@ -732,6 +925,12 @@ export type Database = {
         | "social_responsibility"
       deviation_phase: "operations" | "construction"
       deviation_status: "open" | "in_progress" | "done"
+      training_enrollment_status: "pending" | "present" | "absent"
+      training_session_status:
+        | "scheduled"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
       user_role: "technician" | "supervisor" | "admin"
       workflow_nature: "corrective" | "preventive"
       workflow_status:
@@ -908,6 +1107,13 @@ export const Constants = {
       ],
       deviation_phase: ["operations", "construction"],
       deviation_status: ["open", "in_progress", "done"],
+      training_enrollment_status: ["pending", "present", "absent"],
+      training_session_status: [
+        "scheduled",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
       user_role: ["technician", "supervisor", "admin"],
       workflow_nature: ["corrective", "preventive"],
       workflow_status: [

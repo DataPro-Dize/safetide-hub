@@ -447,5 +447,70 @@
       "confirmDelete": "Confirmar Exclusão",
       "deleteWarning": "Esta ação não pode ser desfeita."
     }
+  },
+  "trainings": {
+    "title": "Treinamentos",
+    "description": "Gerencie treinamentos e capacitações",
+    "unknown": "Desconhecido",
+    "noData": "Nenhum treinamento encontrado",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "sessions": "Sessões",
+      "classroom": "Sala de Aula"
+    },
+    "kpi": {
+      "scheduled": "Agendados",
+      "completed": "Concluídos",
+      "expiredCertificates": "Certificados Vencidos",
+      "attendanceRate": "Taxa de Presença"
+    },
+    "charts": {
+      "complianceByDepartment": "Conformidade por Departamento",
+      "monthlyExecuted": "Treinamentos Executados por Mês"
+    },
+    "status": {
+      "scheduled": "Agendado",
+      "in_progress": "Em Andamento",
+      "completed": "Concluído",
+      "cancelled": "Cancelado"
+    },
+    "sessionStarted": "Sessão iniciada!",
+    "sessions": {
+      "title": "Sessões de Treinamento",
+      "schedule": "Agendar Treinamento",
+      "trainingName": "Treinamento",
+      "instructor": "Instrutor",
+      "location": "Local",
+      "enrolled": "Inscritos",
+      "startClass": "Iniciar Aula",
+      "continueClass": "Continuar Aula",
+      "trainingType": "Tipo de Treinamento",
+      "selectType": "Selecione o tipo",
+      "plant": "Unidade",
+      "selectPlant": "Selecione a unidade",
+      "time": "Horário",
+      "selectInstructor": "Selecione o instrutor",
+      "locationPlaceholder": "Ex: Sala 01, Auditório",
+      "maxParticipants": "Máximo de Participantes",
+      "participants": "Participantes",
+      "selectedCount": "{{count}} selecionados",
+      "createSuccess": "Treinamento agendado com sucesso!"
+    },
+    "classroom": {
+      "present": "Presente",
+      "attendanceList": "Lista de Presença",
+      "addParticipant": "Adicionar Participante",
+      "signed": "Assinado",
+      "evidence": "Evidências Fotográficas",
+      "classPhoto": "Foto da Turma",
+      "finalize": "Concluir Treinamento",
+      "signatureFor": "Assinatura de",
+      "signatureSaved": "Assinatura salva!",
+      "participantAdded": "Participante adicionado!",
+      "noUsersAvailable": "Nenhum usuário disponível",
+      "confirmFinalize": "Confirmar Conclusão",
+      "finalizeDescription": "{{present}} de {{total}} participantes estão presentes. Deseja concluir o treinamento?",
+      "trainingCompleted": "Treinamento concluído com sucesso!"
+    }
   }
 }
