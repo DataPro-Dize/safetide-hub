@@ -287,6 +287,11 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
         if (updateError) throw updateError;
       }
 
+      // Ensure we have a valid audit ID before saving items
+      if (!auditRecordId) {
+        throw new Error('Failed to create or retrieve audit ID');
+      }
+
       // Save audit items
       const itemsToSave = Object.values(answers)
         .filter(a => a.answer !== null)
@@ -301,7 +306,10 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
       if (itemsToSave.length > 0) {
         // Delete existing items first
         if (!isNew) {
-          await supabase.from('audit_items').delete().eq('audit_id', auditRecordId);
+          const { error: deleteError } = await supabase.from('audit_items').delete().eq('audit_id', auditRecordId);
+          if (deleteError) {
+            console.error('Error deleting existing audit items:', deleteError);
+          }
         }
 
         const { error: itemsError } = await supabase.from('audit_items').insert(itemsToSave);
@@ -313,10 +321,11 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
       });
 
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving audit:', error);
       toast({
         title: t('common.error'),
+        description: error?.message || 'An unexpected error occurred',
         variant: 'destructive',
       });
     } finally {
