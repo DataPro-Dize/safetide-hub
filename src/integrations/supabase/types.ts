@@ -368,6 +368,7 @@ export type Database = {
           plant_id: string
           probability: number
           risk_rating: number | null
+          sequence_id: number
           severity: number
           status: Database["public"]["Enums"]["deviation_status"]
           title: string
@@ -388,6 +389,7 @@ export type Database = {
           plant_id: string
           probability: number
           risk_rating?: number | null
+          sequence_id?: number
           severity: number
           status?: Database["public"]["Enums"]["deviation_status"]
           title: string
@@ -408,6 +410,7 @@ export type Database = {
           plant_id?: string
           probability?: number
           risk_rating?: number | null
+          sequence_id?: number
           severity?: number
           status?: Database["public"]["Enums"]["deviation_status"]
           title?: string
@@ -988,6 +991,7 @@ export type Database = {
           nature: Database["public"]["Enums"]["workflow_nature"] | null
           response_notes: string | null
           responsible_id: string
+          sequence_id: number
           status: Database["public"]["Enums"]["workflow_status"]
           title: string
           updated_at: string
@@ -1006,6 +1010,7 @@ export type Database = {
           nature?: Database["public"]["Enums"]["workflow_nature"] | null
           response_notes?: string | null
           responsible_id: string
+          sequence_id?: number
           status?: Database["public"]["Enums"]["workflow_status"]
           title: string
           updated_at?: string
@@ -1024,6 +1029,7 @@ export type Database = {
           nature?: Database["public"]["Enums"]["workflow_nature"] | null
           response_notes?: string | null
           responsible_id?: string
+          sequence_id?: number
           status?: Database["public"]["Enums"]["workflow_status"]
           title?: string
           updated_at?: string

@@ -58,7 +58,7 @@ export default function RiskManagement() {
 
   const fetchDeviations = async () => {
     setLoading(true);
-    let query = supabase.from('deviations').select('*').order('created_at', { ascending: false });
+    let query = supabase.from('deviations').select('*, sequence_id').order('created_at', { ascending: false });
     
     if (statusFilter !== 'all') {
       query = query.eq('status', statusFilter as DeviationStatus);
@@ -126,7 +126,7 @@ export default function RiskManagement() {
     const creatorName = creatorProfile?.name || '';
     const dateStr = format(new Date(deviation.created_at), 'dd/MM/yyyy');
     
-    if (searchId && !deviation.id.toLowerCase().includes(searchId.toLowerCase())) return false;
+    if (searchId && !(deviation as any).sequence_id?.toString().includes(searchId)) return false;
     if (searchTitle && !deviation.title.toLowerCase().includes(searchTitle.toLowerCase())) return false;
     if (searchDate && !dateStr.includes(searchDate)) return false;
     if (searchReporter && !creatorName.toLowerCase().includes(searchReporter.toLowerCase())) return false;
@@ -139,7 +139,7 @@ export default function RiskManagement() {
     const exportData = filteredDeviations.map(deviation => {
       const creatorProfile = profiles.find(p => p.id === deviation.creator_id);
       return {
-        'ID': deviation.id.substring(0, 8),
+        'ID': (deviation as any).sequence_id || deviation.id.substring(0, 8),
         [t('common.title')]: deviation.title,
         [t('deviations.category')]: t(`deviations.categories.${deviation.category}`),
         [t('deviations.riskRating')]: getRiskLabel(deviation.risk_rating),
@@ -284,8 +284,8 @@ export default function RiskManagement() {
                       className="cursor-pointer hover:bg-muted/50 transition-colors"
                       onClick={() => setSelectedDeviation(deviation)}
                     >
-                      <TableCell className="font-mono text-xs">
-                        {deviation.id.substring(0, 8)}
+                      <TableCell className="font-mono text-xs font-semibold">
+                        #{(deviation as any).sequence_id || '-'}
                       </TableCell>
                       <TableCell className="font-medium">{deviation.title}</TableCell>
                       <TableCell>

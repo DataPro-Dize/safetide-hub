@@ -92,7 +92,7 @@ export function DeviationDetailsSheet({
     if (!deviation) return;
     const { data } = await supabase
       .from('workflows')
-      .select('*')
+      .select('*, sequence_id')
       .eq('deviation_id', deviation.id)
       .order('created_at', { ascending: false });
     if (data) setWorkflows(data);
@@ -322,13 +322,15 @@ export function DeviationDetailsSheet({
                   </SelectContent>
                 </Select>
                 
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  onClick={() => setShowNewWorkflow(!showNewWorkflow)}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                {deviation.status !== 'done' && (
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    onClick={() => setShowNewWorkflow(!showNewWorkflow)}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
 
               {showNewWorkflow && (
