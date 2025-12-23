@@ -423,6 +423,9 @@
     "finalize": "Finalizar Inspeção",
     "saveSuccess": "Inspeção salva com sucesso!",
     "finalizeSuccess": "Inspeção finalizada com sucesso!",
+    "viewAudit": "Visualizar Inspeção",
+    "completedLocked": "Finalizada - Somente Leitura",
+    "noDescription": "Sem descrição disponível",
     "templates": {
       "title": "Templates de Inspeção",
       "description": "Configure os templates e checklists para suas inspeções",

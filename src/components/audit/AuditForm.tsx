@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,7 +35,7 @@ import { ImageUpload } from '@/components/ui/ImageUpload';
 import { SignaturePad } from '@/components/audit/SignaturePad';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, Minus, ArrowLeft, Save } from 'lucide-react';
+import { Check, X, Minus, ArrowLeft, Save, ClipboardCheck, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AuditFormProps {
@@ -46,6 +47,7 @@ interface AuditFormProps {
 interface Template {
   id: string;
   name: string;
+  description: string | null;
   category: string;
 }
 
@@ -91,6 +93,10 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [signature, setSignature] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  const [auditStatus, setAuditStatus] = useState<string>('planned');
+  
+  const isCompleted = auditStatus === 'completed';
+  const isReadOnly = isCompleted && !isNew;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -123,7 +129,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
   const fetchInitialData = async () => {
     try {
       const [templatesRes, plantsRes] = await Promise.all([
-        supabase.from('audit_templates').select('id, name, category').eq('is_active', true),
+        supabase.from('audit_templates').select('id, name, description, category').eq('is_active', true),
         supabase.from('plants').select('id, name'),
       ]);
 
@@ -200,6 +206,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
       form.setValue('scheduled_date', audit.scheduled_date);
       form.setValue('notes', audit.notes || '');
       setSignature(audit.signature_url);
+      setAuditStatus(audit.status);
 
       // Fetch existing answers
       const { data: items, error: itemsError } = await supabase
@@ -346,6 +353,8 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
     }
   };
 
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -355,8 +364,13 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
           {t('common.cancel')}
         </Button>
         <h2 className="text-xl font-semibold">
-          {isNew ? t('audit.newAudit') : t('audit.editAudit')}
+          {isNew ? t('audit.newAudit') : (isReadOnly ? t('audit.viewAudit') : t('audit.editAudit'))}
         </h2>
+        {isReadOnly && (
+          <Badge variant="outline" className="bg-chart-2/10 text-chart-2 border-chart-2">
+            {t('audit.completedLocked')}
+          </Badge>
+        )}
       </div>
 
       <Form {...form}>
@@ -373,7 +387,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('audit.type')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={!isNew}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={!isNew || isReadOnly}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder={t('audit.selectType')} />
@@ -398,7 +412,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('audit.location')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={!isNew}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={!isNew || isReadOnly}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder={t('audit.selectLocation')} />
@@ -424,7 +438,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                   <FormItem>
                     <FormLabel>{t('common.date')}</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} disabled={!isNew} />
+                      <Input type="date" {...field} disabled={!isNew || isReadOnly} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -432,6 +446,26 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
               />
             </CardContent>
           </Card>
+
+          {/* Template Info Card - Show when template is selected */}
+          {selectedTemplate && (
+            <Card className="border-primary/20 bg-primary/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <ClipboardCheck className="h-5 w-5 text-primary" />
+                  {selectedTemplate.name}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm">
+                  {selectedTemplate.description || t('audit.noDescription')}
+                </p>
+                <Badge variant="secondary" className="mt-2">
+                  {t(`audit.categories.${selectedTemplate.category}`)}
+                </Badge>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Checklist Sections */}
           {sections.length > 0 && (
@@ -468,21 +502,22 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                                 value={answer?.answer || ''}
                                 onValueChange={(value) => updateAnswer(question.id, 'answer', value)}
                                 className="flex gap-4"
+                                disabled={isReadOnly}
                               >
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="pass" id={`${question.id}-pass`} />
-                                  <Label htmlFor={`${question.id}-pass`} className="text-chart-2 cursor-pointer">
+                                  <RadioGroupItem value="pass" id={`${question.id}-pass`} disabled={isReadOnly} />
+                                  <Label htmlFor={`${question.id}-pass`} className={cn("cursor-pointer", isReadOnly ? "text-muted-foreground" : "text-chart-2")}>
                                     {t('audit.answers.pass')}
                                   </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="fail" id={`${question.id}-fail`} />
-                                  <Label htmlFor={`${question.id}-fail`} className="text-destructive cursor-pointer">
+                                  <RadioGroupItem value="fail" id={`${question.id}-fail`} disabled={isReadOnly} />
+                                  <Label htmlFor={`${question.id}-fail`} className={cn("cursor-pointer", isReadOnly ? "text-muted-foreground" : "text-destructive")}>
                                     {t('audit.answers.fail')}
                                   </Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="na" id={`${question.id}-na`} />
+                                  <RadioGroupItem value="na" id={`${question.id}-na`} disabled={isReadOnly} />
                                   <Label htmlFor={`${question.id}-na`} className="text-muted-foreground cursor-pointer">
                                     N/A
                                   </Label>
@@ -499,17 +534,30 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                                       onChange={(e) => updateAnswer(question.id, 'comment', e.target.value)}
                                       placeholder={t('audit.commentPlaceholder')}
                                       className="mt-1"
+                                      disabled={isReadOnly}
                                     />
                                   </div>
-                                  <div>
-                                    <Label>{t('audit.evidence')}</Label>
-                                    <ImageUpload
-                                      bucket="audit-evidence"
-                                      maxImages={3}
-                                      images={answer.photos}
-                                      onImagesChange={(photos) => updateAnswer(question.id, 'photos', photos)}
-                                    />
-                                  </div>
+                                  {!isReadOnly && (
+                                    <div>
+                                      <Label>{t('audit.evidence')}</Label>
+                                      <ImageUpload
+                                        bucket="audit-evidence"
+                                        maxImages={3}
+                                        images={answer.photos}
+                                        onImagesChange={(photos) => updateAnswer(question.id, 'photos', photos)}
+                                      />
+                                    </div>
+                                  )}
+                                  {isReadOnly && answer.photos.length > 0 && (
+                                    <div>
+                                      <Label>{t('audit.evidence')}</Label>
+                                      <div className="flex gap-2 mt-1">
+                                        {answer.photos.map((photo, idx) => (
+                                          <img key={idx} src={photo} alt="" className="h-20 w-20 object-cover rounded" />
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -539,6 +587,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                         {...field}
                         placeholder={t('audit.notesPlaceholder')}
                         rows={3}
+                        disabled={isReadOnly}
                       />
                     </FormControl>
                     <FormMessage />
@@ -549,35 +598,58 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
           </Card>
 
           {/* Signature */}
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('audit.signature')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SignaturePad
-                value={signature}
-                onChange={setSignature}
-              />
-            </CardContent>
-          </Card>
+          {!isReadOnly && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('audit.signature')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SignaturePad
+                  value={signature}
+                  onChange={setSignature}
+                />
+              </CardContent>
+            </Card>
+          )}
+
+          {isReadOnly && signature && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('audit.signature')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <img src={signature} alt="Signature" className="max-h-32" />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={onClose}>
-              {t('common.cancel')}
-            </Button>
-            <Button type="submit" variant="secondary" disabled={loading}>
-              <Save className="h-4 w-4 mr-2" />
-              {t('audit.saveDraft')}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => form.handleSubmit((data) => onSubmit(data, true))()}
-              disabled={loading || !signature}
-            >
-              {t('audit.finalize')}
-            </Button>
-          </div>
+          {!isReadOnly && (
+            <div className="flex justify-end gap-3">
+              <Button type="button" variant="outline" onClick={onClose}>
+                {t('common.cancel')}
+              </Button>
+              <Button type="submit" variant="secondary" disabled={loading}>
+                <Save className="h-4 w-4 mr-2" />
+                {t('audit.saveDraft')}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => form.handleSubmit((data) => onSubmit(data, true))()}
+                disabled={loading || !signature}
+              >
+                {t('audit.finalize')}
+              </Button>
+            </div>
+          )}
+
+          {isReadOnly && (
+            <div className="flex justify-end gap-3">
+              <Button type="button" variant="outline" onClick={onClose}>
+                {t('common.close')}
+              </Button>
+            </div>
+          )}
         </form>
       </Form>
     </div>
