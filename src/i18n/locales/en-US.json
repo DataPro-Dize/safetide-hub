@@ -172,7 +172,12 @@
       "open": "Open",
       "in_progress": "In Progress",
       "done": "Done"
-    }
+    },
+    "photos": "Photos",
+    "completeDeviation": "Complete Deviation",
+    "completeSuccess": "Deviation completed successfully!",
+    "cannotComplete": "Cannot complete",
+    "requireApprovedWorkflow": "At least one approved action is required to complete the deviation"
   },
   "workflows": {
     "title": "Workflows",

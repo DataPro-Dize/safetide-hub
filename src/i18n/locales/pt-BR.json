@@ -101,6 +101,8 @@
     "selectProjectLabel": "Selecione o projeto",
     "company": "Empresa",
     "selectCompany": "Selecione a empresa",
+    "plant": "Unidade",
+    "selectPlant": "Selecione a unidade",
     "unit": "Unidade",
     "selectUnit": "Selecione a unidade",
     "selectCategory": "Selecione a categoria",
@@ -173,7 +175,12 @@
       "open": "Aberto",
       "in_progress": "Em Andamento",
       "done": "Concluído"
-    }
+    },
+    "photos": "Fotos",
+    "completeDeviation": "Concluir Desvio",
+    "completeSuccess": "Desvio concluído com sucesso!",
+    "cannotComplete": "Não é possível concluir",
+    "requireApprovedWorkflow": "É necessário ao menos uma ação aprovada para concluir o desvio"
   },
   "workflows": {
     "title": "Fluxos de Trabalho",

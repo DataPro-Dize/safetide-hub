@@ -114,8 +114,8 @@ export default function Dashboard() {
     : 0;
 
   const riskChartData = [
-    { name: t('dashboard.controlledRisks'), value: stats.controlledRisks, color: 'hsl(var(--success))' },
-    { name: t('dashboard.uncontrolledRisks'), value: stats.uncontrolledRisks, color: 'hsl(var(--destructive))' },
+    { name: t('dashboard.controlledRisks'), value: stats.controlledRisks, color: 'hsl(142, 76%, 36%)' },
+    { name: t('dashboard.uncontrolledRisks'), value: stats.uncontrolledRisks, color: 'hsl(0, 72%, 51%)' },
   ];
 
   const statCards = [
@@ -165,7 +165,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {statCards.map((stat, index) => (
           <Card 
             key={stat.title} 
@@ -190,7 +190,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         {/* Risk Pie Chart */}
         <Card className="border-0 shadow-md">
           <CardHeader>
@@ -299,7 +299,7 @@ export default function Dashboard() {
                     />
                     <Bar 
                       dataKey="deviations" 
-                      fill="hsl(var(--destructive))" 
+                      fill="hsl(213, 37%, 26%)" 
                       radius={[4, 4, 0, 0]}
                       name={t('dashboard.deviations')}
                     />

@@ -27,7 +27,7 @@ import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { WorkflowCard } from '@/components/workflows/WorkflowCard';
 import { WorkflowResponseSheet } from '@/components/workflows/WorkflowResponseSheet';
 import { WorkflowValidationSheet } from '@/components/workflows/WorkflowValidationSheet';
-import { Plus, Filter } from 'lucide-react';
+import { Plus, Filter, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -168,6 +168,36 @@ export function DeviationDetailsSheet({
     setLoading(false);
   };
 
+  const handleCompleteDeviation = async () => {
+    if (!deviation) return;
+    
+    // Check if there's at least one approved workflow
+    const approvedWorkflows = workflows.filter(w => w.status === 'approved');
+    if (approvedWorkflows.length === 0) {
+      toast({ 
+        title: t('deviations.cannotComplete'), 
+        description: t('deviations.requireApprovedWorkflow'),
+        variant: 'destructive' 
+      });
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase
+      .from('deviations')
+      .update({ status: 'done' })
+      .eq('id', deviation.id);
+
+    if (error) {
+      toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: t('deviations.completeSuccess') });
+      onUpdate();
+      onOpenChange(false);
+    }
+    setLoading(false);
+  };
+
   const filteredWorkflows = workflows.filter(w => {
     if (statusFilter === 'all') return true;
     if (statusFilter === 'mine') return w.responsible_id === currentUserId;
@@ -250,6 +280,26 @@ export function DeviationDetailsSheet({
                 <Label>{t('deviations.photos')}</Label>
                 <ImageCarousel images={deviation.photos || []} />
               </div>
+
+              {/* Complete Deviation Button */}
+              {deviation.status !== 'done' && (
+                <div className="pt-4 border-t">
+                  <Button
+                    variant="brand"
+                    className="w-full"
+                    onClick={handleCompleteDeviation}
+                    disabled={loading || workflows.filter(w => w.status === 'approved').length === 0}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    {t('deviations.completeDeviation')}
+                  </Button>
+                  {workflows.filter(w => w.status === 'approved').length === 0 && (
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      {t('deviations.requireApprovedWorkflow')}
+                    </p>
+                  )}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="workflows" className="space-y-4 mt-4">
