@@ -107,9 +107,9 @@ export function AuditDashboard({ onNewAudit }: AuditDashboardProps) {
       const completed = audits?.filter(a => a.status === 'completed').length || 0;
 
       setStatusData([
-        { name: t('audit.status.planned'), value: planned, color: 'hsl(var(--muted-foreground))' },
-        { name: t('audit.status.in_progress'), value: inProgress, color: 'hsl(var(--primary))' },
-        { name: t('audit.status.completed'), value: completed, color: 'hsl(var(--chart-2))' },
+        { name: t('audit.status.planned'), value: planned, color: 'hsl(213, 37%, 45%)' },
+        { name: t('audit.status.in_progress'), value: inProgress, color: 'hsl(38, 92%, 50%)' },
+        { name: t('audit.status.completed'), value: completed, color: 'hsl(142, 76%, 36%)' },
       ]);
 
       // Category distribution
@@ -213,26 +213,33 @@ export function AuditDashboard({ onNewAudit }: AuditDashboardProps) {
             <CardTitle>{t('audit.charts.byStatus')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px]">
+            <div className="h-[250px] flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={statusData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
+                    innerRadius={50}
+                    outerRadius={70}
+                    paddingAngle={2}
                     dataKey="value"
-                    label={({ name, value }) => `${name}: ${value}`}
                   >
                     {statusData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value) => [value, '']} />
                 </PieChart>
               </ResponsiveContainer>
+            </div>
+            <div className="flex justify-center gap-4 mt-2">
+              {statusData.map((entry, index) => (
+                <div key={index} className="flex items-center gap-2 text-sm">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                  <span>{entry.name}: {entry.value}</span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -245,11 +252,11 @@ export function AuditDashboard({ onNewAudit }: AuditDashboardProps) {
           <CardContent>
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={categoryData}>
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis />
+                <BarChart data={categoryData} layout="vertical">
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={100} />
                   <Tooltip />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" fill="hsl(184, 80%, 32%)" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

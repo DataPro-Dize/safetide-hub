@@ -422,6 +422,9 @@
     "finalize": "Finalize Inspection",
     "saveSuccess": "Inspection saved successfully!",
     "finalizeSuccess": "Inspection finalized successfully!",
+    "viewAudit": "View Inspection",
+    "completedLocked": "Completed - Read Only",
+    "noDescription": "No description available",
     "templates": {
       "title": "Inspection Templates",
       "description": "Configure templates and checklists for your inspections",

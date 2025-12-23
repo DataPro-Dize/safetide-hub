@@ -74,15 +74,37 @@ export default function AuditTemplates() {
   const [editingSection, setEditingSection] = useState<Section | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<{ sectionId: string; question: Question | null }>({ sectionId: '', question: null });
   const [deleteDialog, setDeleteDialog] = useState<{ type: 'template' | 'section' | 'question'; id: string } | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   // Form states
   const [templateForm, setTemplateForm] = useState({ name: '', description: '', category: 'safety' });
   const [sectionForm, setSectionForm] = useState({ name: '' });
   const [questionForm, setQuestionForm] = useState({ question_text: '' });
 
+  const isAdmin = userRole === 'admin' || userRole === 'supervisor';
+
   useEffect(() => {
     fetchTemplates();
+    fetchUserRole();
   }, []);
+
+  const fetchUserRole = async () => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', userData.user.id)
+          .single();
+        if (profile) {
+          setUserRole(profile.role);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+    }
+  };
 
   useEffect(() => {
     if (selectedTemplate) {
@@ -306,16 +328,17 @@ export default function AuditTemplates() {
           <h1 className="text-2xl font-bold text-foreground">{t('audit.templates.title')}</h1>
           <p className="text-muted-foreground">{t('audit.templates.description')}</p>
         </div>
-        <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingTemplate(null);
-              setTemplateForm({ name: '', description: '', category: 'safety' });
-            }}>
-              <Plus className="h-4 w-4 mr-2" />
-              {t('audit.templates.newTemplate')}
-            </Button>
-          </DialogTrigger>
+        {isAdmin && (
+          <Dialog open={isTemplateModalOpen} onOpenChange={setIsTemplateModalOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => {
+                setEditingTemplate(null);
+                setTemplateForm({ name: '', description: '', category: 'safety' });
+              }}>
+                <Plus className="h-4 w-4 mr-2" />
+                {t('audit.templates.newTemplate')}
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
@@ -366,6 +389,7 @@ export default function AuditTemplates() {
             </div>
           </DialogContent>
         </Dialog>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
