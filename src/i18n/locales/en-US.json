@@ -101,6 +101,8 @@
     "selectProjectLabel": "Select project",
     "company": "Company",
     "selectCompany": "Select company",
+    "plant": "Unit",
+    "selectPlant": "Select unit",
     "unit": "Unit",
     "selectUnit": "Select unit",
     "selectCategory": "Select category",

@@ -64,7 +64,12 @@ export function WorkflowCard({
       workflow.status === 'returned' && "border-l-red-500"
     )}>
       <div className="flex items-start justify-between gap-2">
-        <h4 className="font-medium flex-1">{workflow.title}</h4>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-muted-foreground">
+            #{(workflow as any).sequence_id || '-'}
+          </span>
+          <h4 className="font-medium flex-1">{workflow.title}</h4>
+        </div>
         <Badge variant={statusConfig.variant} className={statusConfig.className}>
           {statusConfig.label}
         </Badge>
