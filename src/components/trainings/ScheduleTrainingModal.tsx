@@ -25,6 +25,8 @@ interface TrainingType {
   description: string | null;
   validity_months: number;
   is_mandatory: boolean;
+  training_link: string | null;
+  notification_days: number[] | null;
 }
 
 interface Plant {
@@ -55,6 +57,9 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
   const [locationRoom, setLocationRoom] = useState('');
   const [maxParticipants, setMaxParticipants] = useState('30');
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
+  const [trainingLink, setTrainingLink] = useState('');
+
+  const selectedTypeData = trainingTypes.find(t => t.id === selectedType);
 
   useEffect(() => {
     fetchData();
@@ -162,7 +167,13 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>{t('trainings.sessions.trainingType')} *</Label>
-          <Select value={selectedType} onValueChange={setSelectedType}>
+          <Select value={selectedType} onValueChange={(value) => {
+            setSelectedType(value);
+            const typeData = trainingTypes.find(t => t.id === value);
+            if (typeData?.training_link) {
+              setTrainingLink(typeData.training_link);
+            }
+          }}>
             <SelectTrigger>
               <SelectValue placeholder={t('trainings.sessions.selectType')} />
             </SelectTrigger>
@@ -175,6 +186,9 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
               ))}
             </SelectContent>
           </Select>
+          {selectedTypeData?.description && (
+            <p className="text-xs text-muted-foreground">{selectedTypeData.description}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -241,15 +255,27 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>{t('trainings.sessions.maxParticipants')}</Label>
-        <Input
-          type="number"
-          value={maxParticipants}
-          onChange={(e) => setMaxParticipants(e.target.value)}
-          min="1"
-          max="100"
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>{t('trainings.sessions.maxParticipants')}</Label>
+          <Input
+            type="number"
+            value={maxParticipants}
+            onChange={(e) => setMaxParticipants(e.target.value)}
+            min="1"
+            max="100"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>{t('trainings.sessions.trainingLink')}</Label>
+          <Input
+            type="url"
+            value={trainingLink}
+            onChange={(e) => setTrainingLink(e.target.value)}
+            placeholder="https://..."
+          />
+        </div>
       </div>
 
       <div className="space-y-2">

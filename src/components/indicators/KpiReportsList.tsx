@@ -21,10 +21,20 @@ import * as XLSX from 'xlsx';
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
 
+// Period options for filtering
+const periodOptions = [
+  { value: 'all', label: 'Todos os períodos' },
+  { value: 'month', label: 'Mensal' },
+  { value: 'quarter', label: 'Trimestral' },
+  { value: 'semester', label: 'Semestral' },
+  { value: 'year', label: 'Anual' },
+];
+
 export function KpiReportsList() {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [periodFilter, setPeriodFilter] = useState<string>('all');
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ['kpi-reports-list', selectedYear],
@@ -54,7 +64,22 @@ export function KpiReportsList() {
     const plantName = report.plant?.name?.toLowerCase() || '';
     const companyName = report.plant?.company?.name?.toLowerCase() || '';
     const search = searchTerm.toLowerCase();
-    return plantName.includes(search) || companyName.includes(search);
+    const matchesSearch = plantName.includes(search) || companyName.includes(search);
+    
+    // Period filter logic
+    let matchesPeriod = true;
+    if (periodFilter === 'quarter') {
+      // Show only first month of each quarter
+      matchesPeriod = [1, 4, 7, 10].includes(report.month);
+    } else if (periodFilter === 'semester') {
+      // Show only first month of each semester
+      matchesPeriod = [1, 7].includes(report.month);
+    } else if (periodFilter === 'year') {
+      // Show only December (year summary)
+      matchesPeriod = report.month === 12;
+    }
+    
+    return matchesSearch && matchesPeriod;
   });
 
   const handleExport = () => {
@@ -126,6 +151,18 @@ export function KpiReportsList() {
               className="pl-9"
             />
           </div>
+          <Select value={periodFilter} onValueChange={setPeriodFilter}>
+            <SelectTrigger className="w-full sm:w-40">
+              <SelectValue placeholder="Período" />
+            </SelectTrigger>
+            <SelectContent>
+              {periodOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={selectedYear} onValueChange={setSelectedYear}>
             <SelectTrigger className="w-full sm:w-32">
               <SelectValue />

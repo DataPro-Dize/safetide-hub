@@ -28,6 +28,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
 
 const navItems = [
   { 
@@ -84,6 +85,7 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { canManageUsers, canViewSettings, isTechnician } = useUserPermissions();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -92,6 +94,17 @@ export function AppSidebar() {
   };
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Filter admin items based on permissions
+  const filteredAdminItems = adminItems.filter(item => {
+    if (item.url === '/settings/users') {
+      return canManageUsers;
+    }
+    if (item.url === '/settings/audit-templates') {
+      return canViewSettings;
+    }
+    return true;
+  });
 
   return (
     <Sidebar
@@ -146,34 +159,36 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup className="mt-auto">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminItems.map((item) => (
-                <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    asChild
-                    disabled={item.disabled}
-                    tooltip={collapsed ? t(item.title) : undefined}
-                    className={cn(
-                      'w-full justify-start gap-3 px-4 py-3 text-white/80 hover:bg-[hsl(184_80%_32%)] hover:text-white transition-colors',
-                      'dark:hover:bg-[hsl(184_80%_32%)]',
-                      isActive(item.url) && 'bg-[hsl(184_80%_32%)] text-white font-medium'
-                    )}
-                  >
-                    <NavLink
-                      to={item.url}
-                      className="flex items-center gap-3 w-full"
+        {filteredAdminItems.length > 0 && (
+          <SidebarGroup className="mt-auto">
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {filteredAdminItems.map((item) => (
+                  <SidebarMenuItem key={item.url}>
+                    <SidebarMenuButton
+                      asChild
+                      disabled={item.disabled}
+                      tooltip={collapsed ? t(item.title) : undefined}
+                      className={cn(
+                        'w-full justify-start gap-3 px-4 py-3 text-white/80 hover:bg-[hsl(184_80%_32%)] hover:text-white transition-colors',
+                        'dark:hover:bg-[hsl(184_80%_32%)]',
+                        isActive(item.url) && 'bg-[hsl(184_80%_32%)] text-white font-medium'
+                      )}
                     >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      {!collapsed && <span>{t(item.title)}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+                      <NavLink
+                        to={item.url}
+                        className="flex items-center gap-3 w-full"
+                      >
+                        <item.icon className="h-5 w-5 shrink-0" />
+                        {!collapsed && <span>{t(item.title)}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-white/10 p-4">

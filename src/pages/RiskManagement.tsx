@@ -36,12 +36,16 @@ import * as XLSX from 'xlsx';
 
 type Deviation = Tables<'deviations'>;
 type Profile = Tables<'profiles'>;
+type Plant = Tables<'plants'>;
+type Company = Tables<'companies'>;
 
 export default function RiskManagement() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const [deviations, setDeviations] = useState<Deviation[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [isNewSheetOpen, setIsNewSheetOpen] = useState(false);
   const [selectedDeviation, setSelectedDeviation] = useState<Deviation | null>(null);
@@ -58,6 +62,15 @@ export default function RiskManagement() {
 
   const fetchDeviations = async () => {
     setLoading(true);
+    
+    // Fetch plants and companies for display
+    const [plantsRes, companiesRes] = await Promise.all([
+      supabase.from('plants').select('*'),
+      supabase.from('companies').select('*'),
+    ]);
+    if (plantsRes.data) setPlants(plantsRes.data);
+    if (companiesRes.data) setCompanies(companiesRes.data);
+    
     let query = supabase.from('deviations').select('*, sequence_id').order('created_at', { ascending: false });
     
     if (statusFilter !== 'all') {
@@ -186,8 +199,10 @@ export default function RiskManagement() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead className="w-[100px]">ID</TableHead>
+                <TableHead className="w-[80px]">ID</TableHead>
                 <TableHead>{t('common.title')}</TableHead>
+                <TableHead>{t('deviations.projectLabel')}</TableHead>
+                <TableHead>{t('deviations.plant')}</TableHead>
                 <TableHead>{t('deviations.category')}</TableHead>
                 <TableHead>{t('deviations.riskRating')}</TableHead>
                 <TableHead>{t('common.status')}</TableHead>
@@ -212,6 +227,8 @@ export default function RiskManagement() {
                     className="h-8 text-xs"
                   />
                 </TableHead>
+                <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2"></TableHead>
                 <TableHead className="py-2">
                   <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                     <SelectTrigger className="h-8 text-xs">
@@ -262,7 +279,7 @@ export default function RiskManagement() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                       {t('common.loading')}
@@ -271,13 +288,15 @@ export default function RiskManagement() {
                 </TableRow>
               ) : filteredDeviations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     {t('deviations.noData')}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredDeviations.map((deviation) => {
                   const creatorProfile = profiles.find(p => p.id === deviation.creator_id);
+                  const plant = plants.find(p => p.id === deviation.plant_id);
+                  const company = plant ? companies.find(c => c.id === plant.company_id) : null;
                   return (
                     <TableRow 
                       key={deviation.id} 
@@ -288,6 +307,12 @@ export default function RiskManagement() {
                         #{(deviation as any).sequence_id || '-'}
                       </TableCell>
                       <TableCell className="font-medium">{deviation.title}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {company?.name || '-'}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {plant?.name || '-'}
+                      </TableCell>
                       <TableCell>
                         {t(`deviations.categories.${deviation.category}`)}
                       </TableCell>
