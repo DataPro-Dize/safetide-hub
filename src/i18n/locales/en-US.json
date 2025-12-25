@@ -465,7 +465,31 @@
     "tabs": {
       "dashboard": "Dashboard",
       "sessions": "Sessions",
+      "types": "Types",
       "classroom": "Classroom"
+    },
+    "types": {
+      "title": "Training Types",
+      "add": "New Type",
+      "edit": "Edit Type",
+      "name": "Name",
+      "namePlaceholder": "E.g., Fall Protection Training",
+      "description": "Description",
+      "descriptionPlaceholder": "Training description",
+      "validityMonths": "Validity (months)",
+      "mandatory": "Mandatory",
+      "trainingLink": "Training Link",
+      "trainingLinkHelp": "URL of the online course the employee must access",
+      "notificationDays": "Advance Notice Days",
+      "notificationDaysHelp": "When to notify before certificate expiration",
+      "days": "days",
+      "months": "months",
+      "openLink": "Open Link",
+      "noData": "No training types registered",
+      "createSuccess": "Training type created!",
+      "updateSuccess": "Training type updated!",
+      "deleteSuccess": "Training type deleted!",
+      "deleteConfirm": "Are you sure you want to delete this training type? Existing sessions won't be affected."
     },
     "kpi": {
       "scheduled": "Scheduled",

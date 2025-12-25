@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrainingDashboard } from '@/components/trainings/TrainingDashboard';
 import { TrainingSessionsList } from '@/components/trainings/TrainingSessionsList';
 import { TrainingClassroom } from '@/components/trainings/TrainingClassroom';
-import { BarChart3, List, BookOpen } from 'lucide-react';
+import { TrainingTypesManager } from '@/components/trainings/TrainingTypesManager';
+import { BarChart3, List, BookOpen, Settings } from 'lucide-react';
 
 export default function Trainings() {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export default function Trainings() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
           <TabsTrigger value="dashboard" className="gap-2">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">{t('trainings.tabs.dashboard')}</span>
@@ -37,6 +38,10 @@ export default function Trainings() {
           <TabsTrigger value="list" className="gap-2">
             <List className="h-4 w-4" />
             <span className="hidden sm:inline">{t('trainings.tabs.sessions')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="types" className="gap-2">
+            <Settings className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('trainings.tabs.types')}</span>
           </TabsTrigger>
           <TabsTrigger value="classroom" className="gap-2" disabled={!selectedSessionId}>
             <BookOpen className="h-4 w-4" />
@@ -50,6 +55,10 @@ export default function Trainings() {
 
         <TabsContent value="list" className="mt-6">
           <TrainingSessionsList onStartClass={handleStartClass} />
+        </TabsContent>
+
+        <TabsContent value="types" className="mt-6">
+          <TrainingTypesManager />
         </TabsContent>
 
         <TabsContent value="classroom" className="mt-6">
