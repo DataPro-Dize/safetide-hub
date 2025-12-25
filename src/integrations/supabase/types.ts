@@ -478,6 +478,76 @@ export type Database = {
           },
         ]
       }
+      kpi_definitions: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          formula: string
+          frequency: string
+          id: string
+          is_active: boolean
+          name: string
+          plant_id: string | null
+          target_value: number | null
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          formula: string
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          plant_id?: string | null
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          formula?: string
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          plant_id?: string | null
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_definitions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_definitions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_definitions_plant_id_fkey"
+            columns: ["plant_id"]
+            isOneToOne: false
+            referencedRelation: "plants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kpi_reports: {
         Row: {
           acidente_afastamento: number
@@ -898,7 +968,9 @@ export type Database = {
           description: string | null
           id: string
           is_mandatory: boolean
+          notification_days: number[] | null
           title: string
+          training_link: string | null
           updated_at: string
           validity_months: number
         }
@@ -907,7 +979,9 @@ export type Database = {
           description?: string | null
           id?: string
           is_mandatory?: boolean
+          notification_days?: number[] | null
           title: string
+          training_link?: string | null
           updated_at?: string
           validity_months?: number
         }
@@ -916,7 +990,9 @@ export type Database = {
           description?: string | null
           id?: string
           is_mandatory?: boolean
+          notification_days?: number[] | null
           title?: string
+          training_link?: string | null
           updated_at?: string
           validity_months?: number
         }

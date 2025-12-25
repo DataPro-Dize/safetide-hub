@@ -503,7 +503,10 @@
       "maxParticipants": "Max Participants",
       "participants": "Participants",
       "selectedCount": "{{count}} selected",
-      "createSuccess": "Training scheduled successfully!"
+      "createSuccess": "Training scheduled successfully!",
+      "trainingLink": "Training Link",
+      "notificationDays": "Notify before (days)",
+      "expirationNotice": "Expiration Notice"
     },
     "classroom": {
       "present": "Present",

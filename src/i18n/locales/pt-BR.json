@@ -504,7 +504,10 @@
       "maxParticipants": "Máximo de Participantes",
       "participants": "Participantes",
       "selectedCount": "{{count}} selecionados",
-      "createSuccess": "Treinamento agendado com sucesso!"
+      "createSuccess": "Treinamento agendado com sucesso!",
+      "trainingLink": "Link do Treinamento",
+      "notificationDays": "Avisar antes (dias)",
+      "expirationNotice": "Aviso de Vencimento"
     },
     "classroom": {
       "present": "Presente",
