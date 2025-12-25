@@ -466,7 +466,31 @@
     "tabs": {
       "dashboard": "Dashboard",
       "sessions": "Sessões",
+      "types": "Tipos",
       "classroom": "Sala de Aula"
+    },
+    "types": {
+      "title": "Tipos de Treinamento",
+      "add": "Novo Tipo",
+      "edit": "Editar Tipo",
+      "name": "Nome",
+      "namePlaceholder": "Ex: NR-35 Trabalho em Altura",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descrição do treinamento",
+      "validityMonths": "Validade (meses)",
+      "mandatory": "Obrigatório",
+      "trainingLink": "Link do Treinamento",
+      "trainingLinkHelp": "URL do curso online que o colaborador deve acessar",
+      "notificationDays": "Dias de Aviso Antecipado",
+      "notificationDaysHelp": "Quando avisar antes do vencimento do certificado",
+      "days": "dias",
+      "months": "meses",
+      "openLink": "Abrir Link",
+      "noData": "Nenhum tipo de treinamento cadastrado",
+      "createSuccess": "Tipo de treinamento criado!",
+      "updateSuccess": "Tipo de treinamento atualizado!",
+      "deleteSuccess": "Tipo de treinamento excluído!",
+      "deleteConfirm": "Tem certeza que deseja excluir este tipo de treinamento? Sessões existentes não serão afetadas."
     },
     "kpi": {
       "scheduled": "Agendados",
