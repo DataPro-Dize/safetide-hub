@@ -465,6 +465,7 @@
     "tabs": {
       "dashboard": "Dashboard",
       "sessions": "Sessions",
+      "certificates": "Certificates",
       "types": "Types",
       "classroom": "Classroom"
     },
@@ -490,6 +491,26 @@
       "updateSuccess": "Training type updated!",
       "deleteSuccess": "Training type deleted!",
       "deleteConfirm": "Are you sure you want to delete this training type? Existing sessions won't be affected."
+    },
+    "certificates": {
+      "total": "Total Certificates",
+      "validCount": "Valid",
+      "expiringCount": "Expiring",
+      "expiredCount": "Expired",
+      "valid": "Valid",
+      "expiring": "Expires in {{days}} days",
+      "expiringLabel": "Expiring soon",
+      "expired": "Expired",
+      "collaborator": "Collaborator",
+      "training": "Training",
+      "completedAt": "Completed at",
+      "expiresAt": "Expires at",
+      "status": "Status",
+      "searchPlaceholder": "Search by name, email or training...",
+      "filterStatus": "Filter by status",
+      "allStatuses": "All statuses",
+      "noData": "No certificates found",
+      "renew": "Renew"
     },
     "kpi": {
       "scheduled": "Scheduled",
