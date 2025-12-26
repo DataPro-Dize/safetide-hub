@@ -242,6 +242,15 @@
       "return": "Devolver",
       "approved": "Ação aprovada com sucesso!",
       "returned": "Ação devolvida para refazer"
+    },
+    "tabs": {
+      "hazards": "Perigos",
+      "actions": "Ações"
+    },
+    "list": {
+      "myActionsOnly": "Minhas Ações",
+      "deviationId": "ID Desvio",
+      "nature": "Natureza"
     }
   },
   "imageUpload": {
