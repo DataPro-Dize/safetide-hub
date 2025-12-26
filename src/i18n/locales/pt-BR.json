@@ -466,6 +466,7 @@
     "tabs": {
       "dashboard": "Dashboard",
       "sessions": "Sessões",
+      "certificates": "Certificados",
       "types": "Tipos",
       "classroom": "Sala de Aula"
     },
@@ -491,6 +492,26 @@
       "updateSuccess": "Tipo de treinamento atualizado!",
       "deleteSuccess": "Tipo de treinamento excluído!",
       "deleteConfirm": "Tem certeza que deseja excluir este tipo de treinamento? Sessões existentes não serão afetadas."
+    },
+    "certificates": {
+      "total": "Total de Certificados",
+      "validCount": "Válidos",
+      "expiringCount": "Vencendo",
+      "expiredCount": "Vencidos",
+      "valid": "Válido",
+      "expiring": "Vence em {{days}} dias",
+      "expiringLabel": "Vencendo em breve",
+      "expired": "Vencido",
+      "collaborator": "Colaborador",
+      "training": "Treinamento",
+      "completedAt": "Concluído em",
+      "expiresAt": "Vence em",
+      "status": "Status",
+      "searchPlaceholder": "Buscar por nome, email ou treinamento...",
+      "filterStatus": "Filtrar por status",
+      "allStatuses": "Todos os status",
+      "noData": "Nenhum certificado encontrado",
+      "renew": "Renovar"
     },
     "kpi": {
       "scheduled": "Agendados",
