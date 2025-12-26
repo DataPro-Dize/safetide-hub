@@ -241,6 +241,15 @@
       "return": "Return",
       "approved": "Action approved successfully!",
       "returned": "Action returned for revision"
+    },
+    "tabs": {
+      "hazards": "Hazards",
+      "actions": "Actions"
+    },
+    "list": {
+      "myActionsOnly": "My Actions Only",
+      "deviationId": "Deviation ID",
+      "nature": "Nature"
     }
   },
   "imageUpload": {

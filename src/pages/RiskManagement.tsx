@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -24,9 +25,10 @@ import type { Database } from '@/integrations/supabase/types';
 
 type DeviationStatus = Database['public']['Enums']['deviation_status'];
 type DeviationCategory = Database['public']['Enums']['deviation_category'];
-import { Plus, Download } from 'lucide-react';
+import { Plus, Download, AlertTriangle, ListChecks } from 'lucide-react';
 import { NewDeviationSheet } from '@/components/deviations/NewDeviationSheet';
 import { DeviationDetailsSheet } from '@/components/deviations/DeviationDetailsSheet';
+import { WorkflowsListView } from '@/components/workflows/WorkflowsListView';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,6 +44,7 @@ type Company = Tables<'companies'>;
 export default function RiskManagement() {
   const { t } = useTranslation();
   const { language } = useLanguage();
+  const [activeTab, setActiveTab] = useState<string>('hazards');
   const [deviations, setDeviations] = useState<Deviation[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [plants, setPlants] = useState<Plant[]>([]);
@@ -170,6 +173,20 @@ export default function RiskManagement() {
     XLSX.writeFile(wb, `riscos_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
   };
 
+  // Handler to view deviation from workflows tab
+  const handleViewDeviationFromWorkflow = (deviationId: string) => {
+    const deviation = deviations.find(d => d.id === deviationId);
+    if (deviation) {
+      setSelectedDeviation(deviation);
+    } else {
+      // Fetch the deviation if not in current list
+      supabase.from('deviations').select('*').eq('id', deviationId).maybeSingle()
+        .then(({ data }) => {
+          if (data) setSelectedDeviation(data);
+        });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -181,19 +198,34 @@ export default function RiskManagement() {
             {t('deviations.pageDescription')}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportExcel} disabled={filteredDeviations.length === 0}>
-            <Download className="mr-2 h-4 w-4" />
-            Excel
-          </Button>
-          <Button variant="brand" onClick={() => setIsNewSheetOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t('deviations.new')}
-          </Button>
-        </div>
+        {activeTab === 'hazards' && (
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleExportExcel} disabled={filteredDeviations.length === 0}>
+              <Download className="mr-2 h-4 w-4" />
+              Excel
+            </Button>
+            <Button variant="brand" onClick={() => setIsNewSheetOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('deviations.new')}
+            </Button>
+          </div>
+        )}
       </div>
 
-      {/* Data Table */}
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="hazards" className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            {t('workflows.tabs.hazards')}
+          </TabsTrigger>
+          <TabsTrigger value="actions" className="flex items-center gap-2">
+            <ListChecks className="h-4 w-4" />
+            {t('workflows.tabs.actions')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="hazards" className="mt-4">
       <Card className="border-0 shadow-sm">
         <CardContent className="p-0">
           <Table>
@@ -339,7 +371,13 @@ export default function RiskManagement() {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+        </Card>
+        </TabsContent>
+
+        <TabsContent value="actions" className="mt-4">
+          <WorkflowsListView onViewDeviation={handleViewDeviationFromWorkflow} />
+        </TabsContent>
+      </Tabs>
 
       <NewDeviationSheet 
         open={isNewSheetOpen} 
