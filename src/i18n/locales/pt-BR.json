@@ -271,6 +271,12 @@
     "workflows": "Fluxos",
     "profile": "Perfil"
   },
+  "layout": {
+    "currentCompany": "Você está visualizando",
+    "adminMultipleCompanies": "Modo Administrador",
+    "viewingCompanies": "Visualizando {{count}} empresas",
+    "adminMode": "Admin"
+  },
   "admin": {
     "accessDenied": "Acesso Negado",
     "adminOnly": "Esta página é restrita para administradores.",
@@ -309,7 +315,13 @@
       "deleteSuccess": "Projeto excluído com sucesso!",
       "confirmDelete": "Confirmar exclusão",
       "deleteWarning": "Tem certeza que deseja excluir este projeto? Todas as plantas vinculadas também serão excluídas.",
-      "noData": "Nenhum projeto cadastrado"
+      "noData": "Nenhum projeto cadastrado",
+      "logo": "Logo da Empresa",
+      "uploadLogo": "Enviar Logo",
+      "logoHelp": "Formato quadrado recomendado (PNG ou JPG)",
+      "coverPhoto": "Foto de Capa",
+      "uploadCover": "Clique para enviar imagem de capa",
+      "coverHelp": "Resolução recomendada: 1200x400 pixels"
     },
     "units": {
       "title": "Unidades",

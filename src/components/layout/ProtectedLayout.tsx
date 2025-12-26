@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './AppSidebar';
 import { AppHeader } from './AppHeader';
+import { CompanyBanner } from './CompanyBanner';
 import { User } from '@supabase/supabase-js';
 
 export function ProtectedLayout() {
@@ -50,6 +51,7 @@ export function ProtectedLayout() {
         <div className="flex-1 flex flex-col">
           <AppHeader user={user} />
           <main className="flex-1 p-6 overflow-auto">
+            <CompanyBanner />
             <Outlet context={{ user }} />
           </main>
         </div>
