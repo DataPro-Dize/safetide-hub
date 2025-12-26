@@ -270,6 +270,12 @@
     "workflows": "Workflows",
     "profile": "Profile"
   },
+  "layout": {
+    "currentCompany": "You are viewing",
+    "adminMultipleCompanies": "Administrator Mode",
+    "viewingCompanies": "Viewing {{count}} companies",
+    "adminMode": "Admin"
+  },
   "admin": {
     "accessDenied": "Access Denied",
     "adminOnly": "This page is restricted to administrators.",
@@ -308,7 +314,13 @@
       "deleteSuccess": "Project deleted successfully!",
       "confirmDelete": "Confirm deletion",
       "deleteWarning": "Are you sure you want to delete this project? All linked plants will also be deleted.",
-      "noData": "No projects registered"
+      "noData": "No projects registered",
+      "logo": "Company Logo",
+      "uploadLogo": "Upload Logo",
+      "logoHelp": "Square format recommended (PNG or JPG)",
+      "coverPhoto": "Cover Photo",
+      "uploadCover": "Click to upload cover image",
+      "coverHelp": "Recommended resolution: 1200x400 pixels"
     },
     "units": {
       "title": "Units",
