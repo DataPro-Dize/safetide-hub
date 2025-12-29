@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -37,7 +39,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, GripVertical, Edit2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Edit2, Power, Search, FileText, CheckSquare } from 'lucide-react';
 
 interface Template {
   id: string;
@@ -75,9 +77,12 @@ export default function AuditTemplates() {
   const [editingQuestion, setEditingQuestion] = useState<{ sectionId: string; question: Question | null }>({ sectionId: '', question: null });
   const [deleteDialog, setDeleteDialog] = useState<{ type: 'template' | 'section' | 'question'; id: string } | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Form states
-  const [templateForm, setTemplateForm] = useState({ name: '', description: '', category: 'safety' });
+  const [templateForm, setTemplateForm] = useState({ name: '', description: '', category: 'safety', is_active: true });
   const [sectionForm, setSectionForm] = useState({ name: '' });
   const [questionForm, setQuestionForm] = useState({ question_text: '' });
 
@@ -170,23 +175,53 @@ export default function AuditTemplates() {
       if (editingTemplate) {
         const { error } = await supabase
           .from('audit_templates')
-          .update(templateForm)
+          .update({
+            name: templateForm.name,
+            description: templateForm.description,
+            category: templateForm.category,
+            is_active: templateForm.is_active,
+          })
           .eq('id', editingTemplate.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('audit_templates')
-          .insert(templateForm);
+          .insert({
+            name: templateForm.name,
+            description: templateForm.description,
+            category: templateForm.category,
+            is_active: templateForm.is_active,
+          });
         if (error) throw error;
       }
 
       toast({ title: t('audit.templates.saveSuccess') });
       setIsTemplateModalOpen(false);
       setEditingTemplate(null);
-      setTemplateForm({ name: '', description: '', category: 'safety' });
+      setTemplateForm({ name: '', description: '', category: 'safety', is_active: true });
       fetchTemplates();
     } catch (error) {
       console.error('Error saving template:', error);
+      toast({ title: t('common.error'), variant: 'destructive' });
+    }
+  };
+
+  const handleToggleTemplateStatus = async (template: Template) => {
+    try {
+      const { error } = await supabase
+        .from('audit_templates')
+        .update({ is_active: !template.is_active })
+        .eq('id', template.id);
+
+      if (error) throw error;
+
+      toast({ title: template.is_active ? t('audit.templates.deactivated') : t('audit.templates.activated') });
+      fetchTemplates();
+      if (selectedTemplate?.id === template.id) {
+        setSelectedTemplate({ ...template, is_active: !template.is_active });
+      }
+    } catch (error) {
+      console.error('Error toggling template status:', error);
       toast({ title: t('common.error'), variant: 'destructive' });
     }
   };
@@ -295,6 +330,7 @@ export default function AuditTemplates() {
       name: template.name,
       description: template.description || '',
       category: template.category,
+      is_active: template.is_active,
     });
     setIsTemplateModalOpen(true);
   };
@@ -317,13 +353,25 @@ export default function AuditTemplates() {
     setIsQuestionModalOpen(true);
   };
 
+  // Filter templates
+  const filteredTemplates = templates.filter(template => {
+    if (searchTerm && !template.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (categoryFilter !== 'all' && template.category !== categoryFilter) return false;
+    if (statusFilter === 'active' && !template.is_active) return false;
+    if (statusFilter === 'inactive' && template.is_active) return false;
+    return true;
+  });
+
+  const totalQuestions = sections.reduce((acc, section) => acc + section.questions.length, 0);
+
   if (loading) {
     return <div className="flex items-center justify-center h-64">{t('common.loading')}</div>;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{t('audit.templates.title')}</h1>
           <p className="text-muted-foreground">{t('audit.templates.description')}</p>
@@ -333,96 +381,169 @@ export default function AuditTemplates() {
             <DialogTrigger asChild>
               <Button onClick={() => {
                 setEditingTemplate(null);
-                setTemplateForm({ name: '', description: '', category: 'safety' });
-              }}>
-                <Plus className="h-4 w-4 mr-2" />
+                setTemplateForm({ name: '', description: '', category: 'safety', is_active: true });
+              }} className="gap-2">
+                <Plus className="h-4 w-4" />
                 {t('audit.templates.newTemplate')}
               </Button>
             </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingTemplate ? t('audit.templates.editTemplate') : t('audit.templates.newTemplate')}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>{t('common.name')}</Label>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  {editingTemplate ? t('audit.templates.editTemplate') : t('audit.templates.newTemplate')}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <Label>{t('common.name')} *</Label>
+                  <Input
+                    value={templateForm.name}
+                    onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
+                    placeholder={t('audit.templates.namePlaceholder')}
+                  />
+                </div>
+                <div>
+                  <Label>{t('common.description')}</Label>
+                  <Textarea
+                    value={templateForm.description}
+                    onChange={(e) => setTemplateForm({ ...templateForm, description: e.target.value })}
+                    placeholder={t('audit.templates.descriptionPlaceholder')}
+                  />
+                </div>
+                <div>
+                  <Label>{t('deviations.category')}</Label>
+                  <Select
+                    value={templateForm.category}
+                    onValueChange={(value) => setTemplateForm({ ...templateForm, category: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="safety">{t('audit.categories.safety')}</SelectItem>
+                      <SelectItem value="environment">{t('audit.categories.environment')}</SelectItem>
+                      <SelectItem value="health">{t('audit.categories.health')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+                  <div>
+                    <Label htmlFor="template-active" className="text-base">{t('audit.templates.activeStatus')}</Label>
+                    <p className="text-sm text-muted-foreground">{t('audit.templates.activeDescription')}</p>
+                  </div>
+                  <Switch
+                    id="template-active"
+                    checked={templateForm.is_active}
+                    onCheckedChange={(checked) => setTemplateForm({ ...templateForm, is_active: checked })}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setIsTemplateModalOpen(false)}>
+                    {t('common.cancel')}
+                  </Button>
+                  <Button onClick={handleSaveTemplate} disabled={!templateForm.name.trim()}>
+                    {t('common.save')}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        {/* Templates List */}
+        <Card className="lg:col-span-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">{t('audit.templates.list')}</CardTitle>
+            <div className="space-y-3 pt-2">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  value={templateForm.name}
-                  onChange={(e) => setTemplateForm({ ...templateForm, name: e.target.value })}
-                  placeholder={t('audit.templates.namePlaceholder')}
+                  placeholder={t('common.search')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
                 />
               </div>
-              <div>
-                <Label>{t('common.description')}</Label>
-                <Textarea
-                  value={templateForm.description}
-                  onChange={(e) => setTemplateForm({ ...templateForm, description: e.target.value })}
-                  placeholder={t('audit.templates.descriptionPlaceholder')}
-                />
-              </div>
-              <div>
-                <Label>{t('deviations.category')}</Label>
-                <Select
-                  value={templateForm.category}
-                  onValueChange={(value) => setTemplateForm({ ...templateForm, category: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
+              {/* Filters */}
+              <div className="flex gap-2">
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder={t('deviations.category')} />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="all">{t('common.all')}</SelectItem>
                     <SelectItem value="safety">{t('audit.categories.safety')}</SelectItem>
                     <SelectItem value="environment">{t('audit.categories.environment')}</SelectItem>
                     <SelectItem value="health">{t('audit.categories.health')}</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsTemplateModalOpen(false)}>
-                  {t('common.cancel')}
-                </Button>
-                <Button onClick={handleSaveTemplate}>
-                  {t('common.save')}
-                </Button>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder={t('common.status')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('common.all')}</SelectItem>
+                    <SelectItem value="active">{t('common.active')}</SelectItem>
+                    <SelectItem value="inactive">{t('common.inactive')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-        )}
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        {/* Templates List */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('audit.templates.list')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2">
-            {templates.length === 0 ? (
+          <CardContent className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+            {filteredTemplates.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">{t('audit.templates.noData')}</p>
             ) : (
-              templates.map(template => (
+              filteredTemplates.map(template => (
                 <div
                   key={template.id}
-                  className={`p-3 rounded-lg cursor-pointer flex items-center justify-between transition-colors ${
+                  className={`p-3 rounded-lg cursor-pointer transition-all ${
                     selectedTemplate?.id === template.id 
-                      ? 'bg-primary/10 border border-primary' 
-                      : 'hover:bg-muted'
-                  }`}
+                      ? 'bg-primary/10 border-2 border-primary shadow-sm' 
+                      : 'hover:bg-muted border border-transparent'
+                  } ${!template.is_active ? 'opacity-60' : ''}`}
                   onClick={() => setSelectedTemplate(template)}
                 >
-                  <div>
-                    <p className="font-medium">{template.name}</p>
-                    <p className="text-sm text-muted-foreground">{t(`audit.categories.${template.category}`)}</p>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); openEditTemplate(template); }}>
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setDeleteDialog({ type: 'template', id: template.id }); }}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <p className="font-medium truncate">{template.name}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {t(`audit.categories.${template.category}`)}
+                        </Badge>
+                        <Badge 
+                          variant={template.is_active ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {template.is_active ? t('common.active') : t('common.inactive')}
+                        </Badge>
+                      </div>
+                    </div>
+                    {isAdmin && (
+                      <div className="flex gap-1 flex-shrink-0">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-7 w-7"
+                          onClick={(e) => { e.stopPropagation(); handleToggleTemplateStatus(template); }}
+                          title={template.is_active ? t('audit.templates.deactivate') : t('audit.templates.activate')}
+                        >
+                          <Power className={`h-3.5 w-3.5 ${template.is_active ? 'text-green-500' : 'text-muted-foreground'}`} />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditTemplate(template); }}>
+                          <Edit2 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); setDeleteDialog({ type: 'template', id: template.id }); }}>
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))
@@ -431,10 +552,17 @@ export default function AuditTemplates() {
         </Card>
 
         {/* Sections & Questions */}
-        <Card className="md:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{t('audit.templates.sections')}</CardTitle>
-            {selectedTemplate && (
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div>
+              <CardTitle className="text-lg">{t('audit.templates.sections')}</CardTitle>
+              {selectedTemplate && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {sections.length} {t('audit.templates.sections').toLowerCase()} • {totalQuestions} {t('audit.templates.questions').toLowerCase()}
+                </p>
+              )}
+            </div>
+            {selectedTemplate && isAdmin && (
               <Dialog open={isSectionModalOpen} onOpenChange={setIsSectionModalOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm" onClick={() => {
@@ -453,7 +581,7 @@ export default function AuditTemplates() {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label>{t('common.name')}</Label>
+                      <Label>{t('common.name')} *</Label>
                       <Input
                         value={sectionForm.name}
                         onChange={(e) => setSectionForm({ name: e.target.value })}
@@ -464,7 +592,7 @@ export default function AuditTemplates() {
                       <Button variant="outline" onClick={() => setIsSectionModalOpen(false)}>
                         {t('common.cancel')}
                       </Button>
-                      <Button onClick={handleSaveSection}>
+                      <Button onClick={handleSaveSection} disabled={!sectionForm.name.trim()}>
                         {t('common.save')}
                       </Button>
                     </div>
@@ -473,52 +601,73 @@ export default function AuditTemplates() {
               </Dialog>
             )}
           </CardHeader>
-          <CardContent>
+          <CardContent className="max-h-[calc(100vh-350px)] overflow-y-auto">
             {!selectedTemplate ? (
-              <p className="text-muted-foreground text-center py-8">{t('audit.templates.selectTemplate')}</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <CheckSquare className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                <p className="text-muted-foreground">{t('audit.templates.selectTemplate')}</p>
+              </div>
             ) : sections.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">{t('audit.templates.noSections')}</p>
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                <p className="text-muted-foreground">{t('audit.templates.noSections')}</p>
+              </div>
             ) : (
               <Accordion type="multiple" defaultValue={sections.map(s => s.id)} className="w-full">
                 {sections.map(section => (
-                  <AccordionItem key={section.id} value={section.id}>
-                    <AccordionTrigger className="hover:no-underline">
-                      <div className="flex items-center gap-2">
+                  <AccordionItem key={section.id} value={section.id} className="border rounded-lg mb-3 px-4">
+                    <AccordionTrigger className="hover:no-underline py-3">
+                      <div className="flex items-center gap-3">
                         <GripVertical className="h-4 w-4 text-muted-foreground" />
-                        <span>{section.name}</span>
-                        <span className="text-sm text-muted-foreground">({section.questions.length})</span>
+                        <span className="font-medium">{section.name}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {section.questions.length} {section.questions.length === 1 ? t('audit.templates.question') : t('audit.templates.questions').toLowerCase()}
+                        </Badge>
                       </div>
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-2 pl-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => openEditSection(section)}>
-                            <Edit2 className="h-3 w-3 mr-1" />
-                            {t('common.edit')}
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => setDeleteDialog({ type: 'section', id: section.id })}>
-                            <Trash2 className="h-3 w-3 mr-1 text-destructive" />
-                            {t('common.delete')}
-                          </Button>
-                        </div>
-                        <Button variant="outline" size="sm" onClick={() => openAddQuestion(section.id)}>
-                          <Plus className="h-3 w-3 mr-1" />
-                          {t('audit.templates.addQuestion')}
-                        </Button>
-                      </div>
-                      {section.questions.map(question => (
-                        <div key={question.id} className="flex items-center justify-between p-2 rounded bg-muted/50">
-                          <p className="text-sm">{question.question_text}</p>
-                          <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => openEditQuestion(section.id, question)}>
-                              <Edit2 className="h-3 w-3" />
+                    <AccordionContent className="pb-4">
+                      {isAdmin && (
+                        <div className="flex justify-between items-center mb-4 pb-3 border-b border-border">
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => openEditSection(section)}>
+                              <Edit2 className="h-3 w-3 mr-1" />
+                              {t('common.edit')}
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => setDeleteDialog({ type: 'question', id: question.id })}>
-                              <Trash2 className="h-3 w-3 text-destructive" />
+                            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteDialog({ type: 'section', id: section.id })}>
+                              <Trash2 className="h-3 w-3 mr-1" />
+                              {t('common.delete')}
                             </Button>
                           </div>
+                          <Button variant="default" size="sm" onClick={() => openAddQuestion(section.id)}>
+                            <Plus className="h-3 w-3 mr-1" />
+                            {t('audit.templates.addQuestion')}
+                          </Button>
                         </div>
-                      ))}
+                      )}
+                      <div className="space-y-2">
+                        {section.questions.length === 0 ? (
+                          <p className="text-sm text-muted-foreground text-center py-4">{t('audit.templates.noQuestions')}</p>
+                        ) : (
+                          section.questions.map((question, index) => (
+                            <div key={question.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+                              <div className="flex items-center gap-3">
+                                <span className="text-xs font-medium text-muted-foreground w-6">{index + 1}.</span>
+                                <p className="text-sm">{question.question_text}</p>
+                              </div>
+                              {isAdmin && (
+                                <div className="flex gap-1">
+                                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditQuestion(section.id, question)}>
+                                    <Edit2 className="h-3 w-3" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteDialog({ type: 'question', id: question.id })}>
+                                    <Trash2 className="h-3 w-3 text-destructive" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
@@ -538,18 +687,19 @@ export default function AuditTemplates() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>{t('audit.templates.questionText')}</Label>
+              <Label>{t('audit.templates.questionText')} *</Label>
               <Textarea
                 value={questionForm.question_text}
                 onChange={(e) => setQuestionForm({ question_text: e.target.value })}
                 placeholder={t('audit.templates.questionPlaceholder')}
+                rows={3}
               />
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsQuestionModalOpen(false)}>
                 {t('common.cancel')}
               </Button>
-              <Button onClick={handleSaveQuestion}>
+              <Button onClick={handleSaveQuestion} disabled={!questionForm.question_text.trim()}>
                 {t('common.save')}
               </Button>
             </div>
@@ -568,7 +718,7 @@ export default function AuditTemplates() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>

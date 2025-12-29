@@ -38,6 +38,12 @@ interface CorporateGroup {
   name: string;
 }
 
+interface Company {
+  id: string;
+  name: string;
+  group_id: string;
+}
+
 interface Profile {
   id: string;
   name: string;
@@ -45,6 +51,11 @@ interface Profile {
   role: 'technician' | 'supervisor' | 'admin';
   is_active: boolean;
   is_admin: boolean;
+}
+
+interface UserWithCompany extends Profile {
+  company?: Company | null;
+  corporateGroup?: CorporateGroup | null;
 }
 
 interface UsersSectionProps {
@@ -55,30 +66,68 @@ interface UsersSectionProps {
 export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<UserWithCompany[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [companyFilter, setCompanyFilter] = useState<string>('all');
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
+    fetchCompanies();
   }, []);
+
+  const fetchCompanies = async () => {
+    const { data } = await supabase
+      .from('companies')
+      .select('id, name, group_id')
+      .order('name');
+    if (data) setCompanies(data);
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    
+    // Fetch profiles
+    const { data: profiles, error } = await supabase
       .from('profiles')
       .select('*')
       .order('name');
 
     if (error) {
       console.error('Error fetching users:', error);
-    } else {
-      setUsers(data || []);
+      setLoading(false);
+      return;
     }
+
+    // Fetch user_companies to get company associations
+    const { data: userCompanies } = await supabase
+      .from('user_companies')
+      .select('user_id, company_id');
+
+    // Fetch companies with groups
+    const { data: companiesData } = await supabase
+      .from('companies')
+      .select('id, name, group_id');
+
+    // Build user list with company and group info
+    const usersWithCompany: UserWithCompany[] = (profiles || []).map(profile => {
+      const userCompany = userCompanies?.find(uc => uc.user_id === profile.id);
+      const company = companiesData?.find(c => c.id === userCompany?.company_id);
+      const group = corporateGroups.find(g => g.id === company?.group_id);
+      
+      return {
+        ...profile,
+        company: company || null,
+        corporateGroup: group || null,
+      };
+    });
+
+    setUsers(usersWithCompany);
     setLoading(false);
   };
 
@@ -86,6 +135,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
     if (roleFilter !== 'all' && user.role !== roleFilter) return false;
     if (statusFilter === 'active' && !user.is_active) return false;
     if (statusFilter === 'inactive' && user.is_active) return false;
+    if (companyFilter !== 'all' && user.company?.id !== companyFilter) return false;
     return true;
   });
 
@@ -155,6 +205,23 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
           </Select>
         </div>
 
+        <div className="flex-1 min-w-[200px] max-w-[250px]">
+          <label className="text-sm font-medium text-muted-foreground mb-1 block">
+            {t('admin.users.company')}
+          </label>
+          <Select value={companyFilter} onValueChange={setCompanyFilter}>
+            <SelectTrigger className="bg-card">
+              <SelectValue placeholder={t('common.filter')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('common.all')}</SelectItem>
+              {companies.map(company => (
+                <SelectItem key={company.id} value={company.id}>{company.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="flex-1 flex justify-end">
           <Button onClick={() => setShowAddUserModal(true)} className="gap-2 bg-button-add hover:bg-button-add/90 text-white">
             <Plus className="h-4 w-4" />
@@ -169,6 +236,8 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
             <TableRow className="bg-muted/50">
               <TableHead>{t('common.name')}</TableHead>
               <TableHead>{t('common.email')}</TableHead>
+              <TableHead>{t('admin.users.company')}</TableHead>
+              <TableHead>{t('admin.users.corporateGroup')}</TableHead>
               <TableHead>{t('admin.users.role')}</TableHead>
               <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
@@ -176,13 +245,13 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   {t('common.loading')}
                 </TableCell>
               </TableRow>
             ) : filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   {t('admin.users.noData')}
                 </TableCell>
               </TableRow>
@@ -200,6 +269,12 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {user.company?.name || '-'}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {user.corporateGroup?.name || '-'}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={getRoleBadgeVariant(user.role)}>
                       {t(`admin.users.roles.${user.role}`)}
