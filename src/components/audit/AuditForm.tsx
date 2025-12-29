@@ -519,7 +519,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                                   <Textarea
                                     value={answer?.textAnswer || ''}
                                     onChange={(e) => updateAnswer(question.id, 'textAnswer', e.target.value)}
-                                    placeholder={t('audit.questionTypes.textPlaceholder')}
+                                    placeholder={t('audit.templates.questionTypes.textPlaceholder')}
                                     disabled={isReadOnly}
                                     rows={3}
                                   />
@@ -640,7 +640,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                                   <p className="font-medium">{question.question_text}</p>
                                   {questionType !== 'pass_fail' && (
                                     <Badge variant="outline" className="mt-1 text-xs">
-                                      {t(`audit.questionTypes.${questionType}`)}
+                                      {t(`audit.templates.questionTypes.${questionType}`)}
                                     </Badge>
                                   )}
                                 </div>
