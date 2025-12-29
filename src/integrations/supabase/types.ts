@@ -1043,6 +1043,35 @@ export type Database = {
           },
         ]
       }
+      user_modules: {
+        Row: {
+          created_at: string
+          id: string
+          module_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          module_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          module_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_modules_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string

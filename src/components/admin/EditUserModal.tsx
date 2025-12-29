@@ -108,15 +108,29 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
           if (clientModules) {
             const moduleIds = clientModules.map(m => m.module_id);
             setAvailableModules(moduleIds);
-            // For now, user has access to all client modules
-            // In the future, this could be stored per-user
-            setUserModules(moduleIds);
-            setFormData(prev => ({
-              ...prev,
-              selectedModules: moduleIds,
-            }));
           }
         }
+      }
+
+      // Fetch user's specific modules
+      const { data: userModulesData } = await supabase
+        .from('user_modules')
+        .select('module_id')
+        .eq('user_id', user.id);
+
+      if (userModulesData) {
+        const userModuleIds = userModulesData.map(m => m.module_id);
+        setUserModules(userModuleIds);
+        setFormData(prev => ({
+          ...prev,
+          selectedModules: userModuleIds,
+        }));
+      } else {
+        setUserModules([]);
+        setFormData(prev => ({
+          ...prev,
+          selectedModules: [],
+        }));
       }
     };
 
@@ -167,8 +181,27 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
         throw profileError;
       }
 
-      // Note: Module access is currently at the group level via client_modules
-      // Per-user module access could be implemented in a separate user_modules table
+      // Delete existing user modules
+      await supabase
+        .from('user_modules')
+        .delete()
+        .eq('user_id', user.id);
+
+      // Insert new user modules
+      if (formData.selectedModules.length > 0) {
+        const modulesToInsert = formData.selectedModules.map(moduleId => ({
+          user_id: user.id,
+          module_id: moduleId,
+        }));
+
+        const { error: modulesError } = await supabase
+          .from('user_modules')
+          .insert(modulesToInsert);
+
+        if (modulesError) {
+          throw modulesError;
+        }
+      }
 
       toast({ title: t('admin.users.updateSuccess') });
       onOpenChange(false);
