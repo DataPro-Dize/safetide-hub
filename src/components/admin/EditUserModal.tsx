@@ -10,13 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +17,12 @@ import { useToast } from '@/hooks/use-toast';
 interface CorporateGroup {
   id: string;
   name: string;
+}
+
+interface Company {
+  id: string;
+  name: string;
+  group_id: string;
 }
 
 interface Profile {
@@ -56,61 +55,84 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [availableModules, setAvailableModules] = useState<string[]>([]);
+  const [userModules, setUserModules] = useState<string[]>([]);
   const [userGroupId, setUserGroupId] = useState<string | null>(null);
+  const [userCompany, setUserCompany] = useState<Company | null>(null);
+  const [userGroup, setUserGroup] = useState<CorporateGroup | null>(null);
   const [formData, setFormData] = useState({
     name: user.name,
     phone: user.phone || '',
-    role: user.role,
     is_active: user.is_active,
     selectedModules: [] as string[],
   });
 
-  // Fetch user's company and group on mount
+  // Fetch user's company, group and modules on mount
   useEffect(() => {
-    const fetchUserCompanyAndModules = async () => {
+    const fetchUserData = async () => {
       // Get user's company
-      const { data: userCompany } = await supabase
+      const { data: userCompanyData } = await supabase
         .from('user_companies')
         .select('company_id')
         .eq('user_id', user.id)
         .single();
 
-      if (userCompany) {
-        // Get company's group
-        const { data: company } = await supabase
+      if (userCompanyData) {
+        // Get company details
+        const { data: companyData } = await supabase
           .from('companies')
-          .select('group_id')
-          .eq('id', userCompany.company_id)
+          .select('id, name, group_id')
+          .eq('id', userCompanyData.company_id)
           .single();
 
-        if (company?.group_id) {
-          setUserGroupId(company.group_id);
+        if (companyData) {
+          setUserCompany(companyData);
+          setUserGroupId(companyData.group_id);
+          
+          // Get group details
+          const { data: groupData } = await supabase
+            .from('corporate_groups')
+            .select('id, name')
+            .eq('id', companyData.group_id)
+            .single();
+          
+          if (groupData) {
+            setUserGroup(groupData);
+          }
           
           // Fetch available modules for this group
           const { data: clientModules } = await supabase
             .from('client_modules')
             .select('module_id')
-            .eq('group_id', company.group_id);
+            .eq('group_id', companyData.group_id);
 
           if (clientModules) {
-            setAvailableModules(clientModules.map(m => m.module_id));
+            const moduleIds = clientModules.map(m => m.module_id);
+            setAvailableModules(moduleIds);
+            // For now, user has access to all client modules
+            // In the future, this could be stored per-user
+            setUserModules(moduleIds);
+            setFormData(prev => ({
+              ...prev,
+              selectedModules: moduleIds,
+            }));
           }
         }
       }
     };
 
-    fetchUserCompanyAndModules();
-  }, [user.id]);
+    if (open) {
+      fetchUserData();
+    }
+  }, [user.id, open]);
 
   useEffect(() => {
     setFormData({
       name: user.name,
       phone: user.phone || '',
-      role: user.role,
       is_active: user.is_active,
-      selectedModules: [],
+      selectedModules: userModules,
     });
-  }, [user]);
+  }, [user, userModules]);
 
   const handleModuleToggle = (moduleId: string) => {
     setFormData(prev => ({
@@ -131,15 +153,13 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
     setLoading(true);
 
     try {
-      // Update profile
+      // Update profile (without changing role)
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           name: formData.name.trim(),
           phone: formData.phone || null,
-          role: formData.role,
           is_active: formData.is_active,
-          is_admin: formData.role === 'admin',
         })
         .eq('id', user.id);
 
@@ -147,35 +167,8 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
         throw profileError;
       }
 
-      // Update user_roles table
-      // First, delete existing role
-      await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', user.id);
-
-      // Map profile role to app_role
-      let appRole: 'admin' | 'moderator' | 'user';
-      if (formData.role === 'admin') {
-        appRole = 'admin';
-      } else if (formData.role === 'supervisor') {
-        appRole = 'moderator';
-      } else {
-        appRole = 'user';
-      }
-
-      // Insert new role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: user.id,
-          role: appRole,
-        });
-
-      if (roleError) {
-        console.error('Error updating user role:', roleError);
-        // Don't throw here, the profile was already updated successfully
-      }
+      // Note: Module access is currently at the group level via client_modules
+      // Per-user module access could be implemented in a separate user_modules table
 
       toast({ title: t('admin.users.updateSuccess') });
       onOpenChange(false);
@@ -228,20 +221,33 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-user-role">{t('admin.users.role')} *</Label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as typeof formData.role }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="technician">{t('admin.users.roles.technician')}</SelectItem>
-                  <SelectItem value="supervisor">{t('admin.users.roles.supervisor')}</SelectItem>
-                  <SelectItem value="admin">{t('admin.users.roles.admin')}</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label>{t('admin.users.role')}</Label>
+              <Input
+                value={t(`admin.users.roles.${user.role}`)}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+          </div>
+
+          {/* Company and Group Info */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('admin.users.company')}</Label>
+              <Input
+                value={userCompany?.name || '-'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.users.corporateGroup')}</Label>
+              <Input
+                value={userGroup?.name || '-'}
+                disabled
+                className="bg-muted"
+              />
             </div>
           </div>
 
