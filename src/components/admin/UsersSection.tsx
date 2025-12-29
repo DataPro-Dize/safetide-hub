@@ -73,6 +73,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [companyFilter, setCompanyFilter] = useState<string>('all');
+  const [groupFilter, setGroupFilter] = useState<string>('all');
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [editUserId, setEditUserId] = useState<string | null>(null);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
@@ -151,6 +152,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
     if (statusFilter === 'active' && !user.is_active) return false;
     if (statusFilter === 'inactive' && user.is_active) return false;
     if (companyFilter !== 'all' && user.company?.id !== companyFilter) return false;
+    if (groupFilter !== 'all' && user.corporateGroup?.id !== groupFilter) return false;
     return true;
   });
 
@@ -216,6 +218,23 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
               <SelectItem value="all">{t('common.all')}</SelectItem>
               <SelectItem value="active">{t('admin.users.statusActive')}</SelectItem>
               <SelectItem value="inactive">{t('admin.users.statusInactive')}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex-1 min-w-[200px] max-w-[250px]">
+          <label className="text-sm font-medium text-muted-foreground mb-1 block">
+            {t('admin.users.corporateGroup')}
+          </label>
+          <Select value={groupFilter} onValueChange={setGroupFilter}>
+            <SelectTrigger className="bg-card">
+              <SelectValue placeholder={t('common.filter')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('common.all')}</SelectItem>
+              {corporateGroupsList.map(group => (
+                <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
