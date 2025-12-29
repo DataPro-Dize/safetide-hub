@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, GripVertical, Edit2, Power, Search, FileText, CheckSquare } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Edit2, Power, Search, FileText, CheckSquare, Type, Star, ListChecks, List } from 'lucide-react';
 
 interface Template {
   id: string;
@@ -56,10 +56,15 @@ interface Section {
   questions: Question[];
 }
 
+type QuestionType = 'pass_fail' | 'text' | 'rating' | 'single_choice' | 'multiple_choice';
+
 interface Question {
   id: string;
   question_text: string;
   order_index: number;
+  question_type: QuestionType;
+  options: string[] | null;
+  rating_scale: number | null;
 }
 
 export default function AuditTemplates() {
@@ -84,7 +89,12 @@ export default function AuditTemplates() {
   // Form states
   const [templateForm, setTemplateForm] = useState({ name: '', description: '', category: 'safety', is_active: true });
   const [sectionForm, setSectionForm] = useState({ name: '' });
-  const [questionForm, setQuestionForm] = useState({ question_text: '' });
+  const [questionForm, setQuestionForm] = useState({ 
+    question_text: '', 
+    question_type: 'pass_fail' as QuestionType,
+    options: [''] as string[],
+    rating_scale: 5
+  });
 
   const isAdmin = userRole === 'admin' || userRole === 'supervisor';
 
@@ -144,7 +154,7 @@ export default function AuditTemplates() {
           id,
           name,
           order_index,
-          audit_template_questions(id, question_text, order_index)
+          audit_template_questions(id, question_text, order_index, question_type, options, rating_scale)
         `)
         .eq('template_id', templateId)
         .order('order_index');
@@ -161,6 +171,9 @@ export default function AuditTemplates() {
             id: q.id,
             question_text: q.question_text,
             order_index: q.order_index,
+            question_type: q.question_type || 'pass_fail',
+            options: q.options || null,
+            rating_scale: q.rating_scale || null,
           })),
       }));
 
@@ -267,10 +280,19 @@ export default function AuditTemplates() {
       const section = sections.find(s => s.id === editingQuestion.sectionId);
       const order_index = section?.questions.length || 0;
 
+      const questionData = {
+        question_text: questionForm.question_text,
+        question_type: questionForm.question_type,
+        options: (questionForm.question_type === 'single_choice' || questionForm.question_type === 'multiple_choice') 
+          ? questionForm.options.filter(o => o.trim() !== '')
+          : null,
+        rating_scale: questionForm.question_type === 'rating' ? questionForm.rating_scale : null,
+      };
+
       if (editingQuestion.question) {
         const { error } = await supabase
           .from('audit_template_questions')
-          .update({ question_text: questionForm.question_text })
+          .update(questionData)
           .eq('id', editingQuestion.question.id);
         if (error) throw error;
       } else {
@@ -278,8 +300,8 @@ export default function AuditTemplates() {
           .from('audit_template_questions')
           .insert({
             section_id: editingQuestion.sectionId,
-            question_text: questionForm.question_text,
             order_index,
+            ...questionData,
           });
         if (error) throw error;
       }
@@ -287,7 +309,7 @@ export default function AuditTemplates() {
       toast({ title: t('audit.templates.saveSuccess') });
       setIsQuestionModalOpen(false);
       setEditingQuestion({ sectionId: '', question: null });
-      setQuestionForm({ question_text: '' });
+      setQuestionForm({ question_text: '', question_type: 'pass_fail', options: [''], rating_scale: 5 });
       if (selectedTemplate) fetchSections(selectedTemplate.id);
     } catch (error) {
       console.error('Error saving question:', error);
@@ -343,13 +365,18 @@ export default function AuditTemplates() {
 
   const openAddQuestion = (sectionId: string) => {
     setEditingQuestion({ sectionId, question: null });
-    setQuestionForm({ question_text: '' });
+    setQuestionForm({ question_text: '', question_type: 'pass_fail', options: [''], rating_scale: 5 });
     setIsQuestionModalOpen(true);
   };
 
   const openEditQuestion = (sectionId: string, question: Question) => {
     setEditingQuestion({ sectionId, question });
-    setQuestionForm({ question_text: question.question_text });
+    setQuestionForm({ 
+      question_text: question.question_text,
+      question_type: question.question_type,
+      options: question.options || [''],
+      rating_scale: question.rating_scale || 5,
+    });
     setIsQuestionModalOpen(true);
   };
 
@@ -650,12 +677,28 @@ export default function AuditTemplates() {
                         ) : (
                           section.questions.map((question, index) => (
                             <div key={question.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs font-medium text-muted-foreground w-6">{index + 1}.</span>
-                                <p className="text-sm">{question.question_text}</p>
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <span className="text-xs font-medium text-muted-foreground w-6 flex-shrink-0">{index + 1}.</span>
+                                <div className="flex flex-col gap-1 min-w-0">
+                                  <p className="text-sm">{question.question_text}</p>
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs">
+                                      {question.question_type === 'pass_fail' && <><CheckSquare className="h-3 w-3 mr-1" />{t('audit.templates.questionTypes.passFail')}</>}
+                                      {question.question_type === 'text' && <><Type className="h-3 w-3 mr-1" />{t('audit.templates.questionTypes.text')}</>}
+                                      {question.question_type === 'rating' && <><Star className="h-3 w-3 mr-1" />{t('audit.templates.questionTypes.rating')} (1-{question.rating_scale})</>}
+                                      {question.question_type === 'single_choice' && <><List className="h-3 w-3 mr-1" />{t('audit.templates.questionTypes.singleChoice')}</>}
+                                      {question.question_type === 'multiple_choice' && <><ListChecks className="h-3 w-3 mr-1" />{t('audit.templates.questionTypes.multipleChoice')}</>}
+                                    </Badge>
+                                    {question.options && question.options.length > 0 && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {question.options.length} {t('audit.templates.options').toLowerCase()}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                               {isAdmin && (
-                                <div className="flex gap-1">
+                                <div className="flex gap-1 flex-shrink-0">
                                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditQuestion(section.id, question)}>
                                     <Edit2 className="h-3 w-3" />
                                   </Button>
@@ -679,7 +722,7 @@ export default function AuditTemplates() {
 
       {/* Question Modal */}
       <Dialog open={isQuestionModalOpen} onOpenChange={setIsQuestionModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle>
               {editingQuestion.question ? t('audit.templates.editQuestion') : t('audit.templates.addQuestion')}
@@ -690,11 +733,115 @@ export default function AuditTemplates() {
               <Label>{t('audit.templates.questionText')} *</Label>
               <Textarea
                 value={questionForm.question_text}
-                onChange={(e) => setQuestionForm({ question_text: e.target.value })}
+                onChange={(e) => setQuestionForm(prev => ({ ...prev, question_text: e.target.value }))}
                 placeholder={t('audit.templates.questionPlaceholder')}
                 rows={3}
               />
             </div>
+            
+            <div>
+              <Label>{t('audit.templates.questionType')}</Label>
+              <Select
+                value={questionForm.question_type}
+                onValueChange={(value: QuestionType) => setQuestionForm(prev => ({ ...prev, question_type: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pass_fail">
+                    <div className="flex items-center gap-2">
+                      <CheckSquare className="h-4 w-4" />
+                      {t('audit.templates.questionTypes.passFail')}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="text">
+                    <div className="flex items-center gap-2">
+                      <Type className="h-4 w-4" />
+                      {t('audit.templates.questionTypes.text')}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="rating">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4" />
+                      {t('audit.templates.questionTypes.rating')}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="single_choice">
+                    <div className="flex items-center gap-2">
+                      <List className="h-4 w-4" />
+                      {t('audit.templates.questionTypes.singleChoice')}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="multiple_choice">
+                    <div className="flex items-center gap-2">
+                      <ListChecks className="h-4 w-4" />
+                      {t('audit.templates.questionTypes.multipleChoice')}
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Rating Scale */}
+            {questionForm.question_type === 'rating' && (
+              <div>
+                <Label>{t('audit.templates.ratingScale')}</Label>
+                <Select
+                  value={questionForm.rating_scale.toString()}
+                  onValueChange={(value) => setQuestionForm(prev => ({ ...prev, rating_scale: parseInt(value) }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">1-5</SelectItem>
+                    <SelectItem value="10">1-10</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Choice Options */}
+            {(questionForm.question_type === 'single_choice' || questionForm.question_type === 'multiple_choice') && (
+              <div className="space-y-2">
+                <Label>{t('audit.templates.options')}</Label>
+                {questionForm.options.map((option, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      value={option}
+                      onChange={(e) => {
+                        const newOptions = [...questionForm.options];
+                        newOptions[index] = e.target.value;
+                        setQuestionForm(prev => ({ ...prev, options: newOptions }));
+                      }}
+                      placeholder={`${t('audit.templates.option')} ${index + 1}`}
+                    />
+                    {questionForm.options.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const newOptions = questionForm.options.filter((_, i) => i !== index);
+                          setQuestionForm(prev => ({ ...prev, options: newOptions }));
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setQuestionForm(prev => ({ ...prev, options: [...prev.options, ''] }))}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  {t('audit.templates.addOption')}
+                </Button>
+              </div>
+            )}
+
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setIsQuestionModalOpen(false)}>
                 {t('common.cancel')}

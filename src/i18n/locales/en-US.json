@@ -26,6 +26,8 @@
     "title": "Title",
     "date": "Date",
     "all": "All",
+    "active": "Active",
+    "inactive": "Inactive",
     "error": "Error",
     "fillRequired": "Please fill all required fields"
   },
@@ -212,7 +214,8 @@
       "submitted_blocked": "Submitted - Blocked",
       "approved": "Approved",
       "returned": "Returned",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "overdue": "Overdue"
     },
     "response": {
       "title": "Respond to Action",
@@ -377,7 +380,8 @@
       "confirmDeactivate": "Deactivate User",
       "deactivateWarning": "Are you sure you want to deactivate this user? They will no longer be able to access the system.",
       "deactivate": "Deactivate",
-      "noData": "No users found"
+      "noData": "No users found",
+      "company": "Company"
     }
   },
   "notifications": {
@@ -475,7 +479,28 @@
       "saveSuccess": "Saved successfully!",
       "deleteSuccess": "Deleted successfully!",
       "confirmDelete": "Confirm Deletion",
-      "deleteWarning": "This action cannot be undone."
+      "deleteWarning": "This action cannot be undone.",
+      "activeStatus": "Template Active",
+      "activeDescription": "Inactive templates won't appear in the inspection list",
+      "activated": "Template activated!",
+      "deactivated": "Template deactivated!",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "questions": "Questions",
+      "question": "Question",
+      "noQuestions": "No questions registered",
+      "questionType": "Response Type",
+      "questionTypes": {
+        "passFail": "Pass/Fail",
+        "text": "Descriptive Text",
+        "rating": "Rating",
+        "singleChoice": "Single Choice",
+        "multipleChoice": "Multiple Choice"
+      },
+      "ratingScale": "Rating Scale",
+      "options": "Options",
+      "option": "Option",
+      "addOption": "Add Option"
     }
   },
   "trainings": {
