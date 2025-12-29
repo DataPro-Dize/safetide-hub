@@ -68,6 +68,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
   const { toast } = useToast();
   const [users, setUsers] = useState<UserWithCompany[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [corporateGroupsList, setCorporateGroupsList] = useState<CorporateGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -79,7 +80,16 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
   useEffect(() => {
     fetchUsers();
     fetchCompanies();
+    fetchCorporateGroups();
   }, []);
+
+  const fetchCorporateGroups = async () => {
+    const { data } = await supabase
+      .from('corporate_groups')
+      .select('id, name')
+      .order('name');
+    if (data) setCorporateGroupsList(data);
+  };
 
   const fetchCompanies = async () => {
     const { data } = await supabase
@@ -114,11 +124,16 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
       .from('companies')
       .select('id, name, group_id');
 
+    // Fetch corporate groups
+    const { data: groupsData } = await supabase
+      .from('corporate_groups')
+      .select('id, name');
+
     // Build user list with company and group info
     const usersWithCompany: UserWithCompany[] = (profiles || []).map(profile => {
       const userCompany = userCompanies?.find(uc => uc.user_id === profile.id);
       const company = companiesData?.find(c => c.id === userCompany?.company_id);
-      const group = corporateGroups.find(g => g.id === company?.group_id);
+      const group = groupsData?.find(g => g.id === company?.group_id);
       
       return {
         ...profile,
@@ -311,7 +326,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
       <AddUserModal
         open={showAddUserModal}
         onOpenChange={setShowAddUserModal}
-        corporateGroups={corporateGroups}
+        corporateGroups={corporateGroupsList.length > 0 ? corporateGroupsList : corporateGroups}
         onSuccess={() => {
           fetchUsers();
           onRefresh();
@@ -323,7 +338,7 @@ export function UsersSection({ corporateGroups, onRefresh }: UsersSectionProps) 
           open={!!editUserId}
           onOpenChange={() => setEditUserId(null)}
           user={editingUser}
-          corporateGroups={corporateGroups}
+          corporateGroups={corporateGroupsList.length > 0 ? corporateGroupsList : corporateGroups}
           onSuccess={() => {
             fetchUsers();
             onRefresh();
