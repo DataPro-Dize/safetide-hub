@@ -66,22 +66,31 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          options: Json | null
           order_index: number
           question_text: string
+          question_type: Database["public"]["Enums"]["question_type"]
+          rating_scale: number | null
           section_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          options?: Json | null
           order_index?: number
           question_text: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          rating_scale?: number | null
           section_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          options?: Json | null
           order_index?: number
           question_text?: string
+          question_type?: Database["public"]["Enums"]["question_type"]
+          rating_scale?: number | null
           section_id?: string
         }
         Relationships: [
@@ -1182,6 +1191,12 @@ export type Database = {
         | "social_responsibility"
       deviation_phase: "operations" | "construction"
       deviation_status: "open" | "in_progress" | "done"
+      question_type:
+        | "pass_fail"
+        | "text"
+        | "rating"
+        | "single_choice"
+        | "multiple_choice"
       training_enrollment_status: "pending" | "present" | "absent"
       training_session_status:
         | "scheduled"
@@ -1364,6 +1379,13 @@ export const Constants = {
       ],
       deviation_phase: ["operations", "construction"],
       deviation_status: ["open", "in_progress", "done"],
+      question_type: [
+        "pass_fail",
+        "text",
+        "rating",
+        "single_choice",
+        "multiple_choice",
+      ],
       training_enrollment_status: ["pending", "present", "absent"],
       training_session_status: [
         "scheduled",

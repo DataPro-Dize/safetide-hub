@@ -26,6 +26,8 @@
     "title": "Título",
     "date": "Data",
     "all": "Todos",
+    "active": "Ativo",
+    "inactive": "Inativo",
     "error": "Erro",
     "fillRequired": "Preencha todos os campos obrigatórios"
   },
@@ -213,7 +215,8 @@
       "submitted_blocked": "Submetido - Bloqueado",
       "approved": "Aprovado",
       "returned": "Devolvido",
-      "rejected": "Rejeitado"
+      "rejected": "Rejeitado",
+      "overdue": "Atrasado"
     },
     "response": {
       "title": "Responder Ação",
@@ -378,7 +381,8 @@
       "confirmDeactivate": "Desativar Usuário",
       "deactivateWarning": "Tem certeza que deseja desativar este usuário? Ele não poderá mais acessar o sistema.",
       "deactivate": "Desativar",
-      "noData": "Nenhum usuário encontrado"
+      "noData": "Nenhum usuário encontrado",
+      "company": "Empresa"
     }
   },
   "notifications": {
@@ -476,7 +480,28 @@
       "saveSuccess": "Salvo com sucesso!",
       "deleteSuccess": "Excluído com sucesso!",
       "confirmDelete": "Confirmar Exclusão",
-      "deleteWarning": "Esta ação não pode ser desfeita."
+      "deleteWarning": "Esta ação não pode ser desfeita.",
+      "activeStatus": "Template Ativo",
+      "activeDescription": "Templates inativos não aparecem na lista de inspeções",
+      "activated": "Template ativado!",
+      "deactivated": "Template desativado!",
+      "activate": "Ativar",
+      "deactivate": "Desativar",
+      "questions": "Perguntas",
+      "question": "Pergunta",
+      "noQuestions": "Nenhuma pergunta cadastrada",
+      "questionType": "Tipo de Resposta",
+      "questionTypes": {
+        "passFail": "Conforme/Não Conforme",
+        "text": "Texto Descritivo",
+        "rating": "Classificação",
+        "singleChoice": "Escolha Única",
+        "multipleChoice": "Múltipla Escolha"
+      },
+      "ratingScale": "Escala de Classificação",
+      "options": "Opções",
+      "option": "Opção",
+      "addOption": "Adicionar Opção"
     }
   },
   "trainings": {

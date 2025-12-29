@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, ExternalLink } from 'lucide-react';
+import { Download, ExternalLink, Eye, Pencil, Clock, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -111,20 +111,26 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
     fetchData();
   }, []);
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (status: string, deadline?: string | null) => {
+    const isOverdue = deadline && new Date(deadline) < new Date() && status !== 'approved';
+    
+    if (isOverdue && status === 'pending') {
+      return { className: 'bg-red-600 hover:bg-red-700 text-white', label: t('workflows.status.overdue'), isOverdue: true };
+    }
+    
     switch (status) {
       case 'pending':
-        return { className: 'bg-yellow-500 hover:bg-yellow-600 text-white', label: t('workflows.status.pending') };
+        return { className: 'bg-yellow-500 hover:bg-yellow-600 text-white', label: t('workflows.status.pending'), isOverdue: false };
       case 'submitted_completed':
-        return { className: 'bg-blue-500 hover:bg-blue-600 text-white', label: t('workflows.status.submitted_completed') };
+        return { className: 'bg-blue-500 hover:bg-blue-600 text-white', label: t('workflows.status.submitted_completed'), isOverdue: false };
       case 'submitted_blocked':
-        return { className: 'bg-orange-500 hover:bg-orange-600 text-white', label: t('workflows.status.submitted_blocked') };
+        return { className: 'bg-orange-500 hover:bg-orange-600 text-white', label: t('workflows.status.submitted_blocked'), isOverdue: false };
       case 'approved':
-        return { className: 'bg-green-500 hover:bg-green-600 text-white', label: t('workflows.status.approved') };
+        return { className: 'bg-green-500 hover:bg-green-600 text-white', label: t('workflows.status.approved'), isOverdue: false };
       case 'returned':
-        return { className: 'bg-red-500 hover:bg-red-600 text-white', label: t('workflows.status.returned') };
+        return { className: 'bg-red-500 hover:bg-red-600 text-white', label: t('workflows.status.returned'), isOverdue: false };
       default:
-        return { className: '', label: status };
+        return { className: '', label: status, isOverdue: false };
     }
   };
 
@@ -152,7 +158,7 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
     const exportData = filteredWorkflows.map(workflow => {
       const responsibleProfile = profiles.find(p => p.id === workflow.responsible_id);
       const deviation = deviations.find(d => d.id === workflow.deviation_id);
-      const statusConfig = getStatusConfig(workflow.status);
+      const statusConfig = getStatusConfig(workflow.status, workflow.deadline);
       
       return {
         'ID': (workflow as any).sequence_id || '-',
@@ -299,7 +305,7 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                 filteredWorkflows.map((workflow) => {
                   const responsibleProfile = profiles.find(p => p.id === workflow.responsible_id);
                   const deviation = deviations.find(d => d.id === workflow.deviation_id);
-                  const statusConfig = getStatusConfig(workflow.status);
+                  const statusConfig = getStatusConfig(workflow.status, workflow.deadline);
                   const isResponsible = currentUserId === workflow.responsible_id;
                   const canRespond = isResponsible && (workflow.status === 'pending' || workflow.status === 'returned');
                   const canValidate = !isResponsible && (workflow.status === 'submitted_completed' || workflow.status === 'submitted_blocked');
