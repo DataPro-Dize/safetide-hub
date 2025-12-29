@@ -493,10 +493,14 @@
       "questionType": "Tipo de Resposta",
       "questionTypes": {
         "passFail": "Conforme/Não Conforme",
+        "pass_fail": "Conforme/Não Conforme",
         "text": "Texto Descritivo",
         "rating": "Classificação",
         "singleChoice": "Escolha Única",
-        "multipleChoice": "Múltipla Escolha"
+        "single_choice": "Escolha Única",
+        "multipleChoice": "Múltipla Escolha",
+        "multiple_choice": "Múltipla Escolha",
+        "textPlaceholder": "Digite sua resposta..."
       },
       "ratingScale": "Escala de Classificação",
       "options": "Opções",

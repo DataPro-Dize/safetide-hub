@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
@@ -35,8 +37,10 @@ import { ImageUpload } from '@/components/ui/ImageUpload';
 import { SignaturePad } from '@/components/audit/SignaturePad';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { Check, X, Minus, ArrowLeft, Save, ClipboardCheck, Lock } from 'lucide-react';
+import { Check, X, Minus, ArrowLeft, Save, ClipboardCheck, Lock, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+type QuestionType = 'pass_fail' | 'text' | 'rating' | 'single_choice' | 'multiple_choice';
 
 interface AuditFormProps {
   auditId: string | null;
@@ -67,11 +71,17 @@ interface Question {
   id: string;
   question_text: string;
   order_index: number;
+  question_type: QuestionType;
+  options: string[] | null;
+  rating_scale: number | null;
 }
 
 interface Answer {
   questionId: string;
   answer: 'pass' | 'fail' | 'na' | null;
+  textAnswer: string;
+  ratingAnswer: number | null;
+  selectedOptions: string[];
   comment: string;
   photos: string[];
 }
@@ -148,7 +158,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
           id,
           name,
           order_index,
-          audit_template_questions(id, question_text, order_index)
+          audit_template_questions(id, question_text, order_index, question_type, options, rating_scale)
         `)
         .eq('template_id', templateId)
         .order('order_index');
@@ -165,6 +175,9 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
             id: q.id,
             question_text: q.question_text,
             order_index: q.order_index,
+            question_type: q.question_type || 'pass_fail',
+            options: q.options || null,
+            rating_scale: q.rating_scale || null,
           })),
       }));
 
@@ -179,6 +192,9 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
             initialAnswers[question.id] = {
               questionId: question.id,
               answer: null,
+              textAnswer: '',
+              ratingAnswer: null,
+              selectedOptions: [],
               comment: '',
               photos: [],
             };
@@ -221,6 +237,9 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
         loadedAnswers[item.question_id] = {
           questionId: item.question_id,
           answer: item.answer as 'pass' | 'fail' | 'na' | null,
+          textAnswer: '',
+          ratingAnswer: null,
+          selectedOptions: [],
           comment: item.comment || '',
           photos: item.photos || [],
         };
@@ -491,41 +510,147 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                       <AccordionContent className="space-y-4 pt-4">
                         {section.questions.map(question => {
                           const answer = answers[question.id];
+                          const questionType = question.question_type || 'pass_fail';
+                          
+                          const renderQuestionInput = () => {
+                            switch (questionType) {
+                              case 'text':
+                                return (
+                                  <Textarea
+                                    value={answer?.textAnswer || ''}
+                                    onChange={(e) => updateAnswer(question.id, 'textAnswer', e.target.value)}
+                                    placeholder={t('audit.questionTypes.textPlaceholder')}
+                                    disabled={isReadOnly}
+                                    rows={3}
+                                  />
+                                );
+                              
+                              case 'rating':
+                                const maxRating = question.rating_scale || 5;
+                                return (
+                                  <div className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                      {Array.from({ length: maxRating }, (_, i) => i + 1).map(rating => (
+                                        <button
+                                          key={rating}
+                                          type="button"
+                                          disabled={isReadOnly}
+                                          onClick={() => updateAnswer(question.id, 'ratingAnswer', rating)}
+                                          className={cn(
+                                            "p-1 transition-colors",
+                                            answer?.ratingAnswer && answer.ratingAnswer >= rating
+                                              ? "text-yellow-500"
+                                              : "text-muted-foreground/30 hover:text-yellow-300"
+                                          )}
+                                        >
+                                          <Star className="h-6 w-6 fill-current" />
+                                        </button>
+                                      ))}
+                                      {answer?.ratingAnswer && (
+                                        <span className="ml-2 text-sm font-medium">
+                                          {answer.ratingAnswer}/{maxRating}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                );
+                              
+                              case 'single_choice':
+                                const singleOptions = (question.options as string[]) || [];
+                                return (
+                                  <RadioGroup
+                                    value={answer?.selectedOptions?.[0] || ''}
+                                    onValueChange={(value) => updateAnswer(question.id, 'selectedOptions', [value])}
+                                    className="space-y-2"
+                                    disabled={isReadOnly}
+                                  >
+                                    {singleOptions.map((option, idx) => (
+                                      <div key={idx} className="flex items-center space-x-2">
+                                        <RadioGroupItem value={option} id={`${question.id}-option-${idx}`} disabled={isReadOnly} />
+                                        <Label htmlFor={`${question.id}-option-${idx}`} className="cursor-pointer">
+                                          {option}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </RadioGroup>
+                                );
+                              
+                              case 'multiple_choice':
+                                const multiOptions = (question.options as string[]) || [];
+                                return (
+                                  <div className="space-y-2">
+                                    {multiOptions.map((option, idx) => (
+                                      <div key={idx} className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id={`${question.id}-multi-${idx}`}
+                                          checked={answer?.selectedOptions?.includes(option) || false}
+                                          disabled={isReadOnly}
+                                          onCheckedChange={(checked) => {
+                                            const currentOptions = answer?.selectedOptions || [];
+                                            const newOptions = checked
+                                              ? [...currentOptions, option]
+                                              : currentOptions.filter(o => o !== option);
+                                            updateAnswer(question.id, 'selectedOptions', newOptions);
+                                          }}
+                                        />
+                                        <Label htmlFor={`${question.id}-multi-${idx}`} className="cursor-pointer">
+                                          {option}
+                                        </Label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                );
+                              
+                              case 'pass_fail':
+                              default:
+                                return (
+                                  <RadioGroup
+                                    value={answer?.answer || ''}
+                                    onValueChange={(value) => updateAnswer(question.id, 'answer', value)}
+                                    className="flex gap-4"
+                                    disabled={isReadOnly}
+                                  >
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem value="pass" id={`${question.id}-pass`} disabled={isReadOnly} />
+                                      <Label htmlFor={`${question.id}-pass`} className={cn("cursor-pointer", isReadOnly ? "text-muted-foreground" : "text-chart-2")}>
+                                        {t('audit.answers.pass')}
+                                      </Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem value="fail" id={`${question.id}-fail`} disabled={isReadOnly} />
+                                      <Label htmlFor={`${question.id}-fail`} className={cn("cursor-pointer", isReadOnly ? "text-muted-foreground" : "text-destructive")}>
+                                        {t('audit.answers.fail')}
+                                      </Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem value="na" id={`${question.id}-na`} disabled={isReadOnly} />
+                                      <Label htmlFor={`${question.id}-na`} className="text-muted-foreground cursor-pointer">
+                                        N/A
+                                      </Label>
+                                    </div>
+                                  </RadioGroup>
+                                );
+                            }
+                          };
+                          
                           return (
                             <div key={question.id} className="border rounded-lg p-4 space-y-3">
                               <div className="flex items-start justify-between gap-4">
-                                <p className="font-medium flex-1">{question.question_text}</p>
-                                {getAnswerIcon(answer?.answer)}
+                                <div className="flex-1">
+                                  <p className="font-medium">{question.question_text}</p>
+                                  {questionType !== 'pass_fail' && (
+                                    <Badge variant="outline" className="mt-1 text-xs">
+                                      {t(`audit.questionTypes.${questionType}`)}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {questionType === 'pass_fail' && getAnswerIcon(answer?.answer)}
                               </div>
 
-                              <RadioGroup
-                                value={answer?.answer || ''}
-                                onValueChange={(value) => updateAnswer(question.id, 'answer', value)}
-                                className="flex gap-4"
-                                disabled={isReadOnly}
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="pass" id={`${question.id}-pass`} disabled={isReadOnly} />
-                                  <Label htmlFor={`${question.id}-pass`} className={cn("cursor-pointer", isReadOnly ? "text-muted-foreground" : "text-chart-2")}>
-                                    {t('audit.answers.pass')}
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="fail" id={`${question.id}-fail`} disabled={isReadOnly} />
-                                  <Label htmlFor={`${question.id}-fail`} className={cn("cursor-pointer", isReadOnly ? "text-muted-foreground" : "text-destructive")}>
-                                    {t('audit.answers.fail')}
-                                  </Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="na" id={`${question.id}-na`} disabled={isReadOnly} />
-                                  <Label htmlFor={`${question.id}-na`} className="text-muted-foreground cursor-pointer">
-                                    N/A
-                                  </Label>
-                                </div>
-                              </RadioGroup>
+                              {renderQuestionInput()}
 
-                              {/* Show evidence fields when fail is selected */}
-                              {answer?.answer === 'fail' && (
+                              {/* Show evidence fields when fail is selected (only for pass_fail type) */}
+                              {questionType === 'pass_fail' && answer?.answer === 'fail' && (
                                 <div className="space-y-3 pt-2 border-t">
                                   <div>
                                     <Label>{t('audit.comment')}</Label>
