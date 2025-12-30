@@ -76,7 +76,7 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
   const [selectedGroup, setSelectedGroup] = useState('');
   const [selectedCompany, setSelectedCompany] = useState('');
   const [selectedPlant, setSelectedPlant] = useState('');
-  const [selectedInstructor, setSelectedInstructor] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState('');
   const [realizationDate, setRealizationDate] = useState('');
   const [expirationDate, setExpirationDate] = useState('');
   const [institution, setInstitution] = useState('');
@@ -168,9 +168,12 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
 
     setUploading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const fileExt = certificateFile.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `certificates/${fileName}`;
+      const filePath = `${user.id}/certificates/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('training-files')
@@ -178,11 +181,8 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from('training-files')
-        .getPublicUrl(filePath);
-
-      return urlData.publicUrl;
+      // Return the file path - signed URLs will be generated when needed
+      return filePath;
     } catch (error) {
       console.error('Error uploading certificate:', error);
       toast({
@@ -199,7 +199,7 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
     e.preventDefault();
 
     // Validate required fields
-    if (!selectedType || !selectedPlant || !realizationDate || !institution || !certificateFile) {
+    if (!selectedType || !selectedPlant || !realizationDate || !institution || !certificateFile || !selectedEmployee) {
       toast({
         title: t('common.fillRequired'),
         variant: 'destructive',
@@ -223,13 +223,13 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
 
       const realizationDateTime = new Date(`${realizationDate}T09:00:00`).toISOString();
 
-      // Create training session
+      // Create training session (use current user as instructor since this is a completed training registration)
       const { data: session, error: sessionError } = await supabase
         .from('training_sessions')
         .insert({
           training_type_id: selectedType,
           plant_id: selectedPlant,
-          instructor_id: selectedInstructor || user.id,
+          instructor_id: user.id, // The logged-in user registers the training
           scheduled_date: realizationDateTime,
           completed_at: realizationDateTime,
           status: 'completed',
@@ -243,6 +243,18 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
         .single();
 
       if (sessionError) throw sessionError;
+
+      // Create enrollment for the employee who took the training
+      const { error: enrollmentError } = await supabase
+        .from('training_enrollments')
+        .insert({
+          session_id: session.id,
+          user_id: selectedEmployee,
+          status: 'present',
+          certificate_url: certUrl,
+        });
+
+      if (enrollmentError) throw enrollmentError;
 
       toast({ title: t('trainings.register.success') });
       resetForm();
@@ -264,7 +276,7 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
     setSelectedGroup('');
     setSelectedCompany('');
     setSelectedPlant('');
-    setSelectedInstructor('');
+    setSelectedEmployee('');
     setRealizationDate('');
     setExpirationDate('');
     setInstitution('');
@@ -457,14 +469,14 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
               </div>
             </div>
 
-            {/* Instructor */}
+            {/* Employee (person who took the training) */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">
-                {t('trainings.register.instructor')}
+                {t('trainings.register.employee')} <span className="text-destructive">*</span>
               </Label>
-              <Select value={selectedInstructor} onValueChange={setSelectedInstructor}>
+              <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('trainings.register.selectInstructor')} />
+                  <SelectValue placeholder={t('trainings.register.selectEmployee')} />
                 </SelectTrigger>
                 <SelectContent>
                   {users.map((user) => (
