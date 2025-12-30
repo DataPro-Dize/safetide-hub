@@ -19,10 +19,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Play, Users } from 'lucide-react';
+import { Plus, Play, Users, Award } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ScheduleTrainingModal } from './ScheduleTrainingModal';
+import { RegisterTrainingModal } from './RegisterTrainingModal';
 import { useToast } from '@/hooks/use-toast';
 
 interface TrainingSessionsListProps {
@@ -53,6 +54,7 @@ export function TrainingSessionsList({ onStartClass }: TrainingSessionsListProps
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   useEffect(() => {
     fetchSessions();
@@ -150,28 +152,44 @@ export function TrainingSessionsList({ onStartClass }: TrainingSessionsListProps
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <h2 className="text-lg font-semibold">{t('trainings.sessions.title')}</h2>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 bg-button-add hover:bg-button-add/90">
-              <Plus className="h-4 w-4" />
-              {t('trainings.sessions.schedule')}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{t('trainings.sessions.schedule')}</DialogTitle>
-            </DialogHeader>
-            <ScheduleTrainingModal 
-              onClose={() => {
-                setIsModalOpen(false);
-                fetchSessions();
-              }} 
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button 
+            variant="outline" 
+            className="gap-2 w-full sm:w-auto"
+            onClick={() => setIsRegisterModalOpen(true)}
+          >
+            <Award className="h-4 w-4" />
+            {t('trainings.register.registerButton')}
+          </Button>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 bg-button-add hover:bg-button-add/90 w-full sm:w-auto">
+                <Plus className="h-4 w-4" />
+                {t('trainings.sessions.schedule')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>{t('trainings.sessions.schedule')}</DialogTitle>
+              </DialogHeader>
+              <ScheduleTrainingModal 
+                onClose={() => {
+                  setIsModalOpen(false);
+                  fetchSessions();
+                }} 
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
+
+      <RegisterTrainingModal
+        open={isRegisterModalOpen}
+        onOpenChange={setIsRegisterModalOpen}
+        onSuccess={fetchSessions}
+      />
 
       <Card>
         <CardContent className="p-0">

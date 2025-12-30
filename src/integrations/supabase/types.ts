@@ -906,12 +906,16 @@ export type Database = {
       }
       training_sessions: {
         Row: {
+          certificate_url: string | null
           completed_at: string | null
           created_at: string
+          expiration_date: string | null
           id: string
+          institution: string | null
           instructor_id: string
           location_room: string | null
           max_participants: number | null
+          modality: Database["public"]["Enums"]["training_modality"] | null
           plant_id: string
           scheduled_date: string
           started_at: string | null
@@ -920,12 +924,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          certificate_url?: string | null
           completed_at?: string | null
           created_at?: string
+          expiration_date?: string | null
           id?: string
+          institution?: string | null
           instructor_id: string
           location_room?: string | null
           max_participants?: number | null
+          modality?: Database["public"]["Enums"]["training_modality"] | null
           plant_id: string
           scheduled_date: string
           started_at?: string | null
@@ -934,12 +942,16 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          certificate_url?: string | null
           completed_at?: string | null
           created_at?: string
+          expiration_date?: string | null
           id?: string
+          institution?: string | null
           instructor_id?: string
           location_room?: string | null
           max_participants?: number | null
+          modality?: Database["public"]["Enums"]["training_modality"] | null
           plant_id?: string
           scheduled_date?: string
           started_at?: string | null
@@ -1227,6 +1239,7 @@ export type Database = {
         | "single_choice"
         | "multiple_choice"
       training_enrollment_status: "pending" | "present" | "absent"
+      training_modality: "ead" | "presencial"
       training_session_status:
         | "scheduled"
         | "in_progress"
@@ -1416,6 +1429,7 @@ export const Constants = {
         "multiple_choice",
       ],
       training_enrollment_status: ["pending", "present", "absent"],
+      training_modality: ["ead", "presencial"],
       training_session_status: [
         "scheduled",
         "in_progress",
