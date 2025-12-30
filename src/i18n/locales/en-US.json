@@ -622,6 +622,8 @@
       "locationPlaceholder": "E.g., Room 01, Auditorium",
       "instructor": "Instructor",
       "selectInstructor": "Select instructor",
+      "employee": "Employee",
+      "selectEmployee": "Select employee",
       "certificate": "Certificate",
       "uploadCertificate": "Click to attach certificate",
       "invalidFileType": "Invalid file type. Use PDF, JPG or PNG.",
