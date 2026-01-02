@@ -504,7 +504,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                       <AccordionTrigger className="text-base font-medium">
                         {section.name}
                         <span className="ml-2 text-sm text-muted-foreground">
-                          ({section.questions.filter(q => answers[q.id]?.answer !== null).length}/{section.questions.length})
+                          ({(section.questions || []).filter(q => answers[q.id]?.answer !== null).length}/{(section.questions || []).length})
                         </span>
                       </AccordionTrigger>
                       <AccordionContent className="space-y-4 pt-4">
@@ -673,7 +673,7 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
                                       />
                                     </div>
                                   )}
-                                  {isReadOnly && answer.photos.length > 0 && (
+                                  {isReadOnly && answer?.photos?.length > 0 && (
                                     <div>
                                       <Label>{t('audit.evidence')}</Label>
                                       <div className="flex gap-2 mt-1">
