@@ -188,7 +188,7 @@ export default function RiskManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
@@ -226,7 +226,7 @@ export default function RiskManagement() {
         </TabsList>
 
         <TabsContent value="hazards" className="mt-4">
-      <Card className="border-0 shadow-sm">
+      <Card className="border-0 shadow-sm overflow-hidden">
         <CardContent className="p-0 overflow-x-auto">
           <Table className="min-w-[900px]">
             <TableHeader>
