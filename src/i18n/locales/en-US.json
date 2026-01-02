@@ -29,7 +29,9 @@
     "active": "Active",
     "inactive": "Inactive",
     "error": "Error",
-    "fillRequired": "Please fill all required fields"
+    "fillRequired": "Please fill all required fields",
+    "unexpectedError": "An unexpected error occurred",
+    "close": "Close"
   },
   "auth": {
     "subtitle": "DataPró, your data automation and workplace safety intelligence platform.",
@@ -457,6 +459,9 @@
     "viewAudit": "View Inspection",
     "completedLocked": "Completed - Read Only",
     "noDescription": "No description available",
+    "errors": {
+      "missingRequiredField": "Error saving: please select a template and answer at least one question before saving."
+    },
     "templates": {
       "title": "Inspection Templates",
       "description": "Configure templates and checklists for your inspections",
