@@ -672,6 +672,7 @@
     "editLocked": "Edit Locked", "edited": "Edited", "editedBy": "Edited by {{name}} on {{date}}",
     "reason": "Reason", "originalRecord": "Original Record", "canEditOnce": "This record can only be changed once. After the change, it cannot be edited again.",
     "createSuccess": "Report created successfully!", "updateSuccess": "Report updated successfully!",
+    "errors": { "noPermission": "You don't have permission to create reports for this plant. Check if you are assigned to the correct project.", "generic": "An error occurred while saving the report. Please try again." },
     "status": { "original": "Original", "edited": "Edited" },
     "editModal": { "title": "Confirm Change", "description": "Report changes are only allowed once.", "warning": "After confirming, this record will be marked as EDITED and cannot be changed again.", "reason": "Change Justification", "placeholder": "Describe the reason for the change...", "minChars": "Minimum 10 characters", "confirm": "Confirm Change" },
     "list": { "title": "KPI Reports", "export": "Export Excel", "searchPlaceholder": "Search by project or plant...", "project": "Project", "plant": "Plant", "period": "Period", "hht": "HHT", "accidents": "Accidents", "status": "Status" },
