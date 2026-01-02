@@ -1185,6 +1185,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_profile_sensitive_fields: {
+        Args: { _user_id: string }
+        Returns: {
+          is_active: boolean
+          is_admin: boolean
+          role: Database["public"]["Enums"]["user_role"]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
