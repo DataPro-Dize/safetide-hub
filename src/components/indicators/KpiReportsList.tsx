@@ -141,8 +141,8 @@ export function KpiReportsList() {
       </CardHeader>
       <CardContent>
         {/* Filters */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row">
-          <div className="relative flex-1">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+          <div className="relative flex-1 min-w-0 max-w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={t('indicators.list.searchPlaceholder')}
@@ -152,7 +152,7 @@ export function KpiReportsList() {
             />
           </div>
           <Select value={periodFilter} onValueChange={setPeriodFilter}>
-            <SelectTrigger className="w-full sm:w-40">
+            <SelectTrigger className="w-full sm:w-40 shrink-0">
               <SelectValue placeholder="Período" />
             </SelectTrigger>
             <SelectContent>
@@ -164,7 +164,7 @@ export function KpiReportsList() {
             </SelectContent>
           </Select>
           <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-full sm:w-32">
+            <SelectTrigger className="w-full sm:w-32 shrink-0">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -179,8 +179,8 @@ export function KpiReportsList() {
         </div>
 
         {/* Table */}
-        <div className="rounded-md border">
-          <Table>
+        <div className="rounded-md border overflow-x-auto">
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
                 <TableHead>{t('indicators.list.project')}</TableHead>
