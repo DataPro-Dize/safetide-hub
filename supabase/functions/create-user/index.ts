@@ -153,30 +153,34 @@ Deno.serve(async (req) => {
       console.log('User role inserted:', appRole)
     }
 
-    // Link user to company if groupId provided
+    // Link user to ALL companies of the group if groupId provided
     if (groupId) {
-      // Get first company of the group
+      // Get ALL companies of the group (not just the first one)
       const { data: companies, error: companiesError } = await supabaseAdmin
         .from('companies')
         .select('id')
         .eq('group_id', groupId)
-        .limit(1)
 
       if (companiesError) {
         console.error('Error fetching companies:', companiesError)
       } else if (companies && companies.length > 0) {
+        // Create user_companies entries for ALL companies in the group
+        const userCompaniesData = companies.map(company => ({
+          user_id: userId,
+          company_id: company.id,
+        }))
+
         const { error: linkError } = await supabaseAdmin
           .from('user_companies')
-          .insert({
-            user_id: userId,
-            company_id: companies[0].id,
-          })
+          .insert(userCompaniesData)
 
         if (linkError) {
-          console.error('Error linking user to company:', linkError)
+          console.error('Error linking user to companies:', linkError)
         } else {
-          console.log('User linked to company:', companies[0].id)
+          console.log('User linked to all companies:', companies.map(c => c.id))
         }
+      } else {
+        console.log('No companies found for group:', groupId)
       }
     }
 
