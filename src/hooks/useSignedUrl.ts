@@ -58,12 +58,12 @@ export function useSignedUrl(ref: string | null | undefined, expiresIn = 3600) {
 }
 
 // Hook for multiple signed URLs
-export function useSignedUrls(refs: string[], expiresIn = 3600) {
+export function useSignedUrls(refs: string[] | undefined | null, expiresIn = 3600) {
   const [signedUrls, setSignedUrls] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!refs || refs.length === 0) {
+    if (!refs || !Array.isArray(refs) || refs.length === 0) {
       setSignedUrls([]);
       setLoading(false);
       return;
