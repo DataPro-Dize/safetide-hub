@@ -320,13 +320,13 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
 
       // Save audit items
       const itemsToSave = Object.values(answers)
-        .filter(a => a.answer !== null)
+        .filter(a => a.answer !== null && a.questionId)
         .map(answer => ({
           audit_id: auditRecordId,
           question_id: answer.questionId,
           answer: answer.answer,
           comment: answer.comment || null,
-          photos: answer.photos,
+          photos: answer.photos || [],
         }));
 
       if (itemsToSave.length > 0) {
@@ -349,9 +349,17 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
       onClose();
     } catch (error: any) {
       console.error('Error saving audit:', error);
+      let errorMessage = t('common.unexpectedError');
+      
+      if (error?.code === '23502') {
+        errorMessage = t('audit.errors.missingRequiredField');
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: t('common.error'),
-        description: error?.message || 'An unexpected error occurred',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

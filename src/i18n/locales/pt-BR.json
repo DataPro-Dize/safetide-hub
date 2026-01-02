@@ -29,7 +29,9 @@
     "active": "Ativo",
     "inactive": "Inativo",
     "error": "Erro",
-    "fillRequired": "Preencha todos os campos obrigatórios"
+    "fillRequired": "Preencha todos os campos obrigatórios",
+    "unexpectedError": "Ocorreu um erro inesperado",
+    "close": "Fechar"
   },
   "auth": {
     "subtitle": "Ao DataPró, sua plataforma de automação de dados e inteligência em segurança do trabalho.",
@@ -458,6 +460,9 @@
     "viewAudit": "Visualizar Inspeção",
     "completedLocked": "Finalizada - Somente Leitura",
     "noDescription": "Sem descrição disponível",
+    "errors": {
+      "missingRequiredField": "Erro ao salvar: selecione um template e responda ao menos uma pergunta antes de salvar."
+    },
     "templates": {
       "title": "Templates de Inspeção",
       "description": "Configure os templates e checklists para suas inspeções",
