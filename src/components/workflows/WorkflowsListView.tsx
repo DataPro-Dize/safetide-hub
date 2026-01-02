@@ -223,8 +223,8 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
 
       {/* Data Table */}
       <Card className="border-0 shadow-sm">
-        <CardContent className="p-0">
-          <Table>
+        <CardContent className="p-0 overflow-x-auto">
+          <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="w-[70px]">ID</TableHead>
