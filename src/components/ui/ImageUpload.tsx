@@ -17,7 +17,7 @@ interface ImageUploadProps {
 export function ImageUpload({ 
   bucket, 
   maxImages = 10, 
-  images, 
+  images = [], 
   onImagesChange,
   disabled = false 
 }: ImageUploadProps) {
@@ -25,7 +25,8 @@ export function ImageUpload({
   const { toast } = useToast();
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const { signedUrls, loading: loadingUrls } = useSignedUrls(images);
+  const safeImages = Array.isArray(images) ? images : [];
+  const { signedUrls, loading: loadingUrls } = useSignedUrls(safeImages);
 
   const uploadFile = async (file: File): Promise<string | null> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -50,7 +51,7 @@ export function ImageUpload({
   const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0 || disabled) return;
 
-    const remainingSlots = maxImages - images.length;
+    const remainingSlots = maxImages - safeImages.length;
     if (remainingSlots <= 0) {
       toast({ 
         title: t('imageUpload.limitReached'), 
@@ -84,10 +85,10 @@ export function ImageUpload({
     }
 
     if (uploadedUrls.length > 0) {
-      onImagesChange([...images, ...uploadedUrls]);
+      onImagesChange([...safeImages, ...uploadedUrls]);
     }
     setUploading(false);
-  }, [bucket, images, maxImages, onImagesChange, disabled, toast, t]);
+  }, [bucket, safeImages, maxImages, onImagesChange, disabled, toast, t]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -107,7 +108,7 @@ export function ImageUpload({
   }, [handleFiles]);
 
   const removeImage = (index: number) => {
-    const newImages = images.filter((_, i) => i !== index);
+    const newImages = safeImages.filter((_, i) => i !== index);
     onImagesChange(newImages);
   };
 
@@ -147,13 +148,13 @@ export function ImageUpload({
               {t('imageUpload.dragOrClick')}
             </p>
             <p className="text-xs text-muted-foreground">
-              {t('imageUpload.maxSize')} • {images.length}/{maxImages} {t('imageUpload.images')}
+              {t('imageUpload.maxSize')} • {safeImages.length}/{maxImages} {t('imageUpload.images')}
             </p>
           </div>
         )}
       </div>
 
-      {images.length > 0 && (
+      {safeImages.length > 0 && (
         <div className="grid grid-cols-4 gap-2">
           {loadingUrls ? (
             <div className="col-span-4 flex justify-center py-4">
