@@ -65,24 +65,29 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
-        <div className="absolute top-4 right-4 lg:hidden flex gap-2">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-4 sm:p-8 pt-20 lg:pt-8 bg-background relative">
+        <div className="absolute top-4 right-4 lg:hidden flex gap-2 z-10">
           <ThemeToggle />
           <LanguageToggle variant="compact" />
         </div>
         
+        {/* Mobile Logo */}
+        <div className="lg:hidden mb-6">
+          <Logo size="md" />
+        </div>
+        
         <Card className="w-full max-w-md shadow-card border-0 animate-fade-in-up">
-          <CardContent className="pt-8 pb-8 px-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gradient-brand mb-3">
+          <CardContent className="pt-6 pb-6 px-4 sm:pt-8 sm:pb-8 sm:px-8">
+            <div className="text-center mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gradient-brand mb-2 sm:mb-3">
                 {t('common.welcome')}
               </h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 {t('auth.subtitle')}
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email">{t('common.email')}</Label>
                 <Input
@@ -92,7 +97,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="h-11"
+                  className="h-10 sm:h-11"
                 />
               </div>
 
@@ -105,12 +110,12 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-11"
+                  className="h-10 sm:h-11"
                 />
               </div>
 
               {!isRegister && (
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="remember"
@@ -134,7 +139,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full h-12 text-base font-semibold"
+                className="w-full h-11 sm:h-12 text-base font-semibold"
                 variant="brand"
                 disabled={isLoading}
               >

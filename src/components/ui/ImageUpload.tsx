@@ -155,7 +155,7 @@ export function ImageUpload({
       </div>
 
       {safeImages.length > 0 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {loadingUrls ? (
             <div className="col-span-4 flex justify-center py-4">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />

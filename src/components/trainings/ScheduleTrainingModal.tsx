@@ -164,7 +164,7 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>{t('trainings.sessions.trainingType')} *</Label>
           <Select value={selectedType} onValueChange={(value) => {
@@ -208,7 +208,7 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>{t('common.date')} *</Label>
           <Input
@@ -228,7 +228,7 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>{t('trainings.sessions.instructor')} *</Label>
           <Select value={selectedInstructor} onValueChange={setSelectedInstructor}>
@@ -255,7 +255,7 @@ export function ScheduleTrainingModal({ onClose }: ScheduleTrainingModalProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>{t('trainings.sessions.maxParticipants')}</Label>
           <Input

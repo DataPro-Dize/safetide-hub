@@ -162,7 +162,7 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
           <DialogTitle>{t('admin.users.add')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="user-name">{t('common.name')} *</Label>
               <Input
@@ -185,7 +185,7 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="user-phone">{t('admin.users.phone')}</Label>
               <Input
@@ -240,7 +240,7 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
             ) : filteredModules.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t('admin.users.noModulesAvailable')}</p>
             ) : (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {filteredModules.map((module) => (
                   <div key={module.id} className="flex items-center space-x-2">
                     <Checkbox
