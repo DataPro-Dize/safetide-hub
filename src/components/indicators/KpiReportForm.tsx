@@ -81,13 +81,33 @@ export function KpiReportForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [showJustificationModal, setShowJustificationModal] = useState(false);
 
-  // Fetch plants
+  // Fetch plants that the user has access to (via user_companies)
   const { data: plants } = useQuery({
     queryKey: ['plants-for-kpi'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Get companies the user has access to
+      const { data: userCompanies, error: ucError } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', user.id);
+      
+      if (ucError) throw ucError;
+      
+      if (!userCompanies || userCompanies.length === 0) {
+        return [];
+      }
+
+      const companyIds = userCompanies.map(uc => uc.company_id);
+      
+      // Get plants from those companies
       const { data, error } = await supabase
         .from('plants')
-        .select('id, name, company:companies(name)');
+        .select('id, name, company:companies(name)')
+        .in('company_id', companyIds);
+      
       if (error) throw error;
       return data;
     },
@@ -172,7 +192,13 @@ export function KpiReportForm() {
           ...formData,
         });
 
-      if (error) throw error;
+      if (error) {
+        // Check for RLS violation
+        if (error.code === '42501') {
+          throw new Error(t('indicators.errors.noPermission'));
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({ title: t('indicators.createSuccess') });

@@ -677,6 +677,7 @@
     "editLocked": "Edição Bloqueada", "edited": "Retificado", "editedBy": "Editado por {{name}} em {{date}}",
     "reason": "Motivo", "originalRecord": "Registro Original", "canEditOnce": "Este registro pode ser alterado apenas uma vez. Após a alteração, não será possível editar novamente.",
     "createSuccess": "Apontamento criado com sucesso!", "updateSuccess": "Apontamento atualizado com sucesso!",
+    "errors": { "noPermission": "Você não tem permissão para criar apontamentos para esta unidade. Verifique se você está associado ao projeto correto.", "generic": "Ocorreu um erro ao salvar o apontamento. Tente novamente." },
     "status": { "original": "Original", "edited": "Retificado" },
     "editModal": { "title": "Confirmar Alteração", "description": "A alteração de apontamentos só é permitida uma vez.", "warning": "Após confirmar, este registro será marcado como RETIFICADO e não poderá ser alterado novamente.", "reason": "Justificativa da Alteração", "placeholder": "Descreva o motivo da alteração...", "minChars": "Mínimo de 10 caracteres", "confirm": "Confirmar Alteração" },
     "list": { "title": "Relatórios de KPI", "export": "Exportar Excel", "searchPlaceholder": "Buscar por projeto ou unidade...", "project": "Projeto", "plant": "Unidade", "period": "Período", "hht": "HHT", "accidents": "Acidentes", "status": "Status" },
