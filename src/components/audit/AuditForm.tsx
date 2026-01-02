@@ -121,20 +121,20 @@ export function AuditForm({ auditId, isNew, onClose }: AuditFormProps) {
   const selectedTemplateId = form.watch('template_id');
 
   useEffect(() => {
-    fetchInitialData();
-  }, []);
+    const initializeForm = async () => {
+      await fetchInitialData();
+      if (auditId && !isNew) {
+        await fetchAuditData(auditId);
+      }
+    };
+    initializeForm();
+  }, [auditId, isNew]);
 
   useEffect(() => {
     if (selectedTemplateId) {
       fetchTemplateSections(selectedTemplateId);
     }
   }, [selectedTemplateId]);
-
-  useEffect(() => {
-    if (auditId && !isNew) {
-      fetchAuditData(auditId);
-    }
-  }, [auditId, isNew]);
 
   const fetchInitialData = async () => {
     try {
