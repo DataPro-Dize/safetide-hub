@@ -24,7 +24,7 @@ export default function Trainings() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-hidden">
       <div>
         <h1 className="text-2xl font-bold text-foreground">{t('trainings.title')}</h1>
         <p className="text-muted-foreground">{t('trainings.description')}</p>

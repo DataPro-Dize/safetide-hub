@@ -129,7 +129,7 @@ export function KpiReportsList() {
   };
 
   return (
-    <Card className="bg-card">
+    <Card className="bg-card overflow-hidden">
       <CardHeader>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>{t('indicators.list.title')}</CardTitle>

@@ -142,8 +142,9 @@ export function AuditList({ onNewAudit, onEditAudit }: AuditListProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="min-w-[700px]">
+      <div className="rounded-md border overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="min-w-[700px]">
           <TableHeader>
             <TableRow>
               <TableHead>{t('common.date')}</TableHead>
@@ -198,7 +199,8 @@ export function AuditList({ onNewAudit, onEditAudit }: AuditListProps) {
               ))
             )}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
     </div>
   );
