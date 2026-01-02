@@ -57,35 +57,41 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
   const [availableModules, setAvailableModules] = useState<string[]>([]);
   const [userModules, setUserModules] = useState<string[]>([]);
   const [userGroupId, setUserGroupId] = useState<string | null>(null);
-  const [userCompany, setUserCompany] = useState<Company | null>(null);
   const [userGroup, setUserGroup] = useState<CorporateGroup | null>(null);
+  
+  // Company access management
+  const [groupCompanies, setGroupCompanies] = useState<Company[]>([]);
+  const [userCompanyIds, setUserCompanyIds] = useState<string[]>([]);
+  
   const [formData, setFormData] = useState({
     name: user.name,
     phone: user.phone || '',
     is_active: user.is_active,
     selectedModules: [] as string[],
+    selectedCompanies: [] as string[],
   });
 
-  // Fetch user's company, group and modules on mount
+  // Fetch user's company, group, modules and companies on mount
   useEffect(() => {
     const fetchUserData = async () => {
-      // Get user's company
-      const { data: userCompanyData } = await supabase
+      // Get user's companies (all of them)
+      const { data: userCompaniesData } = await supabase
         .from('user_companies')
         .select('company_id')
-        .eq('user_id', user.id)
-        .single();
+        .eq('user_id', user.id);
 
-      if (userCompanyData) {
-        // Get company details
+      const currentCompanyIds = userCompaniesData?.map(uc => uc.company_id) || [];
+      setUserCompanyIds(currentCompanyIds);
+
+      if (currentCompanyIds.length > 0) {
+        // Get first company to determine group
         const { data: companyData } = await supabase
           .from('companies')
           .select('id, name, group_id')
-          .eq('id', userCompanyData.company_id)
+          .eq('id', currentCompanyIds[0])
           .single();
 
         if (companyData) {
-          setUserCompany(companyData);
           setUserGroupId(companyData.group_id);
           
           // Get group details
@@ -97,6 +103,17 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
           
           if (groupData) {
             setUserGroup(groupData);
+          }
+          
+          // Fetch ALL companies in this group
+          const { data: companiesInGroup } = await supabase
+            .from('companies')
+            .select('id, name, group_id')
+            .eq('group_id', companyData.group_id)
+            .order('name');
+          
+          if (companiesInGroup) {
+            setGroupCompanies(companiesInGroup);
           }
           
           // Fetch available modules for this group
@@ -124,12 +141,14 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
         setFormData(prev => ({
           ...prev,
           selectedModules: userModuleIds,
+          selectedCompanies: currentCompanyIds,
         }));
       } else {
         setUserModules([]);
         setFormData(prev => ({
           ...prev,
           selectedModules: [],
+          selectedCompanies: currentCompanyIds,
         }));
       }
     };
@@ -145,8 +164,9 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
       phone: user.phone || '',
       is_active: user.is_active,
       selectedModules: userModules,
+      selectedCompanies: userCompanyIds,
     });
-  }, [user, userModules]);
+  }, [user, userModules, userCompanyIds]);
 
   const handleModuleToggle = (moduleId: string) => {
     setFormData(prev => ({
@@ -157,10 +177,24 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
     }));
   };
 
+  const handleCompanyToggle = (companyId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      selectedCompanies: prev.selectedCompanies.includes(companyId)
+        ? prev.selectedCompanies.filter(id => id !== companyId)
+        : [...prev.selectedCompanies, companyId],
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       toast({ title: t('common.error'), description: t('common.fillRequired'), variant: 'destructive' });
+      return;
+    }
+
+    if (formData.selectedCompanies.length === 0) {
+      toast({ title: t('common.error'), description: t('admin.users.selectAtLeastOneCompany'), variant: 'destructive' });
       return;
     }
 
@@ -179,6 +213,37 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
 
       if (profileError) {
         throw profileError;
+      }
+
+      // Update company associations
+      // Find companies to add
+      const companiesToAdd = formData.selectedCompanies.filter(id => !userCompanyIds.includes(id));
+      // Find companies to remove
+      const companiesToRemove = userCompanyIds.filter(id => !formData.selectedCompanies.includes(id));
+
+      // Remove deselected companies
+      if (companiesToRemove.length > 0) {
+        const { error: removeError } = await supabase
+          .from('user_companies')
+          .delete()
+          .eq('user_id', user.id)
+          .in('company_id', companiesToRemove);
+
+        if (removeError) throw removeError;
+      }
+
+      // Add new companies
+      if (companiesToAdd.length > 0) {
+        const companiesToInsert = companiesToAdd.map(companyId => ({
+          user_id: user.id,
+          company_id: companyId,
+        }));
+
+        const { error: addError } = await supabase
+          .from('user_companies')
+          .insert(companiesToInsert);
+
+        if (addError) throw addError;
       }
 
       // Delete existing user modules
@@ -263,25 +328,40 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
             </div>
           </div>
 
-          {/* Company and Group Info */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>{t('admin.users.company')}</Label>
-              <Input
-                value={userCompany?.name || '-'}
-                disabled
-                className="bg-muted"
-              />
-            </div>
+          {/* Corporate Group Info */}
+          <div className="space-y-2">
+            <Label>{t('admin.users.corporateGroup')}</Label>
+            <Input
+              value={userGroup?.name || '-'}
+              disabled
+              className="bg-muted"
+            />
+          </div>
 
-            <div className="space-y-2">
-              <Label>{t('admin.users.corporateGroup')}</Label>
-              <Input
-                value={userGroup?.name || '-'}
-                disabled
-                className="bg-muted"
-              />
-            </div>
+          {/* Company Access Section */}
+          <div className="space-y-3">
+            <Label>{t('admin.users.companyAccess')}</Label>
+            {groupCompanies.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{t('admin.users.noCompaniesInGroup')}</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 p-3 rounded-lg border border-border max-h-40 overflow-y-auto">
+                {groupCompanies.map((company) => (
+                  <div key={company.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`company-${company.id}`}
+                      checked={formData.selectedCompanies.includes(company.id)}
+                      onCheckedChange={() => handleCompanyToggle(company.id)}
+                    />
+                    <label
+                      htmlFor={`company-${company.id}`}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {company.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Module Access Section */}
