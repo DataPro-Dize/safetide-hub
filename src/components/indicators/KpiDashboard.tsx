@@ -272,7 +272,7 @@ export function KpiDashboard() {
       {/* Filters Section */}
       <Card className="bg-card border-border">
         <CardContent className="pt-6">
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t('indicators.dashboard.period', 'Período')}</Label>
               <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(parseInt(v))}>
@@ -333,7 +333,7 @@ export function KpiDashboard() {
       </Card>
 
       {/* Primary KPI Cards - Row 1 */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4 lg:grid-cols-8">
         <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -416,7 +416,7 @@ export function KpiDashboard() {
       </div>
 
       {/* Safety Rates Cards - Row 2 */}
-      <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="bg-card border-l-4 border-l-secondary">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
