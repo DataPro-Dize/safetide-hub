@@ -254,7 +254,24 @@
     "list": {
       "myActionsOnly": "My Actions Only",
       "deviationId": "Deviation ID",
-      "nature": "Nature"
+      "nature": "Nature",
+      "evidence": "Evidence"
+    },
+    "details": {
+      "title": "Workflow Details",
+      "allPhotos": "All Photos",
+      "validatorNotes": "Validator Notes",
+      "history": {
+        "title": "History",
+        "noHistory": "No history recorded",
+        "by": "by",
+        "created": "Workflow created",
+        "submittedCompleted": "Submitted as completed",
+        "submittedBlocked": "Submitted as blocked",
+        "approved": "Approved",
+        "returned": "Returned for revision",
+        "resubmitted": "Resubmitted"
+      }
     }
   },
   "imageUpload": {

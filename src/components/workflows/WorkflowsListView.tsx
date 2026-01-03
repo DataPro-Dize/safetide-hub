@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, ExternalLink, Eye, Pencil, Clock, AlertTriangle, Image } from 'lucide-react';
+import { Download, ExternalLink, Eye, Pencil, Clock, AlertTriangle, Image, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 import { WorkflowResponseSheet } from '@/components/workflows/WorkflowResponseSheet';
 import { WorkflowValidationSheet } from '@/components/workflows/WorkflowValidationSheet';
+import { WorkflowDetailsSheet } from '@/components/workflows/WorkflowDetailsSheet';
 import { useSignedUrl } from '@/hooks/useSignedUrl';
 import * as XLSX from 'xlsx';
 
@@ -68,10 +69,11 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
   const [searchTitle, setSearchTitle] = useState('');
   const [searchResponsible, setSearchResponsible] = useState('');
   
-  // Response/Validation sheets
+  // Response/Validation/Details sheets
   const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
   const [isResponseSheetOpen, setIsResponseSheetOpen] = useState(false);
   const [isValidationSheetOpen, setIsValidationSheetOpen] = useState(false);
+  const [isDetailsSheetOpen, setIsDetailsSheetOpen] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -203,8 +205,15 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
   const handleSuccess = () => {
     setIsResponseSheetOpen(false);
     setIsValidationSheetOpen(false);
+    setIsDetailsSheetOpen(false);
     setSelectedWorkflow(null);
     fetchData();
+  };
+
+  const handleViewDetails = (workflow: Workflow, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedWorkflow(workflow);
+    setIsDetailsSheetOpen(true);
   };
 
   return (
@@ -244,7 +253,7 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                 <TableHead className="w-[100px]">{t('workflows.list.evidence', 'Evidências')}</TableHead>
                 <TableHead>{t('workflows.deadline')}</TableHead>
                 <TableHead>{t('common.date')}</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[80px]"></TableHead>
               </TableRow>
               {/* Search Row */}
               <TableRow className="bg-muted/30">
@@ -375,19 +384,30 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                         {format(new Date(workflow.created_at), 'dd/MM/yyyy', { locale: dateLocale })}
                       </TableCell>
                       <TableCell>
-                        {onViewDeviation && (
+                        <div className="flex items-center gap-1">
                           <Button 
                             variant="ghost" 
                             size="icon"
                             className="h-8 w-8"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onViewDeviation(workflow.deviation_id);
-                            }}
+                            onClick={(e) => handleViewDetails(workflow, e)}
+                            title={t('workflows.details.title')}
                           >
-                            <ExternalLink className="h-4 w-4" />
+                            <Info className="h-4 w-4" />
                           </Button>
-                        )}
+                          {onViewDeviation && (
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onViewDeviation(workflow.deviation_id);
+                              }}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -413,6 +433,14 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
         open={isValidationSheetOpen}
         onOpenChange={setIsValidationSheetOpen}
         onSuccess={handleSuccess}
+      />
+
+      {/* Details Sheet */}
+      <WorkflowDetailsSheet
+        workflow={selectedWorkflow}
+        profiles={profiles}
+        open={isDetailsSheetOpen}
+        onOpenChange={setIsDetailsSheetOpen}
       />
     </div>
   );

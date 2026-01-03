@@ -74,6 +74,15 @@ export function WorkflowValidationSheet({
     if (error) {
       toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } else {
+      // Record history entry
+      await supabase.from('workflow_history').insert({
+        workflow_id: workflow.id,
+        action: approve ? 'approved' : 'returned',
+        notes: validatorNotes || null,
+        photos: [],
+        performed_by: user?.id || '',
+      });
+      
       toast({ title: approve ? t('workflows.validation.approved') : t('workflows.validation.returned') });
       setValidatorNotes('');
       onOpenChange(false);

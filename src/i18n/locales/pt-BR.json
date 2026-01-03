@@ -255,7 +255,24 @@
     "list": {
       "myActionsOnly": "Minhas Ações",
       "deviationId": "ID Desvio",
-      "nature": "Natureza"
+      "nature": "Natureza",
+      "evidence": "Evidências"
+    },
+    "details": {
+      "title": "Detalhes do Fluxo",
+      "allPhotos": "Todas as Fotos",
+      "validatorNotes": "Observações do Validador",
+      "history": {
+        "title": "Histórico",
+        "noHistory": "Nenhum histórico registrado",
+        "by": "por",
+        "created": "Fluxo criado",
+        "submittedCompleted": "Submetido como concluído",
+        "submittedBlocked": "Submetido como bloqueado",
+        "approved": "Aprovado",
+        "returned": "Devolvido para refazer",
+        "resubmitted": "Reenviado"
+      }
     }
   },
   "imageUpload": {
