@@ -73,6 +73,9 @@ export function CompanyBanner() {
           
           {/* Company Info */}
           <div>
+            {currentCompany.group_name && (
+              <p className="text-xs text-muted-foreground/70">{currentCompany.group_name}</p>
+            )}
             <p className="text-sm text-muted-foreground">{t('layout.currentCompany')}</p>
             <h2 className="text-lg font-semibold text-foreground">{currentCompany.name}</h2>
           </div>

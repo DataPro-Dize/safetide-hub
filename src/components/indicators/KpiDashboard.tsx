@@ -585,45 +585,45 @@ export function KpiDashboard() {
 
       {/* Accident Details Cards */}
       <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-        <Card className="bg-card">
+        <Card className="bg-gradient-to-br from-slate-700 to-slate-800 text-white">
           <CardContent className="p-4 text-center">
-            <div className="text-xs text-muted-foreground mb-1">{t('indicators.dashboard.fatalAccidents', 'Fatais')}</div>
-            <div className="text-2xl font-bold text-destructive">{metrics.fatalAccidents}</div>
+            <div className="text-xs opacity-80 mb-1">{t('indicators.dashboard.fatalAccidents', 'Fatais')}</div>
+            <div className="text-2xl font-bold">{metrics.fatalAccidents}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card">
+        <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
           <CardContent className="p-4 text-center">
-            <div className="text-xs text-muted-foreground mb-1">{t('indicators.dashboard.lostTimeAccidents', 'C/ Afastamento')}</div>
-            <div className="text-2xl font-bold text-amber-500">{metrics.lostTimeAccidents}</div>
+            <div className="text-xs opacity-80 mb-1">{t('indicators.dashboard.lostTimeAccidents', 'C/ Afastamento')}</div>
+            <div className="text-2xl font-bold">{metrics.lostTimeAccidents}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card">
+        <Card className="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
           <CardContent className="p-4 text-center">
-            <div className="text-xs text-muted-foreground mb-1">{t('indicators.dashboard.restrictedAccidents', 'C/ Restrição')}</div>
-            <div className="text-2xl font-bold text-amber-400">{metrics.restrictedAccidents}</div>
+            <div className="text-xs opacity-80 mb-1">{t('indicators.dashboard.restrictedAccidents', 'C/ Restrição')}</div>
+            <div className="text-2xl font-bold">{metrics.restrictedAccidents}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card">
+        <Card className="bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground">
           <CardContent className="p-4 text-center">
-            <div className="text-xs text-muted-foreground mb-1">{t('indicators.dashboard.medicalTreatment', 'Trat. Médico')}</div>
-            <div className="text-2xl font-bold text-secondary">{metrics.medicalTreatment}</div>
+            <div className="text-xs opacity-80 mb-1">{t('indicators.dashboard.medicalTreatment', 'Trat. Médico')}</div>
+            <div className="text-2xl font-bold">{metrics.medicalTreatment}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card">
+        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
           <CardContent className="p-4 text-center">
-            <div className="text-xs text-muted-foreground mb-1">{t('indicators.dashboard.firstAid', 'Primeiros Socorros')}</div>
-            <div className="text-2xl font-bold text-primary">{metrics.firstAid}</div>
+            <div className="text-xs opacity-80 mb-1">{t('indicators.dashboard.firstAid', 'Primeiros Socorros')}</div>
+            <div className="text-2xl font-bold">{metrics.firstAid}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-card">
+        <Card className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white">
           <CardContent className="p-4 text-center">
-            <div className="text-xs text-muted-foreground mb-1">{t('indicators.dashboard.nearMisses', 'Quase Acidentes')}</div>
-            <div className="text-2xl font-bold text-muted-foreground">{metrics.nearMisses}</div>
+            <div className="text-xs opacity-80 mb-1">{t('indicators.dashboard.nearMisses', 'Quase Acidentes')}</div>
+            <div className="text-2xl font-bold">{metrics.nearMisses}</div>
           </CardContent>
         </Card>
       </div>

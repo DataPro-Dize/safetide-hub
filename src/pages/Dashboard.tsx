@@ -135,13 +135,13 @@ export default function Dashboard() {
       title: t('dashboard.companies'), 
       value: stats.companies, 
       icon: Building2, 
-      gradient: 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
+      gradient: 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground'
     },
     { 
       title: t('dashboard.units'), 
       value: stats.units, 
       icon: Factory, 
-      gradient: 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground'
+      gradient: 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
     },
     { 
       title: t('dashboard.capaClosureRate'), 
