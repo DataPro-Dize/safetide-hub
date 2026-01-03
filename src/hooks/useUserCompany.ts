@@ -6,6 +6,8 @@ interface Company {
   name: string;
   logo_url: string | null;
   cover_photo_url: string | null;
+  group_id: string | null;
+  group_name: string | null;
 }
 
 interface UseUserCompanyResult {
@@ -42,16 +44,24 @@ export function useUserCompany(): UseUserCompanyResult {
       const userIsAdmin = roles?.some(r => r.role === 'admin') || false;
       setIsAdmin(userIsAdmin);
 
-      // Fetch companies user has access to
+      // Fetch companies user has access to with group info
       const { data: userCompanies, error } = await supabase
         .from('companies')
-        .select('id, name, logo_url, cover_photo_url');
+        .select('id, name, logo_url, cover_photo_url, group_id, corporate_groups(name)');
 
       if (error) {
         console.error('Error fetching companies:', error);
         setCompanies([]);
       } else {
-        setCompanies(userCompanies || []);
+        const companiesWithGroup = (userCompanies || []).map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          logo_url: c.logo_url,
+          cover_photo_url: c.cover_photo_url,
+          group_id: c.group_id,
+          group_name: c.corporate_groups?.name || null,
+        }));
+        setCompanies(companiesWithGroup);
       }
     } catch (error) {
       console.error('Error in useUserCompany:', error);

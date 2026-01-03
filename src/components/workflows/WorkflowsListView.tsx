@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, ExternalLink, Eye, Pencil, Clock, AlertTriangle } from 'lucide-react';
+import { Download, ExternalLink, Eye, Pencil, Clock, AlertTriangle, Image } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,7 +30,15 @@ import { cn } from '@/lib/utils';
 import type { Tables } from '@/integrations/supabase/types';
 import { WorkflowResponseSheet } from '@/components/workflows/WorkflowResponseSheet';
 import { WorkflowValidationSheet } from '@/components/workflows/WorkflowValidationSheet';
+import { useSignedUrl } from '@/hooks/useSignedUrl';
 import * as XLSX from 'xlsx';
+
+// Helper component to display signed images
+function SignedImage({ path, className }: { path: string; className?: string }) {
+  const { signedUrl } = useSignedUrl(path);
+  if (!signedUrl) return <div className={cn("bg-muted animate-pulse", className)} />;
+  return <img src={signedUrl} alt="" className={className} />;
+}
 
 type Workflow = Tables<'workflows'>;
 type Profile = Tables<'profiles'>;
@@ -233,6 +241,7 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                 <TableHead>{t('workflows.list.nature')}</TableHead>
                 <TableHead>{t('common.status')}</TableHead>
                 <TableHead>{t('workflows.responsible')}</TableHead>
+                <TableHead className="w-[100px]">{t('workflows.list.evidence', 'Evidências')}</TableHead>
                 <TableHead>{t('workflows.deadline')}</TableHead>
                 <TableHead>{t('common.date')}</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
@@ -283,12 +292,13 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                 <TableHead className="py-2"></TableHead>
                 <TableHead className="py-2"></TableHead>
                 <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8">
+                  <TableCell colSpan={10} className="text-center py-8">
                     <div className="flex items-center justify-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                       {t('common.loading')}
@@ -297,7 +307,7 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                 </TableRow>
               ) : filteredWorkflows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     {t('workflows.noData')}
                   </TableCell>
                 </TableRow>
@@ -337,6 +347,26 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {responsibleProfile?.name || '-'}
+                      </TableCell>
+                      <TableCell>
+                        {workflow.evidence_photos && workflow.evidence_photos.length > 0 ? (
+                          <div className="flex items-center gap-1">
+                            {workflow.evidence_photos.slice(0, 2).map((photo, idx) => (
+                              <SignedImage 
+                                key={idx} 
+                                path={photo} 
+                                className="h-8 w-8 rounded object-cover border border-border" 
+                              />
+                            ))}
+                            {workflow.evidence_photos.length > 2 && (
+                              <span className="text-xs text-muted-foreground ml-1">
+                                +{workflow.evidence_photos.length - 2}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">-</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {workflow.deadline ? format(new Date(workflow.deadline), 'dd/MM/yyyy', { locale: dateLocale }) : '-'}
