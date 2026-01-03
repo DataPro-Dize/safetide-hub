@@ -123,36 +123,31 @@ export default function Dashboard() {
       title: t('dashboard.deviations'), 
       value: stats.deviations, 
       icon: AlertTriangle, 
-      color: 'text-warning',
-      bgColor: 'bg-warning/10'
+      gradient: 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground'
     },
     { 
       title: t('dashboard.workflows'), 
       value: stats.workflows, 
       icon: GitBranch, 
-      color: 'text-info',
-      bgColor: 'bg-info/10'
+      gradient: 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
     },
     { 
       title: t('dashboard.companies'), 
       value: stats.companies, 
       icon: Building2, 
-      color: 'text-primary',
-      bgColor: 'bg-primary/10'
+      gradient: 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
     },
     { 
       title: t('dashboard.units'), 
       value: stats.units, 
       icon: Factory, 
-      color: 'text-secondary',
-      bgColor: 'bg-secondary/10'
+      gradient: 'bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground'
     },
     { 
       title: t('dashboard.capaClosureRate'), 
       value: `${capaClosureRate}%`, 
       icon: CheckCircle2, 
-      color: 'text-success',
-      bgColor: 'bg-success/10'
+      gradient: 'bg-gradient-to-br from-green-500 to-green-600 text-white'
     },
   ];
 
@@ -169,19 +164,15 @@ export default function Dashboard() {
         {statCards.map((stat, index) => (
           <Card 
             key={stat.title} 
-            className="border-0 shadow-md hover:shadow-lg transition-shadow animate-fade-in-up"
+            className={`border-0 shadow-md hover:shadow-lg transition-shadow animate-fade-in-up ${stat.gradient}`}
             style={{ animationDelay: `${index * 100}ms` }}
           >
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {stat.title}
-              </CardTitle>
-              <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <stat.icon className={`h-5 w-5 ${stat.color}`} />
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <stat.icon className="h-4 w-4 opacity-80" />
+                <span className="text-xs opacity-80">{stat.title}</span>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground">
+              <div className="text-2xl font-bold">
                 {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : stat.value}
               </div>
             </CardContent>

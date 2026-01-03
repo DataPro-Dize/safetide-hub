@@ -140,43 +140,43 @@ export function TrainingDashboard() {
     <div className="space-y-6">
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('trainings.kpi.scheduled')}</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
+        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('trainings.kpi.scheduled')}</span>
+            </div>
             <div className="text-2xl font-bold">{stats.scheduled}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('trainings.kpi.completed')}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-chart-2" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-chart-2">{stats.completed}</div>
+        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('trainings.kpi.completed')}</span>
+            </div>
+            <div className="text-2xl font-bold">{stats.completed}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('trainings.kpi.expiredCertificates')}</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{stats.expiredCertificates}</div>
+        <Card className="bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('trainings.kpi.expiredCertificates')}</span>
+            </div>
+            <div className="text-2xl font-bold">{stats.expiredCertificates}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('trainings.kpi.attendanceRate')}</CardTitle>
-            <Percent className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{stats.attendanceRate}%</div>
+        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Percent className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('trainings.kpi.attendanceRate')}</span>
+            </div>
+            <div className="text-2xl font-bold">{stats.attendanceRate}%</div>
           </CardContent>
         </Card>
       </div>
