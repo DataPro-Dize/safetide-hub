@@ -260,6 +260,7 @@
     },
     "details": {
       "title": "Detalhes do Fluxo",
+      "viewDetails": "Ver detalhes e histórico",
       "allPhotos": "Todas as Fotos",
       "validatorNotes": "Observações do Validador",
       "history": {

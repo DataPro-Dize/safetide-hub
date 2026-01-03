@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -199,6 +200,10 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
     } else if (canValidate) {
       setSelectedWorkflow(workflow);
       setIsValidationSheetOpen(true);
+    } else {
+      // If can't respond or validate, open details
+      setSelectedWorkflow(workflow);
+      setIsDetailsSheetOpen(true);
     }
   };
 
@@ -328,16 +333,12 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                   const isResponsible = currentUserId === workflow.responsible_id;
                   const canRespond = isResponsible && (workflow.status === 'pending' || workflow.status === 'returned');
                   const canValidate = !isResponsible && (workflow.status === 'submitted_completed' || workflow.status === 'submitted_blocked');
-                  const isClickable = canRespond || canValidate;
                   
                   return (
                     <TableRow 
                       key={workflow.id} 
-                      className={cn(
-                        "transition-colors",
-                        isClickable && "cursor-pointer hover:bg-muted/50"
-                      )}
-                      onClick={() => isClickable && handleWorkflowClick(workflow)}
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => handleWorkflowClick(workflow)}
                     >
                       <TableCell className="font-mono text-xs font-semibold">
                         #{(workflow as any).sequence_id || '-'}
@@ -385,15 +386,21 @@ export function WorkflowsListView({ onViewDeviation }: WorkflowsListViewProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={(e) => handleViewDetails(workflow, e)}
-                            title={t('workflows.details.title')}
-                          >
-                            <Info className="h-4 w-4" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="icon"
+                                className="h-8 w-8 text-primary hover:bg-primary/10"
+                                onClick={(e) => handleViewDetails(workflow, e)}
+                              >
+                                <Info className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {t('workflows.details.viewDetails')}
+                            </TooltipContent>
+                          </Tooltip>
                           {onViewDeviation && (
                             <Button 
                               variant="ghost" 
