@@ -53,6 +53,9 @@ export function WorkflowResponseSheet({
     
     const status = responseType === 'completed' ? 'submitted_completed' : 'submitted_blocked';
     
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
     const { error } = await supabase
       .from('workflows')
       .update({
@@ -66,6 +69,16 @@ export function WorkflowResponseSheet({
     if (error) {
       toast({ title: t('common.error'), description: error.message, variant: 'destructive' });
     } else {
+      // Record history entry
+      const isResubmit = workflow.status === 'returned';
+      await supabase.from('workflow_history').insert({
+        workflow_id: workflow.id,
+        action: isResubmit ? 'resubmitted' : status,
+        notes: notes || null,
+        photos: photos,
+        performed_by: user?.id || '',
+      });
+      
       toast({ title: t('workflows.response.success') });
       resetForm();
       onOpenChange(false);

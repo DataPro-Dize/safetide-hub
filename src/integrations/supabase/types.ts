@@ -1116,6 +1116,51 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_history: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          notes: string | null
+          performed_by: string
+          photos: string[] | null
+          workflow_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          performed_by: string
+          photos?: string[] | null
+          workflow_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          performed_by?: string
+          photos?: string[] | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_history_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_history_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workflows: {
         Row: {
           completed_at: string | null
