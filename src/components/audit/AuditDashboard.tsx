@@ -164,43 +164,43 @@ export function AuditDashboard({ onNewAudit }: AuditDashboardProps) {
     <div className="space-y-6">
       {/* KPI Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('audit.kpi.totalInspections')}</CardTitle>
-            <ClipboardCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
+        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <ClipboardCheck className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('audit.kpi.totalInspections')}</span>
+            </div>
             <div className="text-2xl font-bold">{stats.totalInspections}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('audit.kpi.openNonConformities')}</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-destructive">{stats.openNonConformities}</div>
+        <Card className="bg-gradient-to-br from-secondary to-secondary/80 text-secondary-foreground">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('audit.kpi.openNonConformities')}</span>
+            </div>
+            <div className="text-2xl font-bold">{stats.openNonConformities}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('audit.kpi.closedActions')}</CardTitle>
-            <CheckCircle className="h-4 w-4 text-chart-2" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-chart-2">{stats.closedActions}</div>
+        <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('audit.kpi.closedActions')}</span>
+            </div>
+            <div className="text-2xl font-bold">{stats.closedActions}</div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('audit.kpi.complianceRate')}</CardTitle>
-            <Percent className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-primary">{stats.complianceRate}%</div>
+        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Percent className="h-4 w-4 opacity-80" />
+              <span className="text-xs opacity-80">{t('audit.kpi.complianceRate')}</span>
+            </div>
+            <div className="text-2xl font-bold">{stats.complianceRate}%</div>
           </CardContent>
         </Card>
       </div>
