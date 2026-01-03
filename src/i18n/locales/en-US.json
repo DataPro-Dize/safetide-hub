@@ -259,6 +259,7 @@
     },
     "details": {
       "title": "Workflow Details",
+      "viewDetails": "View details and history",
       "allPhotos": "All Photos",
       "validatorNotes": "Validator Notes",
       "history": {
