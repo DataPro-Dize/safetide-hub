@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -11,6 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -55,6 +63,13 @@ export function TrainingSessionsList({ onStartClass }: TrainingSessionsListProps
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  // Filter states
+  const [searchTrainingName, setSearchTrainingName] = useState('');
+  const [searchDate, setSearchDate] = useState('');
+  const [searchInstructor, setSearchInstructor] = useState('');
+  const [searchLocation, setSearchLocation] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchSessions();
@@ -111,6 +126,32 @@ export function TrainingSessionsList({ onStartClass }: TrainingSessionsListProps
       setLoading(false);
     }
   };
+
+  // Filter sessions
+  const filteredSessions = useMemo(() => {
+    return sessions.filter(session => {
+      // Status filter
+      if (statusFilter !== 'all' && session.status !== statusFilter) return false;
+      
+      // Training name filter
+      if (searchTrainingName && !session.training_type.title.toLowerCase().includes(searchTrainingName.toLowerCase())) return false;
+      
+      // Date filter
+      if (searchDate) {
+        const formattedDate = format(new Date(session.scheduled_date), 'dd/MM/yyyy');
+        if (!formattedDate.includes(searchDate)) return false;
+      }
+      
+      // Instructor filter
+      if (searchInstructor && !session.instructor.name.toLowerCase().includes(searchInstructor.toLowerCase())) return false;
+      
+      // Location filter
+      const location = session.location_room || session.plant.name;
+      if (searchLocation && !location.toLowerCase().includes(searchLocation.toLowerCase())) return false;
+      
+      return true;
+    });
+  }, [sessions, statusFilter, searchTrainingName, searchDate, searchInstructor, searchLocation]);
 
   const handleStartSession = async (sessionId: string) => {
     try {
@@ -193,9 +234,10 @@ export function TrainingSessionsList({ onStartClass }: TrainingSessionsListProps
 
       <Card className="overflow-hidden">
         <CardContent className="p-0 overflow-x-auto">
-          <Table className="min-w-[800px]">
+          <Table className="min-w-[900px]">
             <TableHeader>
-              <TableRow>
+              {/* Header row */}
+              <TableRow className="bg-muted/50">
                 <TableHead>{t('trainings.sessions.trainingName')}</TableHead>
                 <TableHead>{t('common.date')}</TableHead>
                 <TableHead>{t('trainings.sessions.instructor')}</TableHead>
@@ -204,16 +246,67 @@ export function TrainingSessionsList({ onStartClass }: TrainingSessionsListProps
                 <TableHead>{t('common.status')}</TableHead>
                 <TableHead>{t('common.actions')}</TableHead>
               </TableRow>
+              {/* Filter row */}
+              <TableRow className="bg-muted/30 hover:bg-muted/30">
+                <TableHead className="py-2">
+                  <Input
+                    placeholder={t('common.search')}
+                    value={searchTrainingName}
+                    onChange={(e) => setSearchTrainingName(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2">
+                  <Input
+                    placeholder="dd/mm/aaaa"
+                    value={searchDate}
+                    onChange={(e) => setSearchDate(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2">
+                  <Input
+                    placeholder={t('common.search')}
+                    value={searchInstructor}
+                    onChange={(e) => setSearchInstructor(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2">
+                  <Input
+                    placeholder={t('common.search')}
+                    value={searchLocation}
+                    onChange={(e) => setSearchLocation(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </TableHead>
+                <TableHead className="py-2"></TableHead>
+                <TableHead className="py-2">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder={t('common.all')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t('common.all')}</SelectItem>
+                      <SelectItem value="scheduled">{t('trainings.status.scheduled')}</SelectItem>
+                      <SelectItem value="in_progress">{t('trainings.status.in_progress')}</SelectItem>
+                      <SelectItem value="completed">{t('trainings.status.completed')}</SelectItem>
+                      <SelectItem value="cancelled">{t('trainings.status.cancelled')}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableHead>
+                <TableHead className="py-2"></TableHead>
+              </TableRow>
             </TableHeader>
             <TableBody>
-              {sessions.length === 0 ? (
+              {filteredSessions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     {t('trainings.noData')}
                   </TableCell>
                 </TableRow>
               ) : (
-                sessions.map((session) => (
+                filteredSessions.map((session) => (
                   <TableRow key={session.id}>
                     <TableCell className="font-medium">
                       {session.training_type.title}

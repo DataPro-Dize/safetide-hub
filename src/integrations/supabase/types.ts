@@ -140,6 +140,7 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          group_id: string | null
           id: string
           is_active: boolean
           name: string
@@ -149,6 +150,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          group_id?: string | null
           id?: string
           is_active?: boolean
           name: string
@@ -158,12 +160,21 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          group_id?: string | null
           id?: string
           is_active?: boolean
           name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "audit_templates_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "corporate_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       audits: {
         Row: {
@@ -1193,6 +1204,7 @@ export type Database = {
           role: Database["public"]["Enums"]["user_role"]
         }[]
       }
+      get_user_group_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

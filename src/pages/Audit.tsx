@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { AuditDashboard } from '@/components/audit/AuditDashboard';
 import { AuditList } from '@/components/audit/AuditList';
 import { AuditForm } from '@/components/audit/AuditForm';
-import { BarChart3, List, ClipboardCheck } from 'lucide-react';
+import { BarChart3, List, ClipboardCheck, Plus } from 'lucide-react';
 
 export default function Audit() {
   const { t } = useTranslation();
@@ -32,9 +33,17 @@ export default function Audit() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">{t('audit.title')}</h1>
-        <p className="text-muted-foreground">{t('audit.description')}</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">{t('audit.title')}</h1>
+          <p className="text-muted-foreground">{t('audit.description')}</p>
+        </div>
+        {activeTab !== 'form' && (
+          <Button onClick={handleNewAudit} className="gap-2 bg-button-add hover:bg-button-add/90">
+            <Plus className="h-4 w-4" />
+            {t('audit.newAudit')}
+          </Button>
+        )}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
