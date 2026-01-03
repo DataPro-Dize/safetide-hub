@@ -197,6 +197,21 @@ export default function AuditTemplates() {
           .eq('id', editingTemplate.id);
         if (error) throw error;
       } else {
+        // Fetch user's group_id for new templates
+        const { data: userData } = await supabase.auth.getUser();
+        let groupId: string | null = null;
+        
+        if (userData.user) {
+          const { data: userCompanyData } = await supabase
+            .from('user_companies')
+            .select('companies(group_id)')
+            .eq('user_id', userData.user.id)
+            .limit(1)
+            .maybeSingle();
+          
+          groupId = (userCompanyData?.companies as any)?.group_id || null;
+        }
+
         const { error } = await supabase
           .from('audit_templates')
           .insert({
@@ -204,6 +219,7 @@ export default function AuditTemplates() {
             description: templateForm.description,
             category: templateForm.category,
             is_active: templateForm.is_active,
+            group_id: groupId,
           });
         if (error) throw error;
       }
