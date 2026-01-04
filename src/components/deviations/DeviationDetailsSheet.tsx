@@ -27,6 +27,7 @@ import { ImageCarousel } from '@/components/ui/ImageCarousel';
 import { WorkflowCard } from '@/components/workflows/WorkflowCard';
 import { WorkflowResponseSheet } from '@/components/workflows/WorkflowResponseSheet';
 import { WorkflowValidationSheet } from '@/components/workflows/WorkflowValidationSheet';
+import { WorkflowDetailsSheet } from '@/components/workflows/WorkflowDetailsSheet';
 import { Plus, Filter, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
@@ -62,6 +63,7 @@ export function DeviationDetailsSheet({
   const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
   const [responseSheetOpen, setResponseSheetOpen] = useState(false);
   const [validationSheetOpen, setValidationSheetOpen] = useState(false);
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
   const [newWorkflow, setNewWorkflow] = useState({
     title: '',
     description: '',
@@ -216,6 +218,11 @@ export function DeviationDetailsSheet({
   const handleValidate = (workflow: Workflow) => {
     setSelectedWorkflow(workflow);
     setValidationSheetOpen(true);
+  };
+
+  const handleViewDetails = (workflow: Workflow) => {
+    setSelectedWorkflow(workflow);
+    setDetailsSheetOpen(true);
   };
 
   if (!deviation) return null;
@@ -433,6 +440,7 @@ export function DeviationDetailsSheet({
                       currentUserId={currentUserId}
                       onRespond={() => handleRespond(workflow)}
                       onValidate={() => handleValidate(workflow)}
+                      onViewDetails={() => handleViewDetails(workflow)}
                     />
                   ))}
                 </div>
@@ -455,6 +463,13 @@ export function DeviationDetailsSheet({
         open={validationSheetOpen}
         onOpenChange={setValidationSheetOpen}
         onSuccess={fetchWorkflows}
+      />
+
+      <WorkflowDetailsSheet
+        workflow={selectedWorkflow}
+        profiles={profiles}
+        open={detailsSheetOpen}
+        onOpenChange={setDetailsSheetOpen}
       />
     </>
   );
