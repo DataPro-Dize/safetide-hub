@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { User, Calendar, MessageSquare, Image as ImageIcon } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { User, Calendar, MessageSquare, Image as ImageIcon, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,6 +18,7 @@ interface WorkflowCardProps {
   currentUserId?: string;
   onRespond?: () => void;
   onValidate?: () => void;
+  onViewDetails?: () => void;
 }
 
 export function WorkflowCard({ 
@@ -24,7 +26,8 @@ export function WorkflowCard({
   profiles, 
   currentUserId,
   onRespond,
-  onValidate 
+  onValidate,
+  onViewDetails 
 }: WorkflowCardProps) {
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -111,20 +114,34 @@ export function WorkflowCard({
       )}
 
       {/* Action buttons */}
-      {(canRespond || canValidate) && (
-        <div className="pt-2 flex gap-2">
-          {canRespond && (
-            <Button size="sm" variant="brand" onClick={onRespond}>
-              {workflow.status === 'returned' ? t('workflows.resubmit') : t('workflows.respond')}
+      <div className="pt-2 flex gap-2">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="text-primary hover:bg-primary/10"
+              onClick={onViewDetails}
+            >
+              <Info className="h-4 w-4 mr-1" />
+              {t('workflows.details.viewDetails')}
             </Button>
-          )}
-          {canValidate && (
-            <Button size="sm" variant="outline" onClick={onValidate}>
-              {t('workflows.validate')}
-            </Button>
-          )}
-        </div>
-      )}
+          </TooltipTrigger>
+          <TooltipContent>
+            {t('workflows.details.viewDetails')}
+          </TooltipContent>
+        </Tooltip>
+        {canRespond && (
+          <Button size="sm" variant="brand" onClick={onRespond}>
+            {workflow.status === 'returned' ? t('workflows.resubmit') : t('workflows.respond')}
+          </Button>
+        )}
+        {canValidate && (
+          <Button size="sm" variant="outline" onClick={onValidate}>
+            {t('workflows.validate')}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
