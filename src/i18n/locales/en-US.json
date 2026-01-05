@@ -710,6 +710,9 @@
     "export": { "project": "Project", "plant": "Plant", "year": "Year", "month": "Month", "status": "Status", "createdBy": "Created by", "createdAt": "Created at", "editReason": "Edit Reason", "editedBy": "Edited by" },
     "dashboard": {
       "period": "Period",
+      "months": "Months",
+      "monthsSelected": "months",
+      "selectAll": "Select All",
       "company": "Company",
       "unit": "Unit/Contract",
       "reportsFound": "reports found",
