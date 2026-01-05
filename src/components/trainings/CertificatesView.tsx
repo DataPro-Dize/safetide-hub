@@ -6,13 +6,17 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CheckCircle, AlertTriangle, XCircle, Search, ExternalLink } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { CheckCircle, AlertTriangle, XCircle, Search, ExternalLink, Plus, FileText, RefreshCw, Download } from 'lucide-react';
 import { format, addMonths, differenceInDays } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
+import { RegisterTrainingModal } from './RegisterTrainingModal';
+import { UpdateCertificateModal } from './UpdateCertificateModal';
 
 interface Certificate {
   id: string;
+  sessionId: string;
   userId: string;
   userName: string;
   userEmail: string;
@@ -23,6 +27,7 @@ interface Certificate {
   expiresAt: Date;
   daysUntilExpiration: number;
   status: 'valid' | 'expiring' | 'expired';
+  certificateUrl: string | null;
 }
 
 export function CertificatesView() {
@@ -31,6 +36,9 @@ export function CertificatesView() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
 
   const dateLocale = i18n.language === 'pt-BR' ? ptBR : enUS;
 
@@ -47,8 +55,11 @@ export function CertificatesView() {
           id,
           user_id,
           signed_at,
+          certificate_url,
           session:training_sessions!inner(
+            id,
             completed_at,
+            certificate_url,
             training_type:training_types(
               id,
               title,
@@ -85,8 +96,12 @@ export function CertificatesView() {
           status = 'expiring';
         }
 
+        // Use enrollment certificate_url if available, otherwise session certificate_url
+        const certificateUrl = enrollment.certificate_url || enrollment.session?.certificate_url || null;
+
         processedCerts.push({
           id: enrollment.id,
+          sessionId: enrollment.session.id,
           userId: enrollment.user_id,
           userName: enrollment.user?.name || 'Unknown',
           userEmail: enrollment.user?.email || '',
@@ -97,6 +112,7 @@ export function CertificatesView() {
           expiresAt,
           daysUntilExpiration,
           status,
+          certificateUrl,
         });
       });
 
@@ -137,6 +153,28 @@ export function CertificatesView() {
       default:
         return null;
     }
+  };
+
+  const handleViewCertificate = async (cert: Certificate) => {
+    if (!cert.certificateUrl) return;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('training-files')
+        .createSignedUrl(cert.certificateUrl, 3600); // 1 hour expiry
+
+      if (error) throw error;
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error getting signed URL:', error);
+    }
+  };
+
+  const handleUpdateCertificate = (cert: Certificate) => {
+    setSelectedCertificate(cert);
+    setIsUpdateModalOpen(true);
   };
 
   const filteredCertificates = certificates.filter((cert) => {
@@ -211,8 +249,12 @@ export function CertificatesView() {
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Action Button and Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
+        <Button onClick={() => setIsRegisterModalOpen(true)} className="shrink-0">
+          <Plus className="h-4 w-4 mr-2" />
+          {t('trainings.certificates.registerTraining')}
+        </Button>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -238,7 +280,7 @@ export function CertificatesView() {
       {/* Table */}
       <Card className="overflow-hidden">
         <CardContent className="p-0 overflow-x-auto">
-          <Table className="min-w-[700px]">
+          <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow>
                 <TableHead>{t('trainings.certificates.collaborator')}</TableHead>
@@ -246,13 +288,14 @@ export function CertificatesView() {
                 <TableHead>{t('trainings.certificates.completedAt')}</TableHead>
                 <TableHead>{t('trainings.certificates.expiresAt')}</TableHead>
                 <TableHead>{t('trainings.certificates.status')}</TableHead>
+                <TableHead>{t('trainings.certificates.certificate')}</TableHead>
                 <TableHead className="text-right">{t('common.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCertificates.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     {t('trainings.certificates.noData')}
                   </TableCell>
                 </TableRow>
@@ -273,17 +316,57 @@ export function CertificatesView() {
                       {format(cert.expiresAt, 'dd/MM/yyyy', { locale: dateLocale })}
                     </TableCell>
                     <TableCell>{getStatusBadge(cert.status, cert.daysUntilExpiration)}</TableCell>
-                    <TableCell className="text-right">
-                      {cert.trainingLink && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(cert.trainingLink!, '_blank')}
-                        >
-                          <ExternalLink className="h-4 w-4 mr-1" />
-                          {t('trainings.certificates.renew')}
-                        </Button>
+                    <TableCell>
+                      {cert.certificateUrl ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewCertificate(cert)}
+                            >
+                              <FileText className="h-4 w-4 mr-1 text-primary" />
+                              {t('trainings.certificates.viewCertificate')}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {t('trainings.certificates.downloadCertificate')}
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">
+                          {t('trainings.certificates.noCertificate')}
+                        </span>
                       )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleUpdateCertificate(cert)}
+                            >
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              {t('trainings.certificates.update')}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {t('trainings.certificates.updateTitle')}
+                          </TooltipContent>
+                        </Tooltip>
+                        {cert.trainingLink && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(cert.trainingLink!, '_blank')}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            {t('trainings.certificates.renew')}
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -292,6 +375,27 @@ export function CertificatesView() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Modals */}
+      <RegisterTrainingModal
+        open={isRegisterModalOpen}
+        onOpenChange={setIsRegisterModalOpen}
+        onSuccess={fetchCertificates}
+      />
+
+      <UpdateCertificateModal
+        open={isUpdateModalOpen}
+        onOpenChange={setIsUpdateModalOpen}
+        certificate={selectedCertificate ? {
+          id: selectedCertificate.id,
+          sessionId: selectedCertificate.sessionId,
+          userName: selectedCertificate.userName,
+          trainingType: selectedCertificate.trainingType,
+          validityMonths: selectedCertificate.validityMonths,
+          completedAt: selectedCertificate.completedAt,
+        } : null}
+        onSuccess={fetchCertificates}
+      />
     </div>
   );
 }
