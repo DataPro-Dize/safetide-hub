@@ -439,8 +439,12 @@
       "completed": "Completed"
     },
     "categories": {
-      "safety": "Safety",
+      "audit": "Audit",
       "environment": "Environment",
+      "health_safety": "Health & Safety",
+      "property_security": "Property Security",
+      "social_responsibility": "Social Responsibility",
+      "safety": "Safety",
       "health": "Health"
     },
     "recentActivity": "Recent Activity",
