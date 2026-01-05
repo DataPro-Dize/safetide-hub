@@ -582,7 +582,17 @@
       "filterStatus": "Filter by status",
       "allStatuses": "All statuses",
       "noData": "No certificates found",
-      "renew": "Renew"
+      "renew": "Renew",
+      "registerTraining": "Register Training",
+      "update": "Update",
+      "updateTitle": "Update Certificate",
+      "viewCertificate": "View Certificate",
+      "downloadCertificate": "Download certificate",
+      "noCertificate": "No attachment",
+      "previousDate": "Previous Date",
+      "newDate": "New Completion Date",
+      "updateSuccess": "Certificate updated successfully!",
+      "certificate": "Certificate"
     },
     "kpi": {
       "scheduled": "Scheduled",

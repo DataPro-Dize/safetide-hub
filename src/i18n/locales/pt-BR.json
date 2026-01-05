@@ -587,7 +587,17 @@
       "filterStatus": "Filtrar por status",
       "allStatuses": "Todos os status",
       "noData": "Nenhum certificado encontrado",
-      "renew": "Renovar"
+      "renew": "Renovar",
+      "registerTraining": "Cadastrar Treinamento",
+      "update": "Atualizar",
+      "updateTitle": "Atualizar Certificado",
+      "viewCertificate": "Ver Certificado",
+      "downloadCertificate": "Baixar certificado",
+      "noCertificate": "Sem anexo",
+      "previousDate": "Data Anterior",
+      "newDate": "Nova Data de Realização",
+      "updateSuccess": "Certificado atualizado com sucesso!",
+      "certificate": "Certificado"
     },
     "kpi": {
       "scheduled": "Agendados",
