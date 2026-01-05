@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Table,
@@ -21,20 +22,34 @@ import * as XLSX from 'xlsx';
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
 
-// Period options for filtering
-const periodOptions = [
-  { value: 'all', label: 'Todos os períodos' },
-  { value: 'month', label: 'Mensal' },
-  { value: 'quarter', label: 'Trimestral' },
-  { value: 'semester', label: 'Semestral' },
-  { value: 'year', label: 'Anual' },
-];
-
 export function KpiReportsList() {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [periodFilter, setPeriodFilter] = useState<string>('all');
+  const [selectedCompany, setSelectedCompany] = useState<string>('all');
+  const [selectedPlant, setSelectedPlant] = useState<string>('all');
+
+  // Buscar empresas
+  const { data: companies } = useQuery({
+    queryKey: ['companies-for-kpi-reports'],
+    queryFn: async () => {
+      const { data } = await supabase.from('companies').select('id, name').order('name');
+      return data || [];
+    },
+  });
+
+  // Buscar unidades filtradas por empresa
+  const { data: plants } = useQuery({
+    queryKey: ['plants-for-kpi-reports', selectedCompany],
+    queryFn: async () => {
+      let query = supabase.from('plants').select('id, name, company_id').order('name');
+      if (selectedCompany !== 'all') {
+        query = query.eq('company_id', selectedCompany);
+      }
+      const { data } = await query;
+      return data || [];
+    },
+  });
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ['kpi-reports-list', selectedYear],
@@ -43,7 +58,7 @@ export function KpiReportsList() {
         .from('kpi_reports')
         .select(`
           *,
-          plant:plants(name, company:companies(name)),
+          plant:plants(name, company_id, company:companies(name)),
           created_by_profile:profiles!kpi_reports_created_by_fkey(name),
           last_edited_by_profile:profiles!kpi_reports_last_edited_by_fkey(name)
         `)
@@ -66,20 +81,13 @@ export function KpiReportsList() {
     const search = searchTerm.toLowerCase();
     const matchesSearch = plantName.includes(search) || companyName.includes(search);
     
-    // Period filter logic
-    let matchesPeriod = true;
-    if (periodFilter === 'quarter') {
-      // Show only first month of each quarter
-      matchesPeriod = [1, 4, 7, 10].includes(report.month);
-    } else if (periodFilter === 'semester') {
-      // Show only first month of each semester
-      matchesPeriod = [1, 7].includes(report.month);
-    } else if (periodFilter === 'year') {
-      // Show only December (year summary)
-      matchesPeriod = report.month === 12;
-    }
+    // Filtro por empresa
+    const matchesCompany = selectedCompany === 'all' || report.plant?.company_id === selectedCompany;
     
-    return matchesSearch && matchesPeriod;
+    // Filtro por unidade
+    const matchesPlant = selectedPlant === 'all' || report.plant_id === selectedPlant;
+    
+    return matchesSearch && matchesCompany && matchesPlant;
   });
 
   const handleExport = () => {
@@ -128,6 +136,12 @@ export function KpiReportsList() {
     XLSX.writeFile(workbook, fileName);
   };
 
+  // Reset plant when company changes
+  const handleCompanyChange = (value: string) => {
+    setSelectedCompany(value);
+    setSelectedPlant('all');
+  };
+
   return (
     <Card className="bg-card overflow-hidden">
       <CardHeader>
@@ -140,42 +154,68 @@ export function KpiReportsList() {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Filters */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-          <div className="relative flex-1 min-w-0 max-w-full sm:max-w-xs">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder={t('indicators.list.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9"
-            />
+        {/* Filtros Padronizados */}
+        <div className="mb-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('indicators.dashboard.period')}</Label>
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={periodFilter} onValueChange={setPeriodFilter}>
-            <SelectTrigger className="w-full sm:w-40 shrink-0">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              {periodOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger className="w-full sm:w-32 shrink-0">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('common.all')}</SelectItem>
-              {years.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('indicators.dashboard.company')}</Label>
+            <Select value={selectedCompany} onValueChange={handleCompanyChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
+                {companies?.map((company) => (
+                  <SelectItem key={company.id} value={company.id}>
+                    {company.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('indicators.dashboard.unit')}</Label>
+            <Select value={selectedPlant} onValueChange={setSelectedPlant}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
+                {plants?.map((plant) => (
+                  <SelectItem key={plant.id} value={plant.id}>
+                    {plant.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('common.search')}</Label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder={t('indicators.list.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Table */}

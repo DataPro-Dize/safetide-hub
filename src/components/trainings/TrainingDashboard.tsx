@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { Calendar, CheckCircle, AlertTriangle, Percent } from 'lucide-react';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface TrainingStats {
   scheduled: number;
@@ -22,6 +22,15 @@ interface MonthlyData {
   month: string;
   count: number;
 }
+
+const CHART_COLORS = [
+  'hsl(213, 37%, 26%)',   // Azul escuro
+  'hsl(142, 76%, 36%)',   // Verde
+  'hsl(43, 96%, 56%)',    // Amarelo
+  'hsl(0, 72%, 51%)',     // Vermelho
+  'hsl(280, 68%, 50%)',   // Roxo
+  'hsl(190, 90%, 40%)',   // Ciano
+];
 
 export function TrainingDashboard() {
   const { t } = useTranslation();
@@ -89,11 +98,10 @@ export function TrainingDashboard() {
         companyCount[companyName] = (companyCount[companyName] || 0) + 1;
       });
 
-      const colors = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
       const complianceDataArr = Object.entries(companyCount).map(([name, value], index) => ({
         name,
         value,
-        color: colors[index % colors.length],
+        color: CHART_COLORS[index % CHART_COLORS.length],
       }));
       setComplianceData(complianceDataArr);
 
@@ -189,7 +197,7 @@ export function TrainingDashboard() {
             <CardTitle>{t('trainings.charts.complianceByDepartment')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px]">
+            <div className="h-[300px]">
               {complianceData.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-muted-foreground">
                   {t('trainings.noData')}
@@ -200,18 +208,29 @@ export function TrainingDashboard() {
                     <Pie
                       data={complianceData}
                       cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
+                      cy="45%"
+                      innerRadius={50}
+                      outerRadius={85}
+                      paddingAngle={3}
                       dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
                     >
                       {complianceData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px',
+                      }}
+                      formatter={(value: number, name: string) => [`${value} ${t('trainings.charts.trainings')}`, name]}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={50}
+                      formatter={(value) => <span className="text-foreground text-sm">{value}</span>}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               )}
@@ -225,13 +244,19 @@ export function TrainingDashboard() {
             <CardTitle>{t('trainings.charts.monthlyExecuted')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-[250px]">
+            <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData}>
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name={t('trainings.charts.trainings')} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
