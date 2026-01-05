@@ -715,6 +715,9 @@
     "export": { "project": "Projeto", "plant": "Unidade", "year": "Ano", "month": "Mês", "status": "Status", "createdBy": "Criado por", "createdAt": "Criado em", "editReason": "Motivo Edição", "editedBy": "Editado por" },
     "dashboard": {
       "period": "Período",
+      "months": "Meses",
+      "monthsSelected": "meses",
+      "selectAll": "Selecionar Todos",
       "company": "Empresa",
       "unit": "Unidade/Contrato",
       "reportsFound": "apontamentos encontrados",

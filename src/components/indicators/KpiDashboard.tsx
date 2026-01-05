@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
 import { 
   Clock, 
   AlertTriangle, 
@@ -21,6 +24,7 @@ import {
   HardHat,
   Footprints,
   ClipboardCheck,
+  ChevronDown,
 } from 'lucide-react';
 import {
   BarChart,
@@ -39,12 +43,14 @@ import {
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+const allMonths = Array.from({ length: 12 }, (_, i) => i + 1);
 
 export function KpiDashboard() {
   const { t } = useTranslation();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedPlant, setSelectedPlant] = useState<string>('all');
+  const [selectedMonths, setSelectedMonths] = useState<number[]>([]);
 
   // Fetch companies
   const { data: companies } = useQuery({
@@ -74,12 +80,17 @@ export function KpiDashboard() {
 
   // Fetch reports for the selected year
   const { data: reports } = useQuery({
-    queryKey: ['kpi-reports-dashboard', selectedYear, selectedCompany, selectedPlant],
+    queryKey: ['kpi-reports-dashboard', selectedYear, selectedCompany, selectedPlant, selectedMonths],
     queryFn: async () => {
       let query = supabase
         .from('kpi_reports')
         .select('*, plant:plants(id, name, company_id, company:companies(id, name))')
         .eq('year', selectedYear);
+      
+      // Filter by selected months if any are selected
+      if (selectedMonths.length > 0 && selectedMonths.length < 12) {
+        query = query.in('month', selectedMonths);
+      }
       
       if (selectedPlant !== 'all') {
         query = query.eq('plant_id', selectedPlant);
@@ -197,8 +208,12 @@ export function KpiDashboard() {
 
   // Monthly data for charts
   const monthlyData = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => {
-      const monthReports = reports?.filter(r => r.month === i + 1) || [];
+    const monthsToShow = selectedMonths.length > 0 && selectedMonths.length < 12 
+      ? selectedMonths 
+      : allMonths;
+
+    return monthsToShow.map((monthNum) => {
+      const monthReports = reports?.filter(r => r.month === monthNum) || [];
       
       const hhtEmpresa = monthReports.reduce((sum, r) => sum + (r.horas_trabalhadas_empresa || 0), 0);
       const hhtContratados = monthReports.reduce((sum, r) => sum + (r.horas_trabalhadas_contratados || 0), 0);
@@ -224,8 +239,8 @@ export function KpiDashboard() {
       const deviations = monthReports.reduce((sum, r) => sum + (r.perigos_desvios || 0), 0);
       
       return {
-        month: t(`indicators.months.${i + 1}`).substring(0, 3),
-        monthFull: t(`indicators.months.${i + 1}`),
+        month: t(`indicators.months.${monthNum}`).substring(0, 3),
+        monthFull: t(`indicators.months.${monthNum}`),
         hht: totalHHT,
         hhtr: totalHHTR,
         tf,
@@ -236,7 +251,7 @@ export function KpiDashboard() {
         deviations,
       };
     });
-  }, [reports, t]);
+  }, [reports, selectedMonths, t]);
 
   // Progress indicators with targets
   const progressIndicators = [
@@ -272,7 +287,7 @@ export function KpiDashboard() {
       {/* Filters Section */}
       <Card className="bg-card border-border">
         <CardContent className="pt-6">
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t('indicators.dashboard.period', 'Período')}</Label>
               <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(parseInt(v))}>
@@ -287,6 +302,63 @@ export function KpiDashboard() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('indicators.dashboard.months', 'Meses')}</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between bg-background font-normal">
+                    {selectedMonths.length === 0 || selectedMonths.length === 12
+                      ? t('common.all')
+                      : `${selectedMonths.length} ${t('indicators.dashboard.monthsSelected', 'meses')}`
+                    }
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-3" align="start">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between border-b pb-2 mb-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedMonths([])}
+                      >
+                        {t('common.all')}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="h-7 text-xs"
+                        onClick={() => setSelectedMonths([...allMonths])}
+                      >
+                        {t('indicators.dashboard.selectAll', 'Selecionar Todos')}
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {allMonths.map((month) => (
+                        <div key={month} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`month-${month}`}
+                            checked={selectedMonths.includes(month)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedMonths([...selectedMonths, month].sort((a, b) => a - b));
+                              } else {
+                                setSelectedMonths(selectedMonths.filter(m => m !== month));
+                              }
+                            }}
+                          />
+                          <label htmlFor={`month-${month}`} className="text-sm cursor-pointer">
+                            {t(`indicators.months.${month}`).substring(0, 3)}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">
