@@ -7,6 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -50,6 +57,12 @@ const allModules = [
   { id: 'audit', label: 'admin.users.modules.audit' },
 ];
 
+const roleOptions = [
+  { value: 'technician', label: 'admin.users.roles.technician' },
+  { value: 'supervisor', label: 'admin.users.roles.supervisor' },
+  { value: 'admin', label: 'admin.users.roles.admin' },
+];
+
 export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuccess }: EditUserModalProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -58,6 +71,7 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
   const [userModules, setUserModules] = useState<string[]>([]);
   const [userGroupId, setUserGroupId] = useState<string | null>(null);
   const [userGroup, setUserGroup] = useState<CorporateGroup | null>(null);
+  const [isCurrentUserAdmin, setIsCurrentUserAdmin] = useState(false);
   
   // Company access management
   const [groupCompanies, setGroupCompanies] = useState<Company[]>([]);
@@ -66,10 +80,32 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
   const [formData, setFormData] = useState({
     name: user.name,
     phone: user.phone || '',
+    role: user.role as 'technician' | 'supervisor' | 'admin',
     is_active: user.is_active,
     selectedModules: [] as string[],
     selectedCompanies: [] as string[],
   });
+
+  // Check if current user is admin
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userData.user.id);
+        
+        if (roles && roles.some(r => r.role === 'admin')) {
+          setIsCurrentUserAdmin(true);
+        }
+      }
+    };
+    
+    if (open) {
+      checkAdminStatus();
+    }
+  }, [open]);
 
   // Fetch user's company, group, modules and companies on mount
   useEffect(() => {
@@ -162,6 +198,7 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
     setFormData({
       name: user.name,
       phone: user.phone || '',
+      role: user.role,
       is_active: user.is_active,
       selectedModules: userModules,
       selectedCompanies: userCompanyIds,
@@ -201,18 +238,53 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
     setLoading(true);
 
     try {
-      // Update profile (without changing role)
+      // Update profile (admin can change role too)
+      const profileUpdate: any = {
+        name: formData.name.trim(),
+        phone: formData.phone || null,
+        is_active: formData.is_active,
+      };
+
+      // Only admin can change roles
+      if (isCurrentUserAdmin && formData.role !== user.role) {
+        profileUpdate.role = formData.role;
+      }
+
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({
-          name: formData.name.trim(),
-          phone: formData.phone || null,
-          is_active: formData.is_active,
-        })
+        .update(profileUpdate)
         .eq('id', user.id);
 
       if (profileError) {
         throw profileError;
+      }
+
+      // Update user_roles if role changed (admin only)
+      if (isCurrentUserAdmin && formData.role !== user.role) {
+        // Map profile role to app_role
+        const appRoleMap: Record<string, 'admin' | 'moderator' | 'user'> = {
+          'admin': 'admin',
+          'supervisor': 'moderator',
+          'technician': 'user',
+        };
+
+        // Delete existing roles
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', user.id);
+
+        // Insert new role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: user.id,
+            role: appRoleMap[formData.role],
+          });
+
+        if (roleError) {
+          console.error('Error updating user role:', roleError);
+        }
       }
 
       // Update company associations
@@ -320,11 +392,29 @@ export function EditUserModal({ open, onOpenChange, user, corporateGroups, onSuc
 
             <div className="space-y-2">
               <Label>{t('admin.users.role')}</Label>
-              <Input
-                value={t(`admin.users.roles.${user.role}`)}
-                disabled
-                className="bg-muted"
-              />
+              {isCurrentUserAdmin ? (
+                <Select
+                  value={formData.role}
+                  onValueChange={(value) => setFormData(prev => ({ ...prev, role: value as 'technician' | 'supervisor' | 'admin' }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roleOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {t(option.label)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  value={t(`admin.users.roles.${user.role}`)}
+                  disabled
+                  className="bg-muted"
+                />
+              )}
             </div>
           </div>
 

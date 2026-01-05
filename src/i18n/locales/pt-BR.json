@@ -440,8 +440,12 @@
       "completed": "Concluída"
     },
     "categories": {
-      "safety": "Segurança",
+      "audit": "Auditoria",
       "environment": "Meio Ambiente",
+      "health_safety": "Saúde e Segurança",
+      "property_security": "Segurança Patrimonial",
+      "social_responsibility": "Responsabilidade Social",
+      "safety": "Segurança",
       "health": "Saúde"
     },
     "recentActivity": "Atividade Recente",

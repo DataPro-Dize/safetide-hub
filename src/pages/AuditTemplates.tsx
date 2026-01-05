@@ -87,7 +87,7 @@ export default function AuditTemplates() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Form states
-  const [templateForm, setTemplateForm] = useState({ name: '', description: '', category: 'safety', is_active: true });
+  const [templateForm, setTemplateForm] = useState({ name: '', description: '', category: 'audit', is_active: true });
   const [sectionForm, setSectionForm] = useState({ name: '' });
   const [questionForm, setQuestionForm] = useState({ 
     question_text: '', 
@@ -424,7 +424,7 @@ export default function AuditTemplates() {
             <DialogTrigger asChild>
               <Button onClick={() => {
                 setEditingTemplate(null);
-                setTemplateForm({ name: '', description: '', category: 'safety', is_active: true });
+                setTemplateForm({ name: '', description: '', category: 'audit', is_active: true });
               }} className="gap-2">
                 <Plus className="h-4 w-4" />
                 {t('audit.templates.newTemplate')}
@@ -463,9 +463,11 @@ export default function AuditTemplates() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="safety">{t('audit.categories.safety')}</SelectItem>
+                      <SelectItem value="audit">{t('audit.categories.audit')}</SelectItem>
                       <SelectItem value="environment">{t('audit.categories.environment')}</SelectItem>
-                      <SelectItem value="health">{t('audit.categories.health')}</SelectItem>
+                      <SelectItem value="health_safety">{t('audit.categories.health_safety')}</SelectItem>
+                      <SelectItem value="property_security">{t('audit.categories.property_security')}</SelectItem>
+                      <SelectItem value="social_responsibility">{t('audit.categories.social_responsibility')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -518,9 +520,11 @@ export default function AuditTemplates() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t('common.all')}</SelectItem>
-                    <SelectItem value="safety">{t('audit.categories.safety')}</SelectItem>
+                    <SelectItem value="audit">{t('audit.categories.audit')}</SelectItem>
                     <SelectItem value="environment">{t('audit.categories.environment')}</SelectItem>
-                    <SelectItem value="health">{t('audit.categories.health')}</SelectItem>
+                    <SelectItem value="health_safety">{t('audit.categories.health_safety')}</SelectItem>
+                    <SelectItem value="property_security">{t('audit.categories.property_security')}</SelectItem>
+                    <SelectItem value="social_responsibility">{t('audit.categories.social_responsibility')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
