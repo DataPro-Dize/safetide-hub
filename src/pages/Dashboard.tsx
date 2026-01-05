@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { 
   AlertTriangle, 
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
@@ -34,6 +35,9 @@ interface MonthlyData {
   deviations: number;
 }
 
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -49,18 +53,63 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [selectedMonths, setSelectedMonths] = useState('6');
+  
+  // Filtros padronizados
+  const [selectedYear, setSelectedYear] = useState<string>(currentYear.toString());
+  const [selectedCompany, setSelectedCompany] = useState<string>('all');
+  const [selectedPlant, setSelectedPlant] = useState<string>('all');
 
   const dateLocale = i18n.language === 'pt-BR' ? ptBR : enUS;
+
+  // Buscar empresas
+  const { data: companies } = useQuery({
+    queryKey: ['companies-for-dashboard'],
+    queryFn: async () => {
+      const { data } = await supabase.from('companies').select('id, name').order('name');
+      return data || [];
+    },
+  });
+
+  // Buscar unidades filtradas por empresa
+  const { data: plants } = useQuery({
+    queryKey: ['plants-for-dashboard', selectedCompany],
+    queryFn: async () => {
+      let query = supabase.from('plants').select('id, name, company_id').order('name');
+      if (selectedCompany !== 'all') {
+        query = query.eq('company_id', selectedCompany);
+      }
+      const { data } = await query;
+      return data || [];
+    },
+  });
+
+  // Reset plant when company changes
+  useEffect(() => {
+    setSelectedPlant('all');
+  }, [selectedCompany]);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const [deviationsRes, workflowsRes, companiesRes, unitsRes, deviationsDataRes] = await Promise.all([
-          supabase.from('deviations').select('id', { count: 'exact', head: true }),
-          supabase.from('workflows').select('id', { count: 'exact', head: true }),
+        setLoading(true);
+        
+        // Build deviations query with filters
+        let deviationsQuery = supabase.from('deviations').select('status, created_at, plant_id');
+        
+        if (selectedPlant !== 'all') {
+          deviationsQuery = deviationsQuery.eq('plant_id', selectedPlant);
+        } else if (selectedCompany !== 'all') {
+          const companyPlants = plants?.filter(p => p.company_id === selectedCompany).map(p => p.id) || [];
+          if (companyPlants.length > 0) {
+            deviationsQuery = deviationsQuery.in('plant_id', companyPlants);
+          }
+        }
+
+        const [companiesRes, unitsRes, deviationsDataRes, workflowsRes] = await Promise.all([
           supabase.from('companies').select('id', { count: 'exact', head: true }),
           supabase.from('plants').select('id', { count: 'exact', head: true }),
-          supabase.from('deviations').select('status, created_at'),
+          deviationsQuery,
+          supabase.from('workflows').select('id', { count: 'exact', head: true }),
         ]);
 
         const deviationsData = deviationsDataRes.data || [];
@@ -69,7 +118,7 @@ export default function Dashboard() {
         const uncontrolledRisks = deviationsData.filter(d => d.status === 'open' || d.status === 'in_progress').length;
 
         setStats({
-          deviations: deviationsRes.count ?? 0,
+          deviations: deviationsData.length,
           workflows: workflowsRes.count ?? 0,
           companies: companiesRes.count ?? 0,
           units: unitsRes.count ?? 0,
@@ -107,7 +156,7 @@ export default function Dashboard() {
     }
 
     fetchStats();
-  }, [selectedMonths, dateLocale]);
+  }, [selectedMonths, dateLocale, selectedCompany, selectedPlant, plants]);
 
   const capaClosureRate = stats.deviations > 0 
     ? Math.round((stats.completedDeviations / stats.deviations) * 100) 
@@ -159,6 +208,61 @@ export default function Dashboard() {
         </h1>
       </div>
 
+      {/* Filtros Padronizados */}
+      <Card className="bg-card border-border">
+        <CardContent className="pt-6">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('indicators.dashboard.period')}</Label>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('indicators.dashboard.company')}</Label>
+              <Select value={selectedCompany} onValueChange={setSelectedCompany}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  {companies?.map((company) => (
+                    <SelectItem key={company.id} value={company.id}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('indicators.dashboard.unit')}</Label>
+              <Select value={selectedPlant} onValueChange={setSelectedPlant}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  {plants?.map((plant) => (
+                    <SelectItem key={plant.id} value={plant.id}>
+                      {plant.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
         {statCards.map((stat, index) => (
@@ -200,19 +304,17 @@ export default function Dashboard() {
                 {t('dashboard.noRiskData')}
               </div>
             ) : (
-              <div className="h-64">
+              <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={riskChartData}
                       cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
+                      cy="40%"
+                      innerRadius={50}
+                      outerRadius={85}
                       paddingAngle={5}
                       dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      labelLine={false}
                     >
                       {riskChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -224,11 +326,16 @@ export default function Dashboard() {
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px',
                       }}
+                      formatter={(value: number, name: string) => {
+                        const total = stats.controlledRisks + stats.uncontrolledRisks;
+                        const percent = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+                        return [`${value} (${percent}%)`, name];
+                      }}
                     />
                     <Legend 
                       verticalAlign="bottom" 
-                      height={36}
-                      formatter={(value) => <span className="text-foreground">{value}</span>}
+                      height={60}
+                      formatter={(value) => <span className="text-foreground text-sm">{value}</span>}
                     />
                   </PieChart>
                 </ResponsiveContainer>
