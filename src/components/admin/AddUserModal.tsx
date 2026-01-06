@@ -92,7 +92,7 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim()) {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.groupId) {
       toast({ title: t('common.error'), description: t('common.fillRequired'), variant: 'destructive' });
       return;
     }
@@ -215,7 +215,7 @@ export function AddUserModal({ open, onOpenChange, corporateGroups, onSuccess }:
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="user-group">{t('admin.users.corporateGroup')}</Label>
+            <Label htmlFor="user-group">{t('admin.users.corporateGroup')} <span className="text-destructive">*</span></Label>
             <Select
               value={formData.groupId}
               onValueChange={(value) => setFormData(prev => ({ ...prev, groupId: value }))}
