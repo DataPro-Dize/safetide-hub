@@ -252,6 +252,7 @@ export function RegisterTrainingModal({ open, onOpenChange, onSuccess }: Registe
           user_id: selectedEmployee,
           status: 'present',
           certificate_url: certUrl,
+          signed_at: realizationDateTime,
         });
 
       if (enrollmentError) throw enrollmentError;
