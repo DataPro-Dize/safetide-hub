@@ -115,13 +115,23 @@ export default function Dashboard() {
         // Build deviations query with filters
         let deviationsQuery = supabase.from('deviations').select('status, created_at, plant_id');
         
+        // Filtrar por grupo (Empresa) → pegar companies do grupo, depois plants dessas companies
+        let filteredPlantIds: string[] | null = null;
+        
         if (selectedPlant !== 'all') {
-          deviationsQuery = deviationsQuery.eq('plant_id', selectedPlant);
+          filteredPlantIds = [selectedPlant];
         } else if (selectedCompany !== 'all') {
-          const companyPlants = plants?.filter(p => p.company_id === selectedCompany).map(p => p.id) || [];
-          if (companyPlants.length > 0) {
-            deviationsQuery = deviationsQuery.in('plant_id', companyPlants);
-          }
+          filteredPlantIds = plants?.filter(p => p.company_id === selectedCompany).map(p => p.id) || [];
+        } else if (selectedGroup !== 'all') {
+          const groupCompanyIds = companies?.filter(c => c.group_id === selectedGroup).map(c => c.id) || [];
+          filteredPlantIds = plants?.filter(p => groupCompanyIds.includes(p.company_id)).map(p => p.id) || [];
+        }
+        
+        if (filteredPlantIds && filteredPlantIds.length > 0) {
+          deviationsQuery = deviationsQuery.in('plant_id', filteredPlantIds);
+        } else if (filteredPlantIds && filteredPlantIds.length === 0) {
+          // Se o filtro não encontrou nenhum plant, não buscar nada
+          deviationsQuery = deviationsQuery.eq('plant_id', 'no-match');
         }
 
         const [companiesRes, unitsRes, deviationsDataRes, workflowsRes] = await Promise.all([
@@ -175,7 +185,7 @@ export default function Dashboard() {
     }
 
     fetchStats();
-  }, [selectedMonths, dateLocale, selectedCompany, selectedPlant, plants]);
+  }, [selectedMonths, dateLocale, selectedGroup, selectedCompany, selectedPlant, companies, plants]);
 
   const capaClosureRate = stats.deviations > 0 
     ? Math.round((stats.completedDeviations / stats.deviations) * 100) 

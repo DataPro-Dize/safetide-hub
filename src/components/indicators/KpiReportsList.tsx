@@ -72,7 +72,7 @@ export function KpiReportsList() {
         .from('kpi_reports')
         .select(`
           *,
-          plant:plants(name, company_id, company:companies(name)),
+          plant:plants(name, company_id, company:companies(name, group_id)),
           created_by_profile:profiles!kpi_reports_created_by_fkey(name),
           last_edited_by_profile:profiles!kpi_reports_last_edited_by_fkey(name)
         `)
@@ -95,13 +95,17 @@ export function KpiReportsList() {
     const search = searchTerm.toLowerCase();
     const matchesSearch = plantName.includes(search) || companyName.includes(search);
     
-    // Filtro por empresa
+    // Filtro por grupo (Empresa)
+    const companyGroupId = (report.plant?.company as any)?.group_id;
+    const matchesGroup = selectedGroup === 'all' || companyGroupId === selectedGroup;
+    
+    // Filtro por empresa (Projeto)
     const matchesCompany = selectedCompany === 'all' || report.plant?.company_id === selectedCompany;
     
     // Filtro por unidade
     const matchesPlant = selectedPlant === 'all' || report.plant_id === selectedPlant;
     
-    return matchesSearch && matchesCompany && matchesPlant;
+    return matchesSearch && matchesGroup && matchesCompany && matchesPlant;
   });
 
   const handleExport = () => {

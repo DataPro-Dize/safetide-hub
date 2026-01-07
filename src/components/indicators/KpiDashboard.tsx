@@ -106,11 +106,11 @@ export function KpiDashboard() {
 
   // Fetch reports for the selected year
   const { data: reports } = useQuery({
-    queryKey: ['kpi-reports-dashboard', selectedYear, selectedCompany, selectedPlant, selectedMonths],
+    queryKey: ['kpi-reports-dashboard', selectedYear, selectedGroup, selectedCompany, selectedPlant, selectedMonths],
     queryFn: async () => {
       let query = supabase
         .from('kpi_reports')
-        .select('*, plant:plants(id, name, company_id, company:companies(id, name))')
+        .select('*, plant:plants(id, name, company_id, company:companies(id, name, group_id))')
         .eq('year', selectedYear);
       
       // Filter by selected months if any are selected
@@ -125,12 +125,19 @@ export function KpiDashboard() {
       const { data, error } = await query;
       if (error) throw error;
       
-      // Filter by company if selected
-      if (selectedCompany !== 'all') {
-        return (data || []).filter((r: any) => r.plant?.company_id === selectedCompany);
+      let filteredData = data || [];
+      
+      // Filter by group if selected
+      if (selectedGroup !== 'all') {
+        filteredData = filteredData.filter((r: any) => r.plant?.company?.group_id === selectedGroup);
       }
       
-      return data || [];
+      // Filter by company if selected
+      if (selectedCompany !== 'all') {
+        filteredData = filteredData.filter((r: any) => r.plant?.company_id === selectedCompany);
+      }
+      
+      return filteredData;
     },
   });
 
