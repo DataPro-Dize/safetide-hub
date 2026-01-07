@@ -26,19 +26,33 @@ export function KpiReportsList() {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedPlant, setSelectedPlant] = useState<string>('all');
 
-  // Buscar empresas
-  const { data: companies } = useQuery({
-    queryKey: ['companies-for-kpi-reports'],
+  // Buscar grupos empresariais (Empresa)
+  const { data: groups } = useQuery({
+    queryKey: ['groups-for-kpi-reports'],
     queryFn: async () => {
-      const { data } = await supabase.from('companies').select('id, name').order('name');
+      const { data } = await supabase.from('corporate_groups').select('id, name').order('name');
       return data || [];
     },
   });
 
-  // Buscar unidades filtradas por empresa
+  // Buscar empresas/projetos filtradas por grupo (Projeto)
+  const { data: companies } = useQuery({
+    queryKey: ['companies-for-kpi-reports', selectedGroup],
+    queryFn: async () => {
+      let query = supabase.from('companies').select('id, name, group_id').order('name');
+      if (selectedGroup !== 'all') {
+        query = query.eq('group_id', selectedGroup);
+      }
+      const { data } = await query;
+      return data || [];
+    },
+  });
+
+  // Buscar unidades filtradas por empresa (Unidade)
   const { data: plants } = useQuery({
     queryKey: ['plants-for-kpi-reports', selectedCompany],
     queryFn: async () => {
@@ -136,7 +150,13 @@ export function KpiReportsList() {
     XLSX.writeFile(workbook, fileName);
   };
 
-  // Reset plant when company changes
+  // Reset em cascata
+  const handleGroupChange = (value: string) => {
+    setSelectedGroup(value);
+    setSelectedCompany('all');
+    setSelectedPlant('all');
+  };
+
   const handleCompanyChange = (value: string) => {
     setSelectedCompany(value);
     setSelectedPlant('all');
@@ -154,8 +174,8 @@ export function KpiReportsList() {
         </div>
       </CardHeader>
       <CardContent>
-        {/* Filtros Padronizados */}
-        <div className="mb-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
+        {/* Filtros Padronizados: Empresa > Projeto > Unidade */}
+        <div className="mb-6 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6">
           <div className="space-y-2">
             <Label className="text-sm font-medium">{t('indicators.dashboard.period')}</Label>
             <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -174,9 +194,25 @@ export function KpiReportsList() {
           </div>
           <div className="space-y-2">
             <Label className="text-sm font-medium">{t('indicators.dashboard.company')}</Label>
+            <Select value={selectedGroup} onValueChange={handleGroupChange}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('indicators.dashboard.selectCompany')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
+                {groups?.map((group) => (
+                  <SelectItem key={group.id} value={group.id}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">{t('indicators.dashboard.project')}</Label>
             <Select value={selectedCompany} onValueChange={handleCompanyChange}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder={t('indicators.dashboard.selectProject')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('common.all')}</SelectItem>
@@ -192,7 +228,7 @@ export function KpiReportsList() {
             <Label className="text-sm font-medium">{t('indicators.dashboard.unit')}</Label>
             <Select value={selectedPlant} onValueChange={setSelectedPlant}>
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder={t('indicators.dashboard.selectUnit')} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('common.all')}</SelectItem>
