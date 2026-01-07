@@ -54,23 +54,37 @@ export default function Dashboard() {
   const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [selectedMonths, setSelectedMonths] = useState('6');
   
-  // Filtros padronizados
+  // Filtros padronizados: Empresa (Group) > Projeto (Company) > Unidade (Plant)
   const [selectedYear, setSelectedYear] = useState<string>(currentYear.toString());
+  const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedPlant, setSelectedPlant] = useState<string>('all');
 
   const dateLocale = i18n.language === 'pt-BR' ? ptBR : enUS;
 
-  // Buscar empresas
-  const { data: companies } = useQuery({
-    queryKey: ['companies-for-dashboard'],
+  // Buscar grupos empresariais (Empresa)
+  const { data: groups } = useQuery({
+    queryKey: ['groups-for-dashboard'],
     queryFn: async () => {
-      const { data } = await supabase.from('companies').select('id, name').order('name');
+      const { data } = await supabase.from('corporate_groups').select('id, name').order('name');
       return data || [];
     },
   });
 
-  // Buscar unidades filtradas por empresa
+  // Buscar empresas/projetos filtradas por grupo (Projeto)
+  const { data: companies } = useQuery({
+    queryKey: ['companies-for-dashboard', selectedGroup],
+    queryFn: async () => {
+      let query = supabase.from('companies').select('id, name, group_id').order('name');
+      if (selectedGroup !== 'all') {
+        query = query.eq('group_id', selectedGroup);
+      }
+      const { data } = await query;
+      return data || [];
+    },
+  });
+
+  // Buscar unidades filtradas por empresa (Unidade)
   const { data: plants } = useQuery({
     queryKey: ['plants-for-dashboard', selectedCompany],
     queryFn: async () => {
@@ -83,7 +97,12 @@ export default function Dashboard() {
     },
   });
 
-  // Reset plant when company changes
+  // Reset em cascata
+  useEffect(() => {
+    setSelectedCompany('all');
+    setSelectedPlant('all');
+  }, [selectedGroup]);
+
   useEffect(() => {
     setSelectedPlant('all');
   }, [selectedCompany]);
@@ -211,7 +230,7 @@ export default function Dashboard() {
       {/* Filtros Padronizados */}
       <Card className="bg-card border-border">
         <CardContent className="pt-6">
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t('indicators.dashboard.period')}</Label>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
@@ -229,9 +248,25 @@ export default function Dashboard() {
             </div>
             <div className="space-y-2">
               <Label className="text-sm font-medium">{t('indicators.dashboard.company')}</Label>
+              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('indicators.dashboard.selectCompany')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  {groups?.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('indicators.dashboard.project')}</Label>
               <Select value={selectedCompany} onValueChange={setSelectedCompany}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder={t('indicators.dashboard.selectProject')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('common.all')}</SelectItem>
@@ -247,7 +282,7 @@ export default function Dashboard() {
               <Label className="text-sm font-medium">{t('indicators.dashboard.unit')}</Label>
               <Select value={selectedPlant} onValueChange={setSelectedPlant}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder={t('indicators.dashboard.selectUnit')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('common.all')}</SelectItem>

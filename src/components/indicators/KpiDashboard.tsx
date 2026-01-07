@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -48,27 +48,43 @@ const allMonths = Array.from({ length: 12 }, (_, i) => i + 1);
 export function KpiDashboard() {
   const { t } = useTranslation();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedPlant, setSelectedPlant] = useState<string>('all');
   const [selectedMonths, setSelectedMonths] = useState<number[]>([]);
 
-  // Fetch companies
-  const { data: companies } = useQuery({
-    queryKey: ['companies-for-dashboard'],
+  // Fetch corporate groups (Empresa)
+  const { data: groups } = useQuery({
+    queryKey: ['groups-for-kpi-dashboard'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('companies')
-        .select('id, name');
+        .from('corporate_groups')
+        .select('id, name')
+        .order('name');
       if (error) throw error;
       return data || [];
     },
   });
 
-  // Fetch plants
-  const { data: plants } = useQuery({
-    queryKey: ['plants-for-dashboard', selectedCompany],
+  // Fetch companies (Projeto) - filtered by group
+  const { data: companies } = useQuery({
+    queryKey: ['companies-for-kpi-dashboard', selectedGroup],
     queryFn: async () => {
-      let query = supabase.from('plants').select('id, name, company_id');
+      let query = supabase.from('companies').select('id, name, group_id').order('name');
+      if (selectedGroup !== 'all') {
+        query = query.eq('group_id', selectedGroup);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Fetch plants (Unidade) - filtered by company
+  const { data: plants } = useQuery({
+    queryKey: ['plants-for-kpi-dashboard', selectedCompany],
+    queryFn: async () => {
+      let query = supabase.from('plants').select('id, name, company_id').order('name');
       if (selectedCompany !== 'all') {
         query = query.eq('company_id', selectedCompany);
       }
@@ -77,6 +93,16 @@ export function KpiDashboard() {
       return data || [];
     },
   });
+
+  // Reset em cascata
+  React.useEffect(() => {
+    setSelectedCompany('all');
+    setSelectedPlant('all');
+  }, [selectedGroup]);
+
+  React.useEffect(() => {
+    setSelectedPlant('all');
+  }, [selectedCompany]);
 
   // Fetch reports for the selected year
   const { data: reports } = useQuery({
@@ -362,10 +388,27 @@ export function KpiDashboard() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">{t('indicators.dashboard.company', 'Empresa')}</Label>
+              <Label className="text-sm font-medium">{t('indicators.dashboard.company')}</Label>
+              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder={t('indicators.dashboard.selectCompany')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  {groups?.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('indicators.dashboard.project')}</Label>
               <Select value={selectedCompany} onValueChange={setSelectedCompany}>
                 <SelectTrigger className="bg-background">
-                  <SelectValue placeholder={t('common.all')} />
+                  <SelectValue placeholder={t('indicators.dashboard.selectProject')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('common.all')}</SelectItem>
@@ -379,10 +422,10 @@ export function KpiDashboard() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">{t('indicators.dashboard.unit', 'Unidade/Contrato')}</Label>
+              <Label className="text-sm font-medium">{t('indicators.dashboard.unit')}</Label>
               <Select value={selectedPlant} onValueChange={setSelectedPlant}>
                 <SelectTrigger className="bg-background">
-                  <SelectValue placeholder={t('common.all')} />
+                  <SelectValue placeholder={t('indicators.dashboard.selectUnit')} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('common.all')}</SelectItem>

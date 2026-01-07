@@ -73,6 +73,8 @@ export function KpiReportForm() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const [selectedGroup, setSelectedGroup] = useState<string>('');
+  const [selectedCompany, setSelectedCompany] = useState<string>('');
   const [selectedPlant, setSelectedPlant] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
@@ -81,9 +83,9 @@ export function KpiReportForm() {
   const [isEditing, setIsEditing] = useState(false);
   const [showJustificationModal, setShowJustificationModal] = useState(false);
 
-  // Fetch plants that the user has access to (via user_companies)
-  const { data: plants } = useQuery({
-    queryKey: ['plants-for-kpi'],
+  // Buscar grupos empresariais que o usuário tem acesso (Empresa)
+  const { data: groups } = useQuery({
+    queryKey: ['groups-for-kpi-form'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
@@ -91,27 +93,81 @@ export function KpiReportForm() {
       // Get companies the user has access to
       const { data: userCompanies, error: ucError } = await supabase
         .from('user_companies')
-        .select('company_id')
+        .select('company_id, company:companies(group_id)')
         .eq('user_id', user.id);
       
       if (ucError) throw ucError;
-      
-      if (!userCompanies || userCompanies.length === 0) {
-        return [];
-      }
+      if (!userCompanies || userCompanies.length === 0) return [];
 
-      const companyIds = userCompanies.map(uc => uc.company_id);
+      const groupIds = [...new Set(userCompanies.map(uc => (uc.company as any)?.group_id).filter(Boolean))];
       
-      // Get plants from those companies
       const { data, error } = await supabase
-        .from('plants')
-        .select('id, name, company:companies(name)')
-        .in('company_id', companyIds);
+        .from('corporate_groups')
+        .select('id, name')
+        .in('id', groupIds)
+        .order('name');
       
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
+
+  // Buscar empresas/projetos filtradas por grupo (Projeto)
+  const { data: companies } = useQuery({
+    queryKey: ['companies-for-kpi-form', selectedGroup],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !selectedGroup) return [];
+
+      // Get companies the user has access to in this group
+      const { data: userCompanies } = await supabase
+        .from('user_companies')
+        .select('company_id')
+        .eq('user_id', user.id);
+      
+      if (!userCompanies) return [];
+      const companyIds = userCompanies.map(uc => uc.company_id);
+
+      const { data, error } = await supabase
+        .from('companies')
+        .select('id, name, group_id')
+        .eq('group_id', selectedGroup)
+        .in('id', companyIds)
+        .order('name');
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedGroup,
+  });
+
+  // Buscar unidades filtradas por empresa (Unidade)
+  const { data: plants } = useQuery({
+    queryKey: ['plants-for-kpi-form', selectedCompany],
+    queryFn: async () => {
+      if (!selectedCompany) return [];
+
+      const { data, error } = await supabase
+        .from('plants')
+        .select('id, name, company_id')
+        .eq('company_id', selectedCompany)
+        .order('name');
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!selectedCompany,
+  });
+
+  // Reset em cascata
+  useEffect(() => {
+    setSelectedCompany('');
+    setSelectedPlant('');
+  }, [selectedGroup]);
+
+  useEffect(() => {
+    setSelectedPlant('');
+  }, [selectedCompany]);
 
   // Fetch existing report
   const { data: report, refetch: refetchReport } = useQuery({
@@ -318,23 +374,55 @@ export function KpiReportForm() {
 
   return (
     <div className="space-y-6">
-      {/* Selectors */}
+      {/* Selectors - Empresa > Projeto > Unidade */}
       <Card className="bg-card">
         <CardHeader>
           <CardTitle>{t('indicators.selectPeriod')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-5">
             <div className="space-y-2">
-              <Label>{t('indicators.plant')}</Label>
-              <Select value={selectedPlant} onValueChange={setSelectedPlant}>
+              <Label>{t('indicators.dashboard.company')}</Label>
+              <Select value={selectedGroup} onValueChange={setSelectedGroup}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('indicators.selectPlant')} />
+                  <SelectValue placeholder={t('indicators.dashboard.selectCompany')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {groups?.map((group) => (
+                    <SelectItem key={group.id} value={group.id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('indicators.dashboard.project')}</Label>
+              <Select value={selectedCompany} onValueChange={setSelectedCompany} disabled={!selectedGroup}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('indicators.dashboard.selectProject')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {companies?.map((company) => (
+                    <SelectItem key={company.id} value={company.id}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('indicators.dashboard.unit')}</Label>
+              <Select value={selectedPlant} onValueChange={setSelectedPlant} disabled={!selectedCompany}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('indicators.dashboard.selectUnit')} />
                 </SelectTrigger>
                 <SelectContent>
                   {plants?.map((plant) => (
                     <SelectItem key={plant.id} value={plant.id}>
-                      {plant.company?.name} - {plant.name}
+                      {plant.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
